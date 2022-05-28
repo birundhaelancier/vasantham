@@ -1,0 +1,24 @@
+:root {
+    --main-theme-color: #c6d75f;
+    --dark-bg-color: #ffffff;
+    --heading-color: #fdfdfd;
+    --paragraph-color: #ffffff;
+}
+
+a,
+h1,
+/* h2, */
+h3,
+h4,
+h5,
+h6,
+p {
+    color: rgb(97, 95, 95);
+    margin: 0;
+}
+
+h2{
+    color: #ffffff;
+}
+
+

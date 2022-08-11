@@ -1,75 +1,161 @@
-import React from 'react'
-import ProductCard from '../Product/ProductCard'
+import React,{useEffect, useState} from 'react'
 import { useSelector } from "react-redux";
-
+import { apiurl, ImageUrl } from '../../../Redux/Utils/baseurl';
+import axios from 'axios'
+import Heading from '../../Furniture/Heading';
+import ProductCard from '../../Common/Product/ProductCard'
 const TopPRoduct = () => {
-    let products = useSelector((state) => state.products.products);
-    products = products.filter(item => item.category === 'electronics')
+    const [headings,setheadings]=useState([])
+
+    const [Products,setProducts]=useState({
+        best:{
+            product:[],
+            advertisement:[]
+        },
+        feature:{
+            product:[],
+            advertisement:[]
+        },
+        flash_deal:{
+            product:[],
+            advertisement:[]
+        },
+        new:{
+            product:[],
+            advertisement:[]
+        },
+        top:{
+            product:[],
+            advertisement:[]
+        },
+    })
+
+   
+
+    const [productList, setProductList]=useState([])
+
+    useEffect(()=>{
+        axios({
+            method: 'get',
+            url:apiurl+"homeAds",
+        })
+        .then((response)=>{
+            response?.data?.map((val)=>{
+                Object.keys(Products).map((data)=>{
+                if(val.id===FilterDataFun(data)){
+                  Products[data].advertisement.push(val)
+                }
+                })
+                setProducts((prevState) => ({
+                    ...prevState,
+                }));
+            })
+        })
+
+        axios({
+            method: 'post',
+            url:apiurl+"homeProduct",
+            data:{"type":"hot"}
+        })
+        .then((response) => {
+            let array=[]
+            setheadings(response?.data?.heading)
+            response?.data?.products.map((val)=>{
+                Object.keys(Products).map((data)=>{
+                    if(val.is_type===data){
+                      Products[data].product?.push(val)
+                    }
+                })
+              
+                setProducts((prevState) => ({
+                    ...prevState,
+                }));
+            })
+            setProductList(array)
+           
+        })
+        },[]) 
+
+        const FilterDataFun=(value)=>{
+            switch (value) {
+                case "top":return 6;
+                case "best":return 2;
+                case "flash_deal":return 4;
+                case "feature":return 3;
+                case "new":return 5;
+                default:return "";
+            }           
+       }
+       const HeaderFun=(value)=>{
+        switch (value) {
+            case "top":return "Top Products";
+            case "best":return "Best Products";
+            case "flash_deal":return "Flash Deals";
+            case "feature":return "Featured Products";
+            case "new":return "New Arrivals";
+            default:return "";
+        }           
+      }
     return (
         <>
-            <section id="electronics_top_product" className="pb-30">
+            <section id="electronics_top_product" className="pb-30 products container">
                 <div className="container">
-                    <div className="row">
-                        <div className="col-lg-6">
-                            <div className="left_heading_three">
-                                <h2>Top Product</h2>
-                            </div>
-                        </div>
-                        {/* <div className="col-lg-6">
-                            <div className="tabs_right_button">
-                                <ul className="nav nav-tabs">
-                                    <li><a data-toggle="tab" href="#video" className="active">Vaideo & Audio</a></li>
-                                    <li><a data-toggle="tab" href="#audio">Audio & Home</a></li>
-                                    <li><a data-toggle="tab" href="#camera">Camera & Photo</a></li>
-                                    <li><a data-toggle="tab" href="#home">Home & Garden</a></li>
-                                </ul>
-                            </div>
-                        </div> */}
-                    </div>
-                    <div className="row">
+                         <div className="row">
                         <div className="col-lg-12">
                             <div className="tabs_el_wrapper">
                                 <div className="tab-content">
-                                    <div id="video" className="tab-pane fade show in active">
-                                        <div className="row">
-                                            {products.slice(0, 12).map((data, index) => (
-                                                <div className="col-lg-2 col-md-4 col-sm-6 col-6" key={index}>
-                                                    <ProductCard data={data} />
+                                    <div  className="tab-pane fade show in active">
+                                        <div className="row lists_product">
+                                        {Object.keys(Products).map((data,dd)=>
+                                        <>
+                                        {/* hheader */}
+                                            <div className="col-lg-12">
+                                              <div className="left_heading_three">
+                                              <Heading heading={HeaderFun(headings[dd]?.is_type)} para="Mauris luctus nisi sapien tristique dignissim" />
+                                              </div>
+                                               </div>
+                                        {/* header end */}
+                                                 {Products[data]["product"].map((pro,ind)=>
+                                                <div className="col-lg-2 col-md-4 col-sm-6 col-6" key={ind}>
+                                                    <ProductCard data={pro} />
                                                 </div>
-                                            ))}
-                                        </div>
-                                    </div>
-                                    <div id="audio" className="tab-pane fade">
-                                        <div className="row">
-                                            {products.slice(4, 10).map((data, index) => (
-                                                <div className="col-lg-2 col-md-4 col-sm-6 col-6" key={index}>
-                                                    <ProductCard data={data} />
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </div>
-                                    <div id="camera" className="tab-pane fade">
-                                        <div className="row">
-                                            {products.slice(3, 9).map((data, index) => (
-                                                <div className="col-lg-2 col-md-4 col-sm-6 col-6" key={index}>
-                                                    <ProductCard data={data} />
-                                                </div>
-                                            ))}
-                                        </div>
-                                    </div>
-                                    <div id="home" className="tab-pane fade">
-                                        <div className="row">
-                                            {products.slice(5, 10).map((data, index) => (
-                                                <div className="col-lg-2 col-md-4 col-sm-6 col-6" key={index}>
-                                                    <ProductCard data={data} />
-                                                </div>
-                                            ))}
+                                                )}
+
+                                                      <div className='advedisement-content'>
+                                                                                      <div className="container">
+                                                                    <div className="row">
+                                                                    {Products[data].advertisement.map((val,index)=>{
+                                                                       
+                                                                    return (
+                                                                        <>
+                                                                    <div className='col-lg-6   ads-image'>
+                                                                    <img src={ImageUrl+val.image1} />
+                                                                    </div>
+                                                                    <div className='col-lg-6  ads-image'>
+                                                                    <img src={ImageUrl+val.image2} />
+                                                                    </div>
+                                                                       </>
+                                                                    )
+                                                                    })}
+                                                               </div>
+                                                              </div>
+                                                             </div> 
+                                            </>
+                                            )}
+
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
+
+
+               
+
+
+                    {/* </>
+                        )})} */}
                 </div>
             </section>
         </>

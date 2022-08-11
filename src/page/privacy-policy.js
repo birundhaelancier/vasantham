@@ -8,7 +8,7 @@ const PrivacyPolicy = () => {
   return (
     <>
       <Header />
-      <Banner title="Privacy Policy" />
+      {/* <Banner title="Privacy Policy" /> */}
       <PrivacyPolicyArea />
       <Footer />
     </>

@@ -1,42 +1,65 @@
-import React from 'react'
+
+import React, { useEffect,useState } from 'react'
 import { Link } from 'react-router-dom'
-const Order = () => {
+import { UserOrders,AdvisorVisit } from '../../Redux/Action/allActions'
+import { connect, useDispatch } from 'react-redux'
+import moment from 'moment'
+const Order = (props) => {
+    let dispatch=useDispatch()
+    const [OrderDetails,setOrderDetails]=useState([])
+    useEffect(()=>{
+      dispatch(UserOrders())
+      dispatch(AdvisorVisit())
+    },[])
+    useEffect(()=>{
+        setOrderDetails(props.Orders)
+
+    },[props.Orders])
+    // const TotalAmt=
     return (
         <>
-            <div className="myaccount-content">
-                <h4 className="title">Orders </h4>
-                <div className="table_page table-responsive">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Order</th>
-                                <th>Date</th>
-                                <th>Status</th>
-                                <th>Total</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>1</td>
-                                <td>May 10, 2018</td>
-                                <td><span className="badge badge-info">Completed</span></td>
-                                <td>₹25.00 for 1 item </td>
-                                <td><Link to="/order-success" className="view">view</Link></td>
-                            </tr>
-                            <tr>
-                                <td>2</td>
-                                <td>May 10, 2018</td>
-                                <td> <span className="badge badge-warning">Processing</span></td>
-                                <td>₹17.00 for 1 item </td>
-                                <td><Link to="/order-tracking" className="view">view</Link></td>
-                            </tr>
-                        </tbody>
-                    </table>
+            <div className="row">
+                <div className="col-lg-12 col-md-12 col-sm-12 col-12">
+                    <div className="vendor_order_boxed">
+                        <h4>All Order</h4>
+                        <div className="table-responsive">
+                            <table className="table pending_table">
+                                <thead className="thead-light">
+                                    <tr>
+                                        <th scope="col">Order Id</th>
+                                        <th scope="col">Date</th>
+                                        <th scope="col">Price</th>
+                                    </tr>
+                                </thead>
+                                {OrderDetails?.map((data)=>
+                                <tbody>
+                                <tr>
+                                    <td className=''>
+                                      <Link to={`/order-success/${data.txnid}`} className="text-primary">
+                                     
+                                      #{data.txnid}
+                                        </Link> 
+                                        </td>
+                                 
+                                    <td>{moment(data.created_at).format("DD-MM-YYYY")}</td>
+                                    <td><span><i class="fa fa-inr"/> {data.orderTotal || 0}</span></td>
+
+                                </tr>
+                                
+                                </tbody>
+                                )}
+                            </table>
+                        </div>
+                      
+                    </div>
                 </div>
             </div>
         </>
     )
 }
 
-export default Order
+const mapStateToProps = (state) =>
+({
+    Orders: state.AllReducer.Orders || []
+});
+export default connect(mapStateToProps)(Order);

@@ -1,46 +1,48 @@
-import React from 'react'
+import React,{useEffect, useState} from 'react'
 import BarChart from '../VendorDashboard/BarChart'
 import LineChart from '../VendorDashboard/LineChart'
-import { useSelector } from "react-redux"
+import { useDispatch, useSelector } from "react-redux"
 import { Link } from 'react-router-dom'
-
+import { Profile_Details, UserOrders } from '../../Redux/Action/allActions'
+import moment from 'moment'
 const DashBoard = () => {
-    let products = useSelector((state) => state.products.products);
+    let dispatch=useDispatch()
+    const profileDetails=useSelector(state=>state.AllReducer.ProfileData)
+    const OrderDetails=useSelector(state=>state.AllReducer.Orders)
+    const [cartDetail,setcartDetail]=useState([])
+    const Orders={
+        totalOrders:"Total Orders",
+        deliveryOrders:"Total Delivery",
+        pendingOrders:"Total Pending",
+    }
+    useEffect(()=>{
+     dispatch(Profile_Details())
+     dispatch(UserOrders())
+    },[])
+    useEffect(()=>{
+        let Data=[]
+        OrderDetails.filter((data)=>{
+            if(data.order_status==="Pending"){
+            Data.push(data)
+            }
+        })
+        setcartDetail(Data)
+
+    },[OrderDetails])
     return (
 
         <>
             <div className="row">
+                {Object.keys(Orders).map((data)=>
                 <div className="col-lg-4 col-md-4 col-sm-6 col-12">
-                    <div className="vendor_top_box pt-4">
-                        <h2>25</h2>
-                        <h4>Total Orders</h4>
+                    <div className="vendor_top_box pt-4 vendor_ads">
+                        <h2>{profileDetails[data] || 0}</h2>
+                        <h4>{Orders[data]}</h4>
                     </div>
-                </div>
-                <div className="col-lg-4 col-md-4 col-sm-6 col-12">
-                    <div className="vendor_top_box">
-                        <h2>2552</h2>
-                        <h4>Total Delivery</h4>
-                    </div>
-                </div>
-                <div className="col-lg-4 col-md-4 col-sm-6 col-12">
-                    <div className="vendor_top_box">
-                        <h2>50</h2>
-                        <h4>Total Pending</h4>
-                    </div>
-                </div>
+                </div>)}
+               
             </div>
-            <div className="row">
-                <div className="col-lg-6">
-                    <div className="mychart_area">
-                        <LineChart />
-                    </div>
-                </div>
-                <div className="col-lg-6">
-                    <div className="mychart_area">
-                        <BarChart />
-                    </div>
-                </div>
-            </div>
+           
             <div className="row">
                 <div className="col-lg-6 col-md-6 col-sm-12 col-12">
                     <div className="vendor_order_boxed pt-4">
@@ -48,23 +50,24 @@ const DashBoard = () => {
                         <table className="table pending_table">
                             <thead className="thead-light">
                                 <tr>
-                                    <th scope="col">Image</th>
-                                    <th scope="col">Product Name</th>
+                                    <th scope="col">Order Id</th>
+                                    <th scope="col">Date</th>
                                     <th scope="col">Price</th>
-                                    <th scope="col">Sales</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                {products.slice(1, 5).map((data, index) => (
-                                    <tr key={index}>
-                                        <td><img width="52px" src={data.img} alt="img" /></td>
-                                        <td>{data.title}</td>
-                                        <td>₹{data.price}</td>
-                                        <td>{parseInt(data.price) * 3}</td>
-                                    </tr>
-                                ))}
 
-                            </tbody>
+                           {OrderDetails?.slice(0,5).map((data)=>
+                                <tbody>
+                                <tr>
+
+                                    <td><Link to={`/order-success/${data.txnid}`} className="text-primary">#{data.txnid}</Link></td>
+                                    <td>{moment(data.created_at).format("DD-MM-YYYY")}</td>
+                                    <td><span><i class="fa fa-inr" aria-hidden="true"></i> {data.orderTotal}</span></td>
+                                </tr>
+                                </tbody>
+                                )}
+
+                            {/* </tbody> */}
                         </table>
                     </div>
                 </div>
@@ -75,51 +78,26 @@ const DashBoard = () => {
                             <thead className="thead-light">
                                 <tr>
                                     <th scope="col">Order Id</th>
-                                    <th scope="col">Product Details</th>
+                                    <th scope="col">Date</th>
                                     <th scope="col">Status</th>
                                 </tr>
                             </thead>
+                            {OrderDetails?.slice(0,5).map((data)=>{
+                            return(
                             <tbody>
                                 <tr>
-                                    <td><Link href="/invoice-one" className="text-primary">#78153</Link></td>
-                                    <td>Belted Trench Coat</td>
-                                    <td><span className="badge badge-info">Shipped</span></td>
-                                </tr>
-                                <tr>
-                                    <td><Link to="/invoice-one" className="text-primary">#78154</Link></td>
-                                    <td>Neck Velvet Dress</td>
-                                    <td><span className="badge badge-warning">Pending</span></td>
-                                </tr>
-                                <tr>
-                                    <td><Link to="/invoice-one" className="text-primary">#78155</Link></td>
-                                    <td>T-Shirt For Woman</td>
-                                    <td><span className="badge badge-success">Confirmed</span></td>
-                                </tr>
-                                <tr>
-                                    <td><Link to="/invoice-one" className="text-primary">#78156</Link></td>
-                                    <td>Fit-Flare Dress</td>
-                                    <td><span className="badge badge-danger">Canceled</span></td>
-                                </tr>
-                                <tr>
-                                    <td><Link to="/invoice-one" className="text-primary">#78157</Link></td>
-                                    <td>Long-Shirt For Men</td>
-                                    <td><span className="badge badge-info">Shipped</span></td>
-                                </tr>
-                                <tr>
-                                    <td><Link to="/invoice-one" className="text-primary">#78158</Link></td>
-                                    <td>Sharee for women</td>
-                                    <td><span className="badge badge-info">Shipped</span></td>
-                                </tr>
-                                <tr>
-                                    <td><Link to="/invoice-one" className="text-primary">#78159</Link></td>
-                                    <td>Handbag for Girls</td>
-                                    <td><span className="badge badge-info">Shipped</span></td>
-                                </tr>
+                                    <td><Link to={`/order-success/${data.txnid}`} className="text-primary">#{data.txnid}</Link></td>
+                                    <td>{moment(data.created_at).format("DD-MM-YYYY")}</td>
+                                    <td><span className={`badge ${data.order_status==="Pending"?"badge-warning":data.order_status==="Completed"?"badge-success":"badge-info"}`}>{data.order_status}</span></td>
+                                </tr>                                
                             </tbody>
+                            )})}
+                            
                         </table>
                     </div>
                 </div>
-            </div>
+               </div>
+               
         </>
     )
 }

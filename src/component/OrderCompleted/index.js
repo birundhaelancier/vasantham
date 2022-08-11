@@ -15,7 +15,7 @@ const OrderComplete = () => {
                                 </div>
                                 <p>Thank you for your order! Your order is being processed and will be completed within 3-6
                                     hours. You will receive an email confirmation when your order is completed.</p>
-                                <Link to="/shop" className="theme-btn-one bg-black btn_sm">Continue Shopping</Link>
+                                <Link to="/" className="theme-btn-one bg-black btn_sm">Continue Shopping</Link>
                             </div>
                         </div>
                     </div>

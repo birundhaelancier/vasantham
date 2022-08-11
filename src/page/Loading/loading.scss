@@ -1,0 +1,19 @@
+   .modal-dialog{
+        max-width:400px !important;
+        width:400px !important;
+    }
+    .spinner_load{
+       display: flex;
+       justify-content: center;
+       padding: 20px;
+       .fa{
+           color:green;
+           font-size: 22px;
+       }
+      
+    }
+    .process_load{
+       font-weight: 600;
+       font-size: 20px;
+       padding-left: 20px;
+   }

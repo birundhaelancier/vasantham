@@ -3,13 +3,14 @@ import {createSlice} from "@reduxjs/toolkit";
 import { ProductData } from '../data/productsData'
 // Alert
 import Swal from "sweetalert2";
+import { useSelector } from "react-redux";
 
 // Product Slice
 const productsSlice = createSlice({
     name: 'products',
     initialState: {
-        products:ProductData,
-        carts: ProductData.slice(4,7),
+        products:[],
+        carts:[],
         favorites: ProductData.slice(8,12),
         compare: ProductData.slice(0,2),
         single:null,
@@ -24,15 +25,15 @@ const productsSlice = createSlice({
         // Add to Cart
         addToCart: (state, action) =>{
 
-            let { id } = action.payload;
+            let { id,product } = action.payload;
 
             // Check existance
             let item = state.carts.find(i => i.id === parseInt(id))
             if (item === undefined) {
                 // Get Product
-                let arr = state.products.find(item => item.id === parseInt(id))
-                arr.quantity = 1
-                state.carts.push(arr)
+                // let arr = state.product.find(item => item.id === parseInt(id))
+                // arr.quantity = 1
+                state.carts.push(product)
                 Swal.fire({
                     title: 'Success!',
                     text: 'Successfully added to your Cart',

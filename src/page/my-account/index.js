@@ -8,7 +8,7 @@ const MyAccounts = () => {
     return (
         <>
             <Header />
-            <Banner title="Customer Dashboard" />
+            {/* <Banner title="Customer Dashboard" /> */}
             <Layout>
                 <Dashboard />
             </Layout>

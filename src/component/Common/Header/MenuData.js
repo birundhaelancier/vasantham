@@ -1,53 +1,53 @@
 export const MenuData = [
     {
-        name: "Category",
-        href: "#!",
+        name: "All Category",
+        // href: "#!",
         // mega_menu: true,
         children: [
-            {
-                name: "Foodgrains&Masala",
-                href: "/shop",
-                children: [
-                    {
-                        name: "Foodgrains&Masala",
-                        href: "/shop"
-                    }
-                ]
-            },
-            {
-                name: "Beauty&Hygine",
-                href: "/shop",
-                children: [
-                    {
-                        name: "Hygine&Masala",
-                        href: "/shop"
-                    }
-                ]
-            },
-            {
-                name: "House hold Supplies",
-                href: "/shop"
-            },
-            {
-                name: "Ready To Eat &Cook",
-                href: "/shop"
-            },
-            {
-                name: "Baby &Kids Care",
-                href: "/shop"
-            },
-            {
-                name: "Oil&Ghee",
-                href: "/shop"
-            },
-            {
-                name: "Snacks&Cookies",
-                href: "/shop"
-            },
-            {
-                name: "Beverages",
-                href: "/shop"
-            },
+            // {
+            //     name: "Foodgrains&Masala",
+            //     href: "/shop",
+            //     children: [
+            //         {
+            //             name: "Foodgrains&Masala",
+            //             href: "/shop"
+            //         }
+            //     ]
+            // },
+            // {
+            //     name: "Beauty&Hygine",
+            //     href: "/shop",
+            //     children: [
+            //         {
+            //             name: "Hygine&Masala",
+            //             href: "/shop"
+            //         }
+            //     ]
+            // },
+            // {
+            //     name: "House hold Supplies",
+            //     href: "/shop"
+            // },
+            // {
+            //     name: "Ready To Eat &Cook",
+            //     href: "/shop"
+            // },
+            // {
+            //     name: "Baby &Kids Care",
+            //     href: "/shop"
+            // },
+            // {
+            //     name: "Oil&Ghee",
+            //     href: "/shop"
+            // },
+            // {
+            //     name: "Snacks&Cookies",
+            //     href: "/shop"
+            // },
+            // {
+            //     name: "Beverages",
+            //     href: "/shop"
+            // },
         ]
     },
     {
@@ -69,44 +69,6 @@ export const MenuData = [
         ]
     },
 
-    {
-        name: "Offer",
-        href: "/shop",
-        children: [
-            // {
-            //     name: "Product Hover",
-            //     href: "/product-hover"
-            // },
-            // {
-            //     name: "Order Success",
-            //     href: "/order-success"
-            // },
-            // {
-            //     name: " Email Template 1",
-            //     href: "/email-template-one"
-            // },
-            // {
-            //     name: "Email Template 2",
-            //     href: "/email-template-two"
-            // },
-            // {
-            //     name: " Email Template 3",
-            //     href: "/email-template-three"
-            // },
-            // {
-            //     name: " LookBook",
-            //     href: "/lookbooks"
-            // },
-            // {
-            //     name: "Invoice 1",
-            //     href: "/invoice-one"
-            // },
-            // {
-            //     name: " Invoice 2",
-            //     href: "/invoice-two"
-            // }
-        ]
-    },
     // {
     //     name: "Post",
     //     href: "/blog-grid-three",
@@ -133,14 +95,13 @@ export const MenuData = [
     // }
     //     ]
     // },
-    {
-        name: "Contact Us",
-        href: "#!",
-        children: [
-            {
-                name: "Vendor Dashboard",
-                href: "/vendor-dashboard"
-            },
+    // {
+    //     name: "Contact Us",
+    //     children: [
+    //         {
+    //             name: "Vendor Dashboard",
+    //             href: "/my-account"
+    //         },
             // {
             //     name: "Customer Dashboard",
             //     href: "/my-account"
@@ -178,6 +139,6 @@ export const MenuData = [
             //     href: "/error"
             // }
 
-        ]
-    },
+    //     ]
+    // },
 ]

@@ -1,12 +1,17 @@
-import React from 'react';
-import { BrowserRouter as Router, Switch, Route, BrowserRouter } from 'react-router-dom';
+import React,{useState} from 'react';
+import { BrowserRouter as Router, Switch, Route,  HashRouter } from 'react-router-dom';
 import loadable from './component/Common/loader/loadable';
 import Loading from './component/Common/loader';
 import pMinDelay from 'p-min-delay';
-
+import { AuthContext } from './context/auth' 
+import AddressList from './component/MyAccountDashboard/AddressList';
+import EditAddressListComp from './component/MyAccountDashboard/EditAddressDetails';
+import TermsAndCondition from './page/terms'
 // All Page Lazy Import
 const Furniture = loadable(() => pMinDelay(import ('./page/furniture'), 0), { fallback: <Loading />});
-const Electronics = loadable(() => pMinDelay(import ('./page/electronics'), 0), { fallback: <Loading />});
+// const TermsAndCondition = loadable(() => pMinDelay(import ('./page/terms'), 0),{ fallback: <Loading />});
+const Refund = loadable(() => pMinDelay(import ('./page/refund'), 0),{ fallback: <Loading />});
+const Electronics = loadable(() => pMinDelay(import ('./page/electronics'), 100), { fallback: <Loading />});
 const ShopGrid = loadable(() => pMinDelay(import ('./page/shop'), 0), { fallback: <Loading />});
 const ShopTwo = loadable(() => pMinDelay(import ('./page/shop/shop-two'), 0), { fallback: <Loading />});
 const ShopList = loadable(() => pMinDelay(import ('./page/shop/shop-list'), 0), { fallback: <Loading />});
@@ -43,12 +48,12 @@ const AllOrders = loadable(() => pMinDelay (import ('./page/vendor/all-order'), 
 const VendorProfile = loadable(() => pMinDelay (import ('./page/vendor/vendor-profile'), 0), { fallback: <Loading />});
 const AddProducts = loadable(() => pMinDelay(import ('./page/vendor/add-products'), 0), { fallback: <Loading />});
 const VendorSetting = loadable(() => pMinDelay(import ('./page/vendor/vendor-setting'), 0), { fallback: <Loading />});
-const MyAccounts = loadable(() => pMinDelay(import ('./page/my-account'), 0), { fallback: <Loading />});
-const CustomerOrder = loadable(() => pMinDelay(import ('./page/my-account/customer-order'), 0), { fallback: <Loading />});
+const MyAccounts = loadable(() => pMinDelay(import ('./page/my-account'), 0), { fallback:""});
+const CustomerOrder = loadable(() => pMinDelay(import ('./page/my-account/customer-order'), 0), { fallback: ""});
 const CustomerDownloads = loadable(() => pMinDelay(import ('./page/my-account/customer-downloads'), 0), { fallback: <Loading />});
-const CustomerAddress = loadable(() => pMinDelay(import ('./page/my-account/customer-address'), 0), { fallback: <Loading />});
-const CustomerAccountDetails = loadable(() => pMinDelay(import ('./page/my-account/customer-account-details'), 0), { fallback: <Loading />});
-const AccountEdit = loadable(() => pMinDelay(import ('./page/vendor/account-edit'), 0), { fallback: <Loading />});
+const CustomerAddress = loadable(() => pMinDelay(import ('./page/my-account/customer-address'), 0), { fallback: ""});
+const CustomerAccountDetails = loadable(() => pMinDelay(import ('./page/my-account/customer-account-details'), 0), { fallback:""});
+const AccountEdit = loadable(() => pMinDelay(import ('./page/vendor/account-edit'), 0), { fallback: ""});
 const Login = loadable(() => pMinDelay(import ('./page/login'), 0), { fallback: <Loading />});
 const Register = loadable(() => pMinDelay(import ('./page/register'), 0), { fallback: <Loading />});
 const Error = loadable(() => pMinDelay(import ('./page/error'), 0), { fallback: <Loading />});
@@ -61,70 +66,84 @@ const ScrollToTop = loadable(() => pMinDelay(import ('./component/Common/ScrollT
 const Fashion = loadable(() => pMinDelay(import ('./page/'), 0), { fallback: <Loading />});
 
 const App = () => {
+  const [loading,setloading]=useState(true)
+  const existingTokens = JSON.parse(localStorage.getItem("data"));
+  const [authTokens, setAuthTokens] = useState(existingTokens);
+  const setTokens=(data)=>{
+    localStorage.setItem("data",JSON.stringify(data))
+    localStorage.setItem("UserId",JSON.stringify(data.id))
+    setAuthTokens(data);
+  }
   return (
-    <>
-      <BrowserRouter>
+    <div style={{height:"100%"}}>
+    <AuthContext.Provider value={{ authTokens,setAuthTokens: setTokens }}>   
+      {/* <HashRouter> */}
         <Router>
           <ScrollToTop />
           <Switch>
             <Route path='/' exact component={Electronics} />
-            <Route path='/furniture' exact component={Furniture} />
-            <Route path='/electronics' exact component={Electronics} />
-            <Route path='/shop' exact component={ShopGrid} />
-            <Route path='/shopTwo' exact component={ShopTwo} />
+            {/* <Route path='/furniture' exact component={Furniture} /> */}
+            {/* <Route path='/electronics' exact component={Electronics} /> */}
+            <Route path='/shop/:slug?' exact component={ShopGrid} />
+            {/* <Route path='/shopTwo' exact component={ShopTwo} /> */}
             <Route path='/shoplist' exact component={ShopList} />
-            <Route path='/shop-left-bar' exact component={ShopLeftSideBar} />
-            <Route path='/shop-right-bar' exact component={ShopRightSideBar} />
-            <Route path='/product-details-one/:id' exact component={ProductDetails} />
-            <Route path='/product-details-two/:id' exact component={ProductDetailsTwos} />
+            {/* <Route path='/shop-left-bar' exact component={ShopLeftSideBar} /> */}
+            {/* <Route path='/shop-right-bar' exact component={ShopRightSideBar} /> */}
+            <Route path='/product-details-one/:id?/:productid?' exact component={ProductDetails} />
+            {/* <Route path='/product-details-two/:id?' exact component={ProductDetailsTwos} /> */}
+            <Route path='/my-account/editaddresslist/:id?/:type?' exact component={EditAddressListComp} />
             <Route path='/cart' exact component={Cart} />
             <Route path='/cartTwo' exact component={CartTwo} />
             <Route path='/empty-cart' exact component={EmptyCarts} />
             <Route path='/checkout-one' exact component={CheckoutOne} />
             <Route path='/checkout-two' exact component={CheckoutTwos} />
             <Route path='/wishlist' exact component={WishLists} />
-            <Route path='/compare' exact component={Compares} />
+            {/* <Route path='/compare' exact component={Compares} /> */}
             <Route path='/order-complete' exact component={OrderComplete} />
-            <Route path='/order-tracking' exact component={OrderTracking} />
+            {/* <Route path='/order-tracking' exact component={OrderTracking} /> */}
+            <Route path='/privacy-policy' exact component={PrivacyPolicy} />
+            <Route path='/terms' component={TermsAndCondition}/>
+            <Route path='/refund' component={Refund}/>
             <Route path='/about' exact component={About} />
+            <Route path='/my-account/addresslist' exact component={AddressList} />
             <Route path='/product-hover' exact component={ProductHover} />
-            <Route path='/order-success' exact component={OrderSuccesses} />
-            <Route path='/email-template-one' exact component={EmailTemplateOnes} />
-            <Route path='/email-template-two' exact component={EmailTemplateTwos} />
-            <Route path='/email-template-three' exact component={EmailTemplateThrees} />
-            <Route path='/invoice-one' exact component={InvoiceOne} />
-            <Route path='/invoice-two' exact component={InvoiceTwo} />
-            <Route path='/lookbooks' exact component={LookBooks} />
-            <Route path='/blog-grid-three' exact component={BlogGridThrees} />
-            <Route path='/blog-grid-two' exact component={BlogGridTwos} />
-            <Route path='/blog-list-view' exact component={BlogListView} />
-            <Route path='/blog-single-one' exact component={BlogSingleOnes} />
-            <Route path='/blog-single-two' exact component={BlogSingleTwos} />
-            <Route path='/vendor-dashboard' exact component={Vendor} />
+            <Route path='/order-success/:id?' exact component={OrderSuccesses} />
+            {/* <Route path='/email-template-one' exact component={EmailTemplateOnes} /> */}
+            {/* <Route path='/email-template-two' exact component={EmailTemplateTwos} /> */}
+            {/* <Route path='/email-template-three' exact component={EmailTemplateThrees} /> */}
+            <Route path='/invoice-one/:id?' exact component={InvoiceOne} />
+            {/* <Route path='/invoice-two' exact component={InvoiceTwo} /> */}
+            {/* <Route path='/lookbooks' exact component={LookBooks} /> */}
+            {/* <Route path='/blog-grid-three' exact component={BlogGridThrees} /> */}
+            {/* <Route path='/blog-grid-two' exact component={BlogGridTwos} /> */}
+            {/* <Route path='/blog-list-view' exact component={BlogListView} /> */}
+            {/* <Route path='/blog-single-one' exact component={BlogSingleOnes} /> */}
+            {/* <Route path='/blog-single-two' exact component={BlogSingleTwos} /> */}
+            {/* <Route path='/vendor-dashboard' exact component={Vendor} />
             <Route path='/vendor/all-product' exact component={AllProducts} />
             <Route path='/vendor/all-order' exact component={AllOrders} />
             <Route path='/vendor/vendor-profile' exact component={VendorProfile} />
             <Route path='/vendor/add-products' exact component={AddProducts} />
-            <Route path='/vendor/vendor-setting' exact component={VendorSetting} />
+            <Route path='/vendor/vendor-setting' exact component={VendorSetting} /> */}
             <Route path='/my-account' exact component={MyAccounts} />
             <Route path='/my-account/customer-order' exact component={CustomerOrder} />
             <Route path='/my-account/customer-download' exact component={CustomerDownloads} />
             <Route path='/my-account/customer-address' exact component={CustomerAddress} />
             <Route path='/my-account/customer-account-details' exact component={CustomerAccountDetails} />
             <Route path='/account-edit' exact component={AccountEdit} />
-            <Route path='/login' exact component={Login} />
+            <Route path='/login/:type?' exact component={Login} />
             <Route path='/register' exact component={Register} />
             <Route path='/privacy-policy' exact component={PrivacyPolicy} />
             <Route path='/faqs' exact component={Faqs} />
-            <Route path='/coming-soon' exact component={ComingSoon} />
-            <Route path='/contact-one' exact component={ContactOne} />
-            <Route path='/contact-two' exact component={ContactTwo} />
+            {/* <Route path='/coming-soon' exact component={ComingSoon} />
+            <Route path='/contact-one' exact component={ContactOne} /> */}
+            {/* <Route path='/contact-two' exact component={ContactTwo} /> */}
             <Route exact component={Error} />
           </Switch>
         </Router>
-      </BrowserRouter>
-
-    </>
+      {/* </HashRouter> */}
+      </AuthContext.Provider>
+    </div>
   );
 }
 

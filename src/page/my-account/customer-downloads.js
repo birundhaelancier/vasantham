@@ -8,7 +8,7 @@ const CustomerDownloads = () => {
     return (
         <>
             <Header />
-            <Banner title="Customer Dashboard" />
+            {/* <Banner title="Customer Dashboard" /> */}
             <Layout>
                 <Download />
             </Layout>

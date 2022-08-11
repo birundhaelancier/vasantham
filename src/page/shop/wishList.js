@@ -1,13 +1,13 @@
 import React from 'react'
 import Header from '../../component/Common/Header'
-import Banner from '../../component/Common/Banner'
+import Banner from '../../component/Fashion/Banner'
 import Wishlist from '../../component/WishList'
 import Footer from '../../component/Common/Footer'
 const WishLists = () => {
     return (
         <>
             <Header />
-            <Banner title="Wishlist" />
+            {/* <Banner title="Wishlist" /> */}
             <Wishlist />
             <Footer />
         </>

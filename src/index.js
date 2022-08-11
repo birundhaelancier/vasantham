@@ -5,13 +5,13 @@ import MessengerCustomerChat from 'react-messenger-customer-chat';
 
 import App from './App';
 
-import { store } from './app/store';
-// import { store } from './Redux/Store/store';
+// import { store } from './app/store';
+import  store  from './Redux/Store/store';
 
 import { Provider } from 'react-redux';
 
 // import Custom Css
-import "./assets/css/style.css"
+import "./assets/css/style.scss"
 import "./assets/css/color.css"
 import "./assets/css/responsive.css"
 import "./assets/css/animate.min.css"

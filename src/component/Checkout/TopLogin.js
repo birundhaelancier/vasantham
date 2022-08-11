@@ -19,7 +19,6 @@ const TopLogin = () => {
         }else{
             dispatch({ type: "user/login" })
             let name = user.name || 'Customer'
-            console.log(typeof(user.name));
             Swal.fire({
                 icon: 'success',
                 title: 'Login Sucessfull',

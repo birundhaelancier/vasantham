@@ -1,8 +1,9 @@
 import React, { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { AiOutlineHeart } from 'react-icons/ai';
-import MyVerticallyCenteredModal from '../../Common/Modal'
+// import MyVerticallyCenteredModal from '../../Common/Modal'
 import { useDispatch } from "react-redux";
+import { ImageUrl } from '../../../Redux/Utils/baseurl';
 const ProductCard = (props) => {
     let dispatch = useDispatch();
     // Add to cart
@@ -20,12 +21,12 @@ const ProductCard = (props) => {
                 <div className="product_item_inner slider_img">
                     <div className={props.styles === "slider" ? "sliderProduct" : "product_img_wraps"}>
                         <Link to={`/product-details-two/${props.data.id}`}>
-                            <img src={props.data.img} alt="product_img" />
+                            <img src={ImageUrl+props.data.photo} alt="product_img" />
                         </Link>
                     </div>
                     <div className='view_cart'> 
                         <div className="actions">
-                            <a href="#!" className="action wishlist" title="Wishlist" onClick={() => addToFav(props.data.id)}><AiOutlineHeart /></a>
+                            <a className="action wishlist" title="Wishlist" onClick={() => addToFav(props.data.id)}><AiOutlineHeart /></a>
                             {/* <a href="#!" className="action quickview" title="Quick view" onClick={() => setModalShow(true)}><AiOutlineExpand /></a>
                         <a href="#!" className="action compare" title="Compare" onClick={() => addToComp(props.data.id)}><FaExchangeAlt /></a> */}
                         </div>
@@ -38,13 +39,13 @@ const ProductCard = (props) => {
                 </div>
                 <div className="product_detail">
                     <h5 className="product_title">
-                        <Link to={`/product-details-two/${props.data.id}`}>{props.data.title}</Link>
+                        <Link to={`/product-details-two/${props.data.id}`}>{props.data.name}</Link>
                     </h5>
-                    <p className="item_price">₹{props.data.price}.00</p>
+                    <p className="item_price">₹{props.data.discount_price}.00</p>
                 </div>
             </div>
 
-            <MyVerticallyCenteredModal data={props.data} show={modalShow} onHide={() => setModalShow(false)} />
+            {/* <MyVerticallyCenteredModal data={props.data} show={modalShow} onHide={() => setModalShow(false)} /> */}
 
         </>
     )

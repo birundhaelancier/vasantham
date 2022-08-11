@@ -7,7 +7,7 @@ const AccountEdit = () => {
   return (
     <>
       <Header />
-      <Banner title="Account Info Edit" />
+      {/* <Banner title="Account Info Edit" /> */}
       <AccountDetailsEdit />
       <Footer />
     </>

@@ -4,7 +4,7 @@ const Loader = () => {
     return (
         <>
             <div className="loader_wrapper">
-                {/* <img width="200px" src={img} alt="loader" /> */}
+                <img width="200px" src={img} alt="loader" />
             </div>
         </>
     )

@@ -7,7 +7,7 @@ const OrderComplete = () => {
     return (
         <>
             <Header />
-            <Banner title="Order Complete" />
+            {/* <Banner title="Order Complete" /> */}
             <OrderCompleted />
             <Footer />
         </>

@@ -1,19 +1,20 @@
-import React from 'react'
+import React,{useEffect,useState} from 'react'
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import Slider from "react-slick";
-import ProductCard from '../Product/ProductCard'
+import ProductCard from '../../Common/Product/ProductCard'
 import { useSelector } from "react-redux";
-
+import axios from 'axios'
+import { apiurl } from '../../../Redux/Utils/baseurl';
 const DealProduct = () => {
-  let products = useSelector((state) => state.products.products);
-  products = products.filter(item => item.category === 'electronics')
+  let products = useSelector((state) => state?.products?.products);
+  products = products?.filter(item => item?.category === 'electronics')
 	// const [slideNumber, setSlideNumber] = useState(3)
   let settings = {
     arrows: false,
     dots: false,
     margin: 30,
-    infinite: true,
+    infinite: false,
     autoplay: true,
     speed: 500,
     slidesToShow: 6,
@@ -45,14 +46,25 @@ const DealProduct = () => {
     },
     ]
   };
+  const [Products,setProducts]=useState([])
+  useEffect(()=>{
+      axios({
+          method: 'post',
+          url:apiurl+"homeProduct",
+          data:{"type":"deal"}
+      })
+      .then((response) => {
+          setProducts(response.data)
+      })
+      },[]) 
   return (
     <>
-      <section id="elce_weekly_deal" className="slider_arrows_one">
+       {Products.length>0 &&<section id="elce_weekly_deal" className="slider_arrows_one">
         <div className="container">
           <div className="row">
             <div className="col-lg-6">
               <div className="left_heading_three">
-                <h2>Products</h2>
+              <h2>Deals Products</h2>
               </div>
             </div>
           </div>
@@ -60,7 +72,7 @@ const DealProduct = () => {
             <div className="col-lg-12">
               <div className="elce_weekly_slider">
                 <Slider {...settings}>
-                  {products.slice(1, 10).map((data, index) => (
+                  {Products?.map((data, index) => (
                     <ProductCard data={data} key={index} styles={"slider"} />
                   ))}
                 </Slider>
@@ -68,7 +80,7 @@ const DealProduct = () => {
             </div>
           </div>
         </div>
-      </section>
+      </section>}
     </>
   )
 }

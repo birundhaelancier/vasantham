@@ -9,8 +9,8 @@ const TopHeader = () => {
     let dispatch = useDispatch();
     const history = useHistory()
 
-    let status = useSelector((state) => state.user.status);
-    let user = useSelector((state) => state.user.user);
+    let status = useSelector((state) => state?.user?.status);
+    let user = useSelector((state) => state?.user?.user);
 
     const logout = () => {
         Swal.fire({
@@ -21,6 +21,7 @@ const TopHeader = () => {
         dispatch({ type: "user/logout" })
         history.push("/login");
     }
+    
     return (
         <>
             {/* <section id="top_header">

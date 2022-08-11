@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect,useState } from 'react'
 import logo from '../../../assets/img/vasanthlogo.png'
 import payment from '../../../assets/img/common/payment.png'
 import { Link } from 'react-router-dom'
@@ -7,40 +7,47 @@ import NewsletterModal from '../NewsletterModal'
 import { useSelector } from "react-redux"
 import { useDispatch } from "react-redux";
 import Swal from 'sweetalert2'
-
+import axios from 'axios'
+import { apiurl } from '../../../Redux/Utils/baseurl'
+import Appfooter from '../../AppFooter'
+import { browserName, isBrowser } from "react-device-detect"
+import { FacebookShareButton, TwitterShareButton, LinkedinShareButton, TelegramShareButton, WhatsappShareButton } from "react-share";
 const FooterData = [
+
     {
-        title: "INFORMATION",
-        links: [
-            { linkTitle: "Home", link: "/" },
-            // { linkTitle: "About us", link: "/about" },
-            // { linkTitle: "Privacy Policy", link: "/privacy-policy" },
-            { linkTitle: "Frequently Questions", link: "/faqs" },
-            { linkTitle: "Order Tracking", link: "/order-tracking" },
-            // { linkTitle: "Compare", link: "/compare" }
-        ]
+            title: "Company",
+            links: [
+                { linkTitle: "Terms and Condition", link: "/terms" },
+                { linkTitle: "Privacy Policy", link: "/privacy-policy" },
+                // { linkTitle: "About Us", link: "/about" },
+                { linkTitle: "Refund Policy", link: "/refund" },
+                { linkTitle: "FAQ", link: "/faqs" },
+            ]
     },
     {
-        title: "SHOP",
+        title: "Our Branches",
         links: [
-            // { linkTitle: "Cart View One", link: "/cart" },
-            // { linkTitle: "Cart View Two", link: "/cartTwo" },
-            // { linkTitle: "Empty Cart", link: "/empty-cart" },
-            // { linkTitle: "Checkout View One", link: "/checkout-one" },
-            // { linkTitle: "Checkout View Two", link: "/checkout-two" },
-            { linkTitle: "Wishlist", link: "/wishlist" }
+            { linkTitle: "Kalavasal - Madurai"},
+            { linkTitle: "Bypass Road - Madurai"},
+            { linkTitle: "Virattipathu - Madurai"},
+            { linkTitle: "K.Pudur - Madurai"},
+            { linkTitle: "Koodal Nagar - Madurai"},
+            { linkTitle: "Vilangudi - Madurai"}
         ]
-    }
+    },
 ]
 
 const Footer = ({ hide }) => {
     let dispatch = useDispatch();
-
-    let promoCenter = useSelector((state) => state.settings.promoCenter);
-    let promoStatus = useSelector((state) => state.settings.promoStatus);
-    let stopPromo = useSelector((state) => state.settings.stopPromo);
-    let cookie = useSelector((state) => state.settings.cookie);
-    let stopCookie = useSelector((state) => state.settings.stopCookie);
+    const [email,setemail]=useState()
+    const [showScroll, setShowScroll] = useState(false)
+    const [paymentdetail,setpaymentdetail]=useState([])
+    const [loading,setloading]=useState(false)
+    let promoCenter = useSelector((state) => state?.settings?.promoCenter);
+    let promoStatus = useSelector((state) => state?.settings?.promoStatus);
+    let stopPromo = useSelector((state) => state?.settings?.stopPromo);
+    let cookie = useSelector((state) => state?.settings?.cookie);
+    let stopCookie = useSelector((state) => state?.settings?.stopCookie);
 
     useEffect(() => {
         if (promoStatus) {
@@ -49,7 +56,7 @@ const Footer = ({ hide }) => {
             dispatch({ type: "settings/promoStatus" })
             setTimeout(function () {
                 dispatch({ type: "settings/promoCenter" })
-            }, 2000)
+            }, 1500)
         }
 
         if (stopCookie) {
@@ -87,42 +94,92 @@ const Footer = ({ hide }) => {
         // Write your function there
         dispatch({ type: "settings/cookie" })
     }
+    const SubscribeNews=()=>{
+        setloading(true)
+        axios({
+            method:"post",
+            url:apiurl+"subscribeSubmit",
+            data:{
+             "email":email
+            }
+        }).then((res)=>{
+              setloading(false)
+              if(res.data.msg){
+                setemail("")
+                Swal.fire({
+                    icon:"success",
+                    title: 'Success!',
+                    text:res.data.msg,
+                    showConfirmButton: false,
+                    timer: 1500
+                  })
+              }else{
+                Swal.fire({
+                    icon:"warning",
+                    title: 'Failed!',
+                    text: Object.values(res?.data?.errors).join("\n"),
+                    showConfirmButton: false,
+                    timer: 1500
+                  })
+              }
+        })
+    }
 
+    const checkScrollTop = () => {
+        if (!showScroll && window.pageYOffset > 400){
+          setShowScroll(true)
+        } else if (showScroll && window.pageYOffset <= 400){
+          setShowScroll(false)
+        }
+      };
+  
+      window.addEventListener('scroll', checkScrollTop)
+      const AppUrl="https://dynamic-froyo-597702.netlify.app/"
     return (
         <>
+        <div className='footer_hide'>
+            {/* <Appfooter/> */}
             <footer id="footer_one">
                 <div className="container">
                     <div className="row">
-                        <div className="col-lg-4 col-md-12 col-sm-12 col-12">
+                        <div className="col-lg-2 col-md-12 col-sm-12 col-12">
                             <div className="footer_left_side">
-                                <Link to="/" ><img src={logo} alt="logo" className='footerImage' /></Link>
+                                <Link to="/" ><img src={"https://elancier.in/vasantham/assets/images/1653572820logo.gif"} alt="logo" className='footerImage' /></Link>
                                 <p>
-                                    <strong>VASANTHAM</strong>&nbsp;
-                                    Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.
+                                    {/* <strong>VASANTHAM</strong>&nbsp; */}
+                                    {/* Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. */}
                                 </p>
                                 <div className="footer_left_side_icon">
                                     <ul>
                                         <li>
-                                            <a href="#!"><i className="fa fa-facebook-f"></i></a>
+                                            <FacebookShareButton url={AppUrl}>
+                                            <a ><i className="fa fa-facebook-f"></i></a>
+                                            </FacebookShareButton>
                                         </li>
                                         <li>
-                                            <a href="#!"><i className="fa fa-twitter"></i></a>
+                                        <TwitterShareButton url={AppUrl}>
+                                            <a ><i className="fa fa-twitter"></i></a>
+                                        </TwitterShareButton>
                                         </li>
                                         <li>
-                                            <a href="#!"><i className="fa fa-linkedin"></i></a>
+                                        <LinkedinShareButton url={AppUrl}>
+                                            <a ><i className="fa fa-linkedin"></i></a>
+                                        </LinkedinShareButton>
                                         </li>
                                         <li>
-                                            <a href="#!"><i className="fa fa-instagram"></i></a>
+                                        <WhatsappShareButton url={AppUrl}>
+                                           <i class="fa fa-whatsapp" aria-hidden="true"></i>
+                                        </WhatsappShareButton>
                                         </li>
                                         <li>
-                                            <a href="#!"><i className="fa fa-google"></i></a>
+                                            <a><i class="fa fa-youtube-play" aria-hidden="true"></i></a>
                                         </li>
                                     </ul>
                                 </div>
                             </div>
                         </div>
                         <div className="col-lg-3 col-md-6 col-sm-12 col-12">
-                            {FooterData.slice(0, 1).map((data, index) => (
+                            {FooterData?.slice(0, 1).map((data, index) => (
                                 <div className="footer_one_widget" key={index}>
                                     <h3>{data.title}</h3>
                                     <ul>
@@ -134,8 +191,8 @@ const Footer = ({ hide }) => {
                             ))}
 
                         </div>
-                        <div className="col-lg-2 col-md-6 col-sm-12 col-12">
-                            {FooterData.slice(1, 2).map((data, index) => (
+                        <div className="col-lg-3 col-md-6 col-sm-12 col-12">
+                            {FooterData?.slice(1, 2).map((data, index) => (
                                 <div className="footer_one_widget" key={index}>
                                     <h3>{data.title}</h3>
                                     <ul>
@@ -146,27 +203,29 @@ const Footer = ({ hide }) => {
                                 </div>
                             ))}
                         </div>
-                        {!hide && <div className="col-lg-3 col-md-12 col-sm-12 col-12">
+                    <div className="col-lg-3 col-md-12 col-sm-12 col-12">
                             <div className="footer_one_widget">
                                 <h3>NEWSLETTER</h3>
                                 <div id="mc_embed_signup" className="subscribe-form">
-                                    <form onSubmit={(e) => { e.preventDefault(); Swal.fire('Success', 'Thank you for your Subscribtion', 'success'); document.querySelector("input[type='email']").value = "" }}>
+                                <form onSubmit={(e) => { e.preventDefault();!loading && SubscribeNews()}}>
                                         <div className="mc-form">
-                                            <input className="form-control" type="email" placeholder="Your Mail" name="EMAIL" defaultValue="" required />
+                                            <input className="form-control" type="email" value={email} onChange={(e)=>setemail(e.target.value)} placeholder="Your Mail" name="EMAIL" defaultValue="" required pattern=".+@gmail\.com"
+                                            />
                                             <div className="clear">
-                                                <button className="theme-btn-one btn_md" type="submit" name="subscribe" defaultValue=""> Send Mail</button>
+                                                <button className="theme-btn-one btn_md" type="submit" name="subscribe" defaultValue="">{loading && <i className='fa fa-spinner fa-spin ' style={{fontSize:"14px",marginTop:"4px"}}/>} Subscribe</button>
                                             </div>
                                         </div>
                                     </form>
                                 </div>
                             </div>
-                        </div>}
+                        </div>
                     </div>
                 </div>
+                {showScroll &&
                 <div className="go-top active" onClick={() => { window.scrollTo(0, 0) }}>
                     <i className="fa fa-chevron-up"></i>
                     <i className="fa fa-arrow-up"></i>
-                </div>
+                </div>}
             </footer>
 
             <section id="copyright_one">
@@ -174,7 +233,7 @@ const Footer = ({ hide }) => {
                     <div className="row">
                         <div className="col-lg-6 col-md-6 col-sm-6 col-12">
                             <div className="copyright_left">
-                                <h6>© CopyRight 2021 <span>Vasantham</span></h6>
+                                <h6>© Copyright 2022 <span>Vasantham</span></h6>
                             </div>
                         </div>
                         <div className="col-lg-6 col-md-6 col-sm-6 col-12">
@@ -189,7 +248,10 @@ const Footer = ({ hide }) => {
                 cookie ? <Cookie accept={acceptCookie} cancel={cancelCookie} /> : null
             }
             <NewsletterModal show={promoCenter} stop={stopPromoModal} start={startPromoModal} />
-        </>
+           
+        </div>
+       
+     </>
     )
 }
 

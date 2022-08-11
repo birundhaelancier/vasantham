@@ -8,7 +8,7 @@ const CustomerAddress = () => {
     return (
         <>
              <Header />
-            <Banner title="Customer Dashboard" />
+            {/* <Banner title="Customer Dashboard" /> */}
             <Layout>
                 <Address />
             </Layout>

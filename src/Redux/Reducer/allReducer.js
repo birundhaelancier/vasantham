@@ -26,7 +26,11 @@ import {
   REWARD_POINTS,
   COUPONCODE,
   CATEGORY_LIST,
-  CART_TOTAL
+  CART_TOTAL,
+  CONTACT_US,
+  MYBILLS,
+  REDEEM_POINT_HISTORY,
+  NOTIFICATIONS
 } from "../Utils/constant";
 const initialState = {
   Slider_list: [],
@@ -55,7 +59,11 @@ const initialState = {
   RewardPoints:[],
   Coupon:"",
   AllCategory:[],
-  Cart_Total_Value:0
+  Cart_Total_Value:0,
+  Contact_us:[],
+  MyBills:[],
+  RedeemPoint:[],
+  Notify:[]
 };
 export default function (state = initialState, action) {
   const { type, payload } = action;
@@ -115,7 +123,15 @@ export default function (state = initialState, action) {
     case CATEGORY_LIST:
         return { ...state,AllCategory:payload}
     case CART_TOTAL:
-        return { ...state,Cart_Total_Value:payload}   
+        return { ...state,Cart_Total_Value:payload} 
+    case CONTACT_US:
+        return { ...state,Contact_us:payload}
+    case MYBILLS:
+        return { ...state,Mybills:payload}
+    case REDEEM_POINT_HISTORY:
+        return { ...state,RedeemPoint:payload}
+    case NOTIFICATIONS:
+          return { ...state,Notify:payload}  
     default:
       return state;
   }

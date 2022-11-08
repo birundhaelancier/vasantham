@@ -9,20 +9,12 @@ import { CategoryList_api } from '../../Redux/Action/allActions'
 import Banner from '../../component/Electronics/Banner'
 
 const ShopGrid = (props) => {
-    let { slug } =useParams()
-    let dispatch=useDispatch()
-    const [Products,setProducts]=useState([])
-    useEffect(()=>{
-        dispatch(CategoryList_api(slug))
-    },[slug])    
-    useEffect(()=>{
-     setProducts(props.Category_List)
-    },[props.Category_List])
+ 
     return (
         <>
             <Header />
             {/* <Banner title="Shop" /> */}
-            <Shop ProductsData={Products}/>
+            <Shop/>
             {/* <InstgramSlider /> */}
             <Footer />
         </>

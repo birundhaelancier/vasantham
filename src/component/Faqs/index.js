@@ -1,5 +1,4 @@
 import React, { useEffect,useState } from 'react'
-import { FaqsData } from './FaqsData'
 import { Faq_List } from '../../Redux/Action/allActions'
 import { useDispatch,connect } from 'react-redux'
 const FaqsArea = (props) => {

@@ -7,7 +7,6 @@ import { CartTotal, Get_Address_List, Profile_Details, RazorpayDetails, Redeemed
 import { OrderPlaced_Create } from '../../Redux/Action/CreateActions'
 import logo from '../../assets/img/vasanth1.jpg'
 import Loading from '../../page/Loading/Loading'
-import { BILLING_INFORMATION } from '../../Redux/Utils/constant'
 const Payment = () => {
     const [open,setopen]=useState(false)
     const [value,setvalue]=useState("")
@@ -30,7 +29,7 @@ const Payment = () => {
     }
     const RedeemTotal = () => {
         return ShoppingCarts?.reduce(function (total, item) {
-            return total +   item.dis_points
+            return (total +   (Number(item.quantity || 1) * item.dis_points))
         }, 0)
     }
 
@@ -121,10 +120,10 @@ const Payment = () => {
 
     } 
     }
-    const Reward_Points=Reward?.rewardpoint ? (Reward?.rewardpoint>cartTotal()?cartTotal():Reward?.rewardpoint) : 0
+    const Reward_Points=Reward?.rewardpoint ? RedeemTotal():0
     const options = {
         // Razorpay?.information?.key || 
-        key:"rzp_test_cDBuRdcX87VjyC",
+        key:Razorpay?.information?.key,
         amount:Math.abs((Number(Cart_Total_Value)*100)).toFixed(2), //  = INR 1
         name: 'Vasantham',
         description: 'Pay Money',
@@ -218,11 +217,7 @@ const Payment = () => {
                                         <label htmlFor={`html${index}`}>{data.name} </label>
                                     </div>
                                 </div>
-                                {/* <div id={`collapseOne${index}`} className="collapse" aria-labelledby="headingOne" data-parent="#accordionExample">
-                                    <div className="payment_body">
-                                        <p>{data.name} </p>
-                                    </div>
-                                </div> */}
+                                
                             </div>
                             )})}
                          

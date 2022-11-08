@@ -4,20 +4,47 @@ import { useDispatch, useSelector } from 'react-redux';
 import { Category_List } from '../../../Redux/Action/allActions';
 import Image from '../../../assets/img/dummy.jpg'
 import { ImageUrl } from '../../../Redux/Utils/baseurl';
+import { useHistory } from 'react-router-dom';
 const CategoryComp = ({ home_offers }) => {
     const AllCategory=useSelector(state=>state.AllReducer.AllCategory)
     let dispatch = useDispatch();
+	let history=useHistory()
+	const [Products,setProducts]=useState([])
 	const [feed_list,setFeed_list]=useState([])
 	let imagealt = 'image';
 	const [slideNumber, setSlideNumber] = useState(3)
 	var settings = {
 		arrows:false,
-		autoplay:true,
+		// autoplay:true,
 		dots: false,
 		infinite: false,
+		swipeToSlide: true,
 		speed: 500,
 		slidesToShow: 5,
-		slidesToScroll: 1
+		slidesToScroll: 1,
+		responsive: [
+			{
+			  breakpoint: 1024,
+			  settings: {
+				slidesToShow: 5,
+				slidesToScroll: 1,
+			  }
+			},
+			{
+			  breakpoint: 600,
+			  settings: {
+				slidesToShow: 5,
+				slidesToScroll: 1,
+			  }
+			},
+			{
+			  breakpoint: 480,
+			  settings: {
+				slidesToShow: 5,
+				slidesToScroll: 1,
+			  }
+			}
+		  ]
 	};
 
 	useEffect(() => {
@@ -34,24 +61,30 @@ const CategoryComp = ({ home_offers }) => {
 		dispatch(Category_List())
 	},[])
 
+	useEffect(()=>{
+		let Data=[]
+		AllCategory.filter((value) => {
+			if(value.home===1){
+			  Data.push(value)
+			}
+		})
+		setProducts(Data)
+	},[AllCategory])
+
 	return (
 		<div className="ltn__testimonial-area section-bg-1--- bg-image-top pt-115 pb-70 mblcart">
 				{/* <div className="row ltn__testimonial-slider-5-active slick-arrow-1"> */}
 				<div className="">
 					<div className='product-slider-container pt-2'>
 						<Slider {...settings}>
-							{AllCategory.map((item) => {
+							{Products.map((item) => {
 								return (
+								
 									<div className="pl-2 pr-2 mobile_category">
-										{/* <div className="ltn__testimonial-item ltn__testimonial-item-7">
-											<div className="ltn__testimoni-info"> */}
-                                            <div><img src={ImageUrl+item.photo || Image}/></div>
+                                            <div onClick={()=>history.push(`/shop/${item.slug}`)}><img src={ImageUrl+item.photo || Image}/></div>
 												<p>
 												{item.name} 
 												</p>
-												
-											{/* </div>
-										</div> */}
 									</div>
 								)
 							})}

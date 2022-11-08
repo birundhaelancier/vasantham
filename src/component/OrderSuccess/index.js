@@ -1,18 +1,11 @@
 import React,{useEffect,useState} from 'react'
 import { useHistory,useParams,Link } from 'react-router-dom'
 // import Img
-import img from '../../assets/img/common/delivery_success.png'
-import img1 from '../../assets/img/email/success.png'
+import img1 from '../../assets/img/success.png'
 
-import invoice from '../../assets/img/invoice/invoice.svg'
-import spoce from '../../assets/img/email/space.jpg'
+import spoce from '../../assets/img/space.jpg'
 // Icon Import
-import facebook from '../../assets/img/email/facebook.png'
-import youtube from '../../assets/img/email/youtube.png'
-import twitter from '../../assets/img/email/twitter.png'
-import gplus from '../../assets/img/email/gplus.png'
-import linkedin from '../../assets/img/email/linkedin.png'
-import pinterest from '../../assets/img/email/pinterest.png'
+
 import { connect,useDispatch, useSelector } from 'react-redux'
 import { ImageUrl } from '../../Redux/Utils/baseurl'
 import { City_List, UserOrders } from '../../Redux/Action/allActions'
@@ -59,7 +52,7 @@ const OrderSuccess = (props) => {
 
   const headings={
     subtotal:"SubTotal",
-    // reward:"Reward Points",
+    reward:"Points",
     discount:"Discount",
     total:"Total",
     deliverycharge:"Delivery Charges",
@@ -68,7 +61,7 @@ const OrderSuccess = (props) => {
 
 const FooterValues={
     subtotal:Number(cartTotal()),
-    // reward:OrderDetails?.reward || 0,
+    reward:OrderDetails?.reward || 0,
     discount:OrderDetails?.discount || 0,
     total:Math.abs(Number(cartTotal())-Number(OrderDetails?.discount!=="[]" ? OrderDetails?.discount : 0)),
     deliverycharge:OrderDetails?.shipping?.price || 0,

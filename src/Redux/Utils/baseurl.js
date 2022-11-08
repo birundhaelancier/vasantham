@@ -1,5 +1,5 @@
-export const apiurl = "https://elancier.in/vasantham/api/"
-export const ImageUrl = "https://elancier.in/vasantham/assets/images/"
+export const apiurl = "https://vasanthamhypermart.in/vasantham/api/"
+export const ImageUrl = "https://vasanthamhypermart.in/vasantham/assets/images/"
 
 
 

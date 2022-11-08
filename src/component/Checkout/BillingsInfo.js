@@ -29,6 +29,17 @@ const BillingsInfo = () => {
     const ProfileData=useSelector(state=>state.AllReducer.ProfileData)
  
     const OnChangeInfo=(data,key)=>{
+        if(key==="pincode"){
+            // var re = /(^\d{6}$)|(^\d{6}-\d{6}$)/;
+            if(Number(data)){
+                Billing_Info.pincode=data
+            }else{
+                Billing_Info.pincode=""
+            }
+            setBilling_Info((prevState) => ({
+                ...prevState,
+            }));
+         }else{
         if(data&&key==="email"){
             var re = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
             if (re.test(data)) {
@@ -37,14 +48,7 @@ const BillingsInfo = () => {
                 setemailerr("Email is Invalid")
             }
          }
-         if(data&&key==="pincode"){
-            var re = /(^\d{6}$)|(^\d{6}-\d{6}$)/;
-            if (re.test(data)) {
-              setpincodeerr("")
-            }else{
-              setpincodeerr("Invalid Pincode")
-            }
-         }
+       
          if(data&&key==="mobileno"){
             var re = /^(?=.*?[1-9])[0-9()-]+$/;
             if (re.test(data)) {
@@ -58,6 +62,7 @@ const BillingsInfo = () => {
             ...prevState,
             [key]: data,
         }));
+    }
        }
 
 
@@ -199,6 +204,11 @@ const DeleteAddress=(id)=>{
         })
 }
 
+
+useEffect(()=>{
+    setAddressId(Address_list[0]?.id)
+},[Address_list])
+
     return (
         <>
             <div className="col-lg-6 col-md-12 col-sm-12 col-12">
@@ -264,8 +274,8 @@ const DeleteAddress=(id)=>{
                                         <label htmlFor="zip">Pincode<span className="text-danger">*</span></label>
 
                                                  
-                                            <input type="text" required className="form-control" id="pincode"
-                                            onChange={(data)=>OnChangeInfo(data.target.value,"pincode")} value={Billing_Info.pincode}/>
+                                            <input type="text" minLength={6} maxLength={6} required className="form-control" id="pincode"
+                                            onChange={(data)=>OnChangeInfo(data.target.value,"pincode")} pvalue={Billing_Info.pincode}/>
                                                 </div>
                                             </div>
                                         </div>

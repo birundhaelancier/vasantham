@@ -205,7 +205,7 @@ export const OrderPlaced_Create = (product,billing,payment,total,shipping,balanc
                 "award":"",
                 "premium":"",
                 "premium_amt":"",
-                "reward":rewardpoint?.rewardpoint || 0,
+                "reward":balance_reward || 0,
                 "total_reward":rewardpoint?.rewardpoint ? balance_reward : 0
               
             },

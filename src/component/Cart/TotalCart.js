@@ -18,11 +18,18 @@ const TotalCart = (props) => {
             return total + (Number(item.quantity || 1) * item.dis_prize)
         }, 0)
     }
+
+    const Discount_price = () => {
+        return carts?.reduce(function (total, item) {
+            return total + (Number(item.quantity || 1) * item.dis_points)
+        }, 0)
+    }
+
     const ProceedCheckout=()=>{
         if(!JSON.parse(localStorage.getItem("UserId"))){
            history.push("/login/cart")
         }else{
-            if(Reward.rewardpoint>cartTotal()){
+            if(Reward.rewardpoint>Discount_price()){
                history.push("/checkout-one")
             }else{
                 Swal.fire({
@@ -60,20 +67,7 @@ const TotalCart = (props) => {
                                 <p>Subtotal</p>
                                 <p className="cart_amount"> <i class="fa fa-rupee"/> {Number(Coupon?Coupon.Discount:cartTotal() || 0).toFixed(2)}</p>
                             </div>
-                            {/* <div className="cart_subtotal ">
-                                <p>Delivery Charges</p>
-                                <p className="cart_amount"> <i class="fa fa-rupee"/> {FilterData?.price || 0}.00</p>
-                            </div>
-
-                            <div className="cart_subtotal">
-                                <p>Reward Point</p>
-                                <td className="cart_amount"><i class="fa fa-rupee"></i> {Number(Reward.rewardpoint)}</td>
-                            </div>
-
-                            <div className="cart_subtotal">
-                                <p>Grand Total</p>
-                                <td className="cart_amount"><i class="fa fa-rupee"></i> {Math.round(Number(FilterData?.price || 0)+Number(Reward.rewardpoint || 0)+Number(Coupon?Coupon.Discount:cartTotal() || 0))}.00</td>
-                            </div> */}
+                          
 
                             {Coupon && <Alert  variant="filled" severity="success" style={{margin:"20px 0px"}}>{Coupon.Details[0]?.title} {Number(Coupon?.Details[0]?.discount)} {Coupon?.Details[0]?.type=="amount"?"Rupees Amount":"Percentage"} Discount</Alert>} 
                             <div className="checkout_btn">

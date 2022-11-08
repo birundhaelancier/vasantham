@@ -1,6 +1,4 @@
 import React,{useEffect, useState} from 'react'
-import BarChart from '../VendorDashboard/BarChart'
-import LineChart from '../VendorDashboard/LineChart'
 import { useDispatch, useSelector } from "react-redux"
 import { Link } from 'react-router-dom'
 import { Profile_Details, UserOrders } from '../../Redux/Action/allActions'

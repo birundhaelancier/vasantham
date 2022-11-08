@@ -13,7 +13,13 @@ const YourOrders = () => {
     const dispatch=useDispatch()
     const cartTotal = () => {
         return ShoppingCarts?.reduce(function (total, item) {
-            return total + (Number(item.quantity || 1) * item.dis_prize)
+            return (total + (Number(item.quantity || 1) * item.dis_prize))
+        }, 0)
+    }
+
+    const pointscartTotal = () => {
+        return ShoppingCarts?.reduce(function (total, item) {
+            return (total + (Number(item.quantity || 1) * item.dis_points))
         }, 0)
     }
 
@@ -57,15 +63,19 @@ const YourOrders = () => {
                         )}
                         </tbody>
                         <tfoot>
+                           {Coupon && <tr>
+                                <th>Product Cost</th>
+                                <td className="product-subtotal"  align="end"><i class="fa fa-rupee"></i> {Number(cartTotal() || 0)}</td>
+                            </tr>}
                             <tr>
                                 <th>SubTotal</th>
                                 <td className="product-subtotal"  align="end"><i class="fa fa-rupee"></i> {Number(Coupon?Coupon.Discount:cartTotal() || 0).toFixed(2)}</td>
                             </tr>
-                            {/* <tr>
-                                <th>Reward Points</th>
-                                <td><i class="fa fa-rupee"></i>  {(Reward?.rewardpoint || 0)}</td>
+                            <tr>
+                                <th>Points</th>
+                                <td><i class="fa fa-rupee"></i>  {(pointscartTotal() || 0)}</td>
                             </tr> 
-                           <tr>
+                           {/* <tr>
                                 <th>Total</th>
                                 <td><i class="fa fa-rupee"></i>  {Math.abs(Number(Coupon?Coupon.Discount:cartTotal())-Number(Reward?.rewardpoint || 0)).toFixed(2)}</td>
                             </tr>  */}
@@ -81,7 +91,7 @@ const YourOrders = () => {
                         </tfoot>
                     </table>
                     
-                    {Coupon && <Alert  variant="filled" severity="success" style={{marginTop:"20px"}}>{Coupon.Details[0]?.title} {Coupon?.Details[0]?.discount} {Coupon?.Details[0]?.type=="amount"?"Rupees Amount":"Percentage"} Discount</Alert>}
+                    {Coupon && <Alert  variant="filled" severity="success" style={{marginTop:"20px"}}>{Coupon.Details[0]?.title} {Coupon?.Details[0]?.discount} {Coupon?.Details[0]?.type==="amount"?"Rupees Amount":"Percentage"} Discount</Alert>}
        
 
                 </div>

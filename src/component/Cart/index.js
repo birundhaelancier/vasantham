@@ -2,7 +2,6 @@ import React,{ useEffect, useState } from "react";
 import Coupon from './Coupon'
 import TotalCart from './TotalCart'
 import { Link } from 'react-router-dom'
-import img from '../../assets/img/common/empty-cart.png'
 import { useDispatch, useSelector } from "react-redux";
 import { ImageUrl } from "../../Redux/Utils/baseurl";
 import emp_img from '../../assets/img/empty-cart.webp'
@@ -27,7 +26,7 @@ const CartArea = () => {
     let carts = useSelector((state) => state?.products?.carts);
 
    useEffect(()=>{
-    dispatch(Profile_Details())
+    // dispatch(Profile_Details())
    },[])
 
     // Remove from Cart
@@ -73,6 +72,7 @@ const CartArea = () => {
             {ShoppingCarts?.length
                 ?
                 <section id="cart_area_one" className="ptb-10">
+                    <h4 className="text-center pb-3 pt-2">Cart</h4>
                     <div className="container">
                         <div className="row">
                             <div className="col-lg-12 col-md-12 col-sm-12 col-12">
@@ -103,15 +103,15 @@ const CartArea = () => {
                                                         <td className="product_name">
                                                             <Link to={`/product-details-one/${data.slug}/${data.id}`}>
                                                                 <span>{data.name}</span>
-                                                                <div style={{fontSize:"13px"}}><span>Points {" "}{data.points} - Prize <i class="fa fa-inr"/> {data.discount_price} </span></div>
+                                                                <div style={{fontSize:"13px"}}><span>Points {" "}{data.points} - Prize <i class="fa fa-inr"/> {(data.discount_price)} </span></div>
                                                             </Link>
                                                         </td>
                                                         <td className="product_name">
                                                             <Link to={`/product-details-one/${data.slug}/${data.id}`}>
-                                                            {data.dis_points}
+                                                            {(data.dis_points*data.quantity).toFixed(2)}
                                                             </Link>
                                                         </td>
-                                                        <td className="product-price"><i class="fa fa-inr"/> {data.dis_prize}</td>
+                                                        <td className="product-price"><i class="fa fa-inr"/> {(data.dis_prize*data.quantity).toFixed(2)}</td>
                                                         <td className="product_quantity">
                                                             <input min="1" max="100" type="number" onChange={e => cartValUpdate(e.currentTarget.value, index,data.id,data.stock)} value={ QuantityValues["test" + index] ||  data.quantity} />
                                                         </td>
@@ -126,7 +126,7 @@ const CartArea = () => {
                                     <div className="cart_box_view">
                                         {ShoppingCarts?.map((data,index) => {
                                             return (
-                                                <div className="cart_content">
+                                                <div className="cart_content" style={{marginBottom:"15px"}}>
                                                 
                                                     <Link to={`/product-details-one/${data.id}`}>
                                                         <img src={ImageUrl+data.photo} alt="img" />
@@ -134,29 +134,29 @@ const CartArea = () => {
                                                     <div className="pro_discription">
                                                         <ul>
                                                             <li>
-                                                                <div className="table_head">Product Name </div>
+                                                                {/* <div className="table_head">Product Name </div> */}
                                                                 <div className="table_val">
                                                                     {data.name}
                                                                     <div style={{fontSize:"13px"}}><span>Points <i class="fa fa-inr"/>{" "}{data.points} - Prize <i class="fa fa-inr"/> {data.discount_price} </span></div>
                                                                 </div>
                                                             </li>
                                                             <li>
-                                                                <div className="table_head">Points</div>
-                                                                <div className="table_val"> {data.dis_points}</div>
+                                                                {/* <div className="table_head">Points</div> */}
+                                                                <div className="table_val"> {(data.dis_points*data.quantity).toFixed(2)}</div>
                                                             </li>
                                                             <li>
-                                                                <div className="table_head">Price </div>
-                                                                <div className="table_val"><i class="fa fa-inr" aria-hidden="true"></i> {data.dis_prize}</div>
+                                                                {/* <div className="table_head">Price </div> */}
+                                                                <div className="table_val"><i class="fa fa-inr" aria-hidden="true"></i> {(data.dis_prize*data.quantity).toFixed(2) }</div>
                                                             </li>
                                                             <li>
-                                                                <div className="table_head">Quantity </div>
+                                                                {/* <div className="table_head">Quantity </div> */}
                                                                 <div className="table_val">
                                                                     <input min="1" max="100" type="number" style={{textAlign:"center"}} onChange={e => cartValUpdate(e.currentTarget.value, index,data.id,data.stock)} value={ QuantityValues["test" + index] ||  data.quantity} />
                                                                 </div>
                                                             </li>
                                                             <li>
-                                                                <div className="table_head">Total </div>
-                                                                <div className="table_val"><i class="fa fa-inr" aria-hidden="true"></i> {(data.dis_prize * (data.quantity || 1)).toFixed(2)}</div>
+                                                               
+                                                                <div className="table_val">Total <i class="fa fa-inr" aria-hidden="true"></i> {(data.dis_prize * (data.quantity || 1)).toFixed(2)}</div>
                                                             </li>
                                                         </ul>
                                                     </div>

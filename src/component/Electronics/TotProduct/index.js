@@ -2,7 +2,7 @@ import React,{useEffect, useState} from 'react'
 import { useSelector } from "react-redux";
 import { apiurl, ImageUrl } from '../../../Redux/Utils/baseurl';
 import axios from 'axios'
-import Heading from '../../Furniture/Heading';
+import Heading from '../../Heading';
 import ProductCard from '../../Common/Product/ProductCard'
 const TopPRoduct = () => {
     const [headings,setheadings]=useState([])
@@ -28,6 +28,7 @@ const TopPRoduct = () => {
             product:[],
             advertisement:[]
         },
+       
     })
 
    
@@ -61,12 +62,13 @@ const TopPRoduct = () => {
             let array=[]
             setheadings(response?.data?.heading)
             response?.data?.products.map((val)=>{
-                Object.keys(Products).map((data)=>{
+            if(val.is_type!=="new"){
+                Object.keys(Products).filter((data)=>{
                     if(val.is_type===data){
                       Products[data].product?.push(val)
                     }
                 })
-              
+            }
                 setProducts((prevState) => ({
                     ...prevState,
                 }));
@@ -82,7 +84,7 @@ const TopPRoduct = () => {
                 case "best":return 2;
                 case "flash_deal":return 4;
                 case "feature":return 3;
-                case "new":return 5;
+                // case "new":return 5;
                 default:return "";
             }           
        }
@@ -92,10 +94,11 @@ const TopPRoduct = () => {
             case "best":return "Best Products";
             case "flash_deal":return "Flash Deals";
             case "feature":return "Featured Products";
-            case "new":return "New Arrivals";
+            // case "new":return "New Arrivals";
             default:return "";
         }           
       }
+
     return (
         <>
             <section id="electronics_top_product" className="pb-30 products container">

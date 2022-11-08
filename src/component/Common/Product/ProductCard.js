@@ -27,8 +27,8 @@ const ProductCard = (props) => {
 
 
     useEffect(()=>{
-      dispatch(RewardPoints())
-      dispatch(Profile_Details())
+      // dispatch(RewardPoints())
+      // dispatch(Profile_Details())
     },[])
     
     const ChangeAttribute = (data) => {
@@ -166,7 +166,6 @@ useEffect(()=>{
     localStorage.setItem("carts",JSON.stringify(ShoopingCarts))
 },[ShoopingCarts])
 
-console.log(WishListData.includes(props.data.id),"kkkkkkkk")
     return (
         <>
             <div className="product_wrappers_one">

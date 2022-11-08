@@ -1,15 +1,12 @@
 import React, { useEffect,useState } from 'react'
 import logo from '../../../assets/img/vasanthlogo.png'
-import payment from '../../../assets/img/common/payment.png'
+import payment from '../../../assets/img/payment.png'
 import { Link } from 'react-router-dom'
-import Cookie from '../Cookie'
-import NewsletterModal from '../NewsletterModal'
 import { useSelector } from "react-redux"
 import { useDispatch } from "react-redux";
 import Swal from 'sweetalert2'
 import axios from 'axios'
 import { apiurl } from '../../../Redux/Utils/baseurl'
-import Appfooter from '../../AppFooter'
 import { browserName, isBrowser } from "react-device-detect"
 import { FacebookShareButton, TwitterShareButton, LinkedinShareButton, TelegramShareButton, WhatsappShareButton } from "react-share";
 const FooterData = [
@@ -22,6 +19,7 @@ const FooterData = [
                 // { linkTitle: "About Us", link: "/about" },
                 { linkTitle: "Refund Policy", link: "/refund" },
                 { linkTitle: "FAQ", link: "/faqs" },
+                { linkTitle: "About", link: "https://vasanthamstore.com/about/" },
             ]
     },
     {
@@ -133,8 +131,8 @@ const Footer = ({ hide }) => {
         }
       };
   
-      window.addEventListener('scroll', checkScrollTop)
-      const AppUrl="https://dynamic-froyo-597702.netlify.app/"
+    //   window.addEventListener('scroll', checkScrollTop)
+      const AppUrl="https://vasanthamstore.com/"
     return (
         <>
         <div className='footer_hide'>
@@ -152,27 +150,33 @@ const Footer = ({ hide }) => {
                                 <div className="footer_left_side_icon">
                                     <ul>
                                         <li>
-                                            <FacebookShareButton url={AppUrl}>
+                                            <FacebookShareButton url={"https://www.facebook.com/Vasanthamsupermart"}>
                                             <a ><i className="fa fa-facebook-f"></i></a>
                                             </FacebookShareButton>
                                         </li>
                                         <li>
-                                        <TwitterShareButton url={AppUrl}>
+                                        <TwitterShareButton url={"https://twitter.com/Vasanthamstore"}>
                                             <a ><i className="fa fa-twitter"></i></a>
                                         </TwitterShareButton>
                                         </li>
-                                        <li>
+                                        {/* <li>
                                         <LinkedinShareButton url={AppUrl}>
                                             <a ><i className="fa fa-linkedin"></i></a>
                                         </LinkedinShareButton>
-                                        </li>
+                                        </li> */}
                                         <li>
-                                        <WhatsappShareButton url={AppUrl}>
-                                           <i class="fa fa-whatsapp" aria-hidden="true"></i>
+                                        <WhatsappShareButton>
+                                           <i class="fa fa-whatsapp"  onClick={()=>window.open("https://wa.me/919047183288","_blank")} aria-hidden="true"></i>
                                         </WhatsappShareButton>
                                         </li>
                                         <li>
-                                            <a><i class="fa fa-youtube-play" aria-hidden="true"></i></a>
+                                            <a>
+                                            <i class="fa fa-instagram" aria-hidden="true" onClick={()=>window.open("https://www.instagram.com/vasanthamsupermart")}></i>
+                                            </a>
+                                        </li>
+                                     
+                                        <li>
+                                            <a><i class="fa fa-youtube-play" onClick={()=>window.open("https://www.youtube.com/channel/UCYIia86MKba5BBiy0YX7Yqw")} aria-hidden="true"></i></a>
                                         </li>
                                     </ul>
                                 </div>
@@ -184,6 +188,8 @@ const Footer = ({ hide }) => {
                                     <h3>{data.title}</h3>
                                     <ul>
                                         {data.links.map((link, index) => (
+                                            link.linkTitle==="About" ?
+                                            <li key={index}><Link onClick={()=>window.open(link.link,"_blank")}>{link.linkTitle}</Link></li>:
                                             <li key={index}><Link to={link.link}>{link.linkTitle}</Link></li>
                                         ))}
                                     </ul>
@@ -197,7 +203,7 @@ const Footer = ({ hide }) => {
                                     <h3>{data.title}</h3>
                                     <ul>
                                         {data.links.map((link, index) => (
-                                            <li key={index}><Link to={link.link}>{link.linkTitle}</Link></li>
+                                            <li key={index} className="link_tag">{link.linkTitle}</li>
                                         ))}
                                     </ul>
                                 </div>
@@ -244,10 +250,8 @@ const Footer = ({ hide }) => {
                     </div>
                 </div>
             </section>
-            {
-                cookie ? <Cookie accept={acceptCookie} cancel={cancelCookie} /> : null
-            }
-            <NewsletterModal show={promoCenter} stop={stopPromoModal} start={startPromoModal} />
+           
+            {/* <NewsletterModal show={promoCenter} stop={stopPromoModal} start={startPromoModal} /> */}
            
         </div>
        

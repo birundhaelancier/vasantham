@@ -1,9 +1,8 @@
 import React,{useEffect,useState,useRef} from 'react'
 import { useHistory, useParams,Link } from 'react-router-dom'
 // import img
-import img1 from '../../assets/img/invoice/invoice.svg'
+import img1 from '../../assets/img/invoice.svg'
 
-import sign from '../../assets/img/invoice/sign.png'
 import { City_List, UserOrders } from '../../Redux/Action/allActions'
 import { ImageUrl } from '../../Redux/Utils/baseurl'
 import { connect,useDispatch, useSelector } from 'react-redux'
@@ -51,7 +50,7 @@ const dropdown=(id)=>{
 
 const headings={
   subtotal:"SubTotal",
-  // reward:"Reward Points",
+  reward:"Points",
   discount:"Discount",
   total:"Total",
   deliverycharge:"Delivery Charges",
@@ -60,9 +59,9 @@ const headings={
 
 const FooterValues={
   subtotal:Number(cartTotal()),
-  // reward:OrderDetails?.reward,
+  reward:OrderDetails?.reward,
   discount:OrderDetails?.discount || 0,
-  total:Math.abs(Number(cartTotal())-Number(OrderDetails?.discount!=="[]" ? OrderDetails?.discount : 0)),
+  total:Math.abs(Number(cartTotal())-Number(OrderDetails?.discount!=="[]" ? OrderDetails?.discount : 0)).toFixed(2),
   deliverycharge:OrderDetails?.shipping?.price || 0,
   total_paid:0
 }
@@ -73,7 +72,7 @@ const FooterValues={
       <section className="theme-invoice-1 pb-100">
         <div className="container">
           <div className="row" ref={componentRef}>
-            <div className="col-xl-8 m-auto">
+            <div className="col-xl-10 m-auto">
               <div className="back_btn_emial">
                 <button className="theme-btn-one btn-black-overlay btn_sm" onClick={routeChange}>
                   <i className="fa fa-arrow-left mr-2"></i>Go Back
@@ -158,8 +157,8 @@ const FooterValues={
 
                             data==="total_paid" ? Number(FooterValues["total"]) + Number(FooterValues["deliverycharge"]) :
 
-                            FooterValues[data] && FooterValues[data] || 0
-                        }.00</td>
+                            (FooterValues[data] && FooterValues[data])|| 0
+                        }</td>
                       </tr>
                     )}
                   
@@ -198,11 +197,11 @@ const FooterValues={
                     </div>
                     <div className="offcanvas-wishlist-item-details">
                       <span className="offcanvas-wishlist-item-details-quantity">
-                        Price : <i class="fa fa-inr"/>  {data.attribute_price?data.attribute_price:data.main_price || 0}.00
+                        Price : <i class="fa fa-inr"/>  {(data.attribute_price?data.attribute_price:data.main_price).toFixed(2) || 0}
                       </span>
                     </div>
                    
-                    <div style={{color:"green"}}> Total : <i class="fa fa-inr"/>  {(data.attribute_price?data.attribute_price:data.main_price)*data.qty}.00</div>
+                    <div style={{color:"green"}}> Total : <i class="fa fa-inr"/>  {((data.attribute_price?data.attribute_price:data.main_price)*data.qty).toFixed(2)}</div>
                       
                   </div>
                 </div>

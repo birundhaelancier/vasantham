@@ -1,8 +1,8 @@
 import {
     GET_SLIDER_LIST,GET_HOMEPRODUCT_LIST,GET_CATEGORY_LISTITEM,GET_PACKAGE ,GET_CITY_LIST,GET_PROFILE_DATA,
     GET_WISH_LIST,GET_SINGLEPRODUCT_LIST,GET_SHIPPING_LIST,GET_COUPONCODE,USER_ORDERS,SEARCH_CATEGORY,
-    GET_ADDRESS_LIST,GET_POST_LIST,FARMER_POST_LIST,STOCK_LIST,FAQ_LIST,ORDER_LIST,RELATED_LIST,ADDITIONAL_CHARGES,AMC_PLANS,ADVISOR_VISIT,RAZORPAY_DETAILS,ADVERTISEMENT_DETAIL, BILLING_INFORMATION,
-    REWARD_POINTS,CATEGORY_LIST, 
+    GET_ADDRESS_LIST,GET_POST_LIST,FARMER_POST_LIST,STOCK_LIST,FAQ_LIST,ORDER_LIST,RELATED_LIST,ADDITIONAL_CHARGES,AMC_PLANS,ADVISOR_VISIT,RAZORPAY_DETAILS,ADVERTISEMENT_DETAIL, BILLING_INFORMATION,NOTIFICATIONS,
+    REWARD_POINTS,CATEGORY_LIST,CONTACT_US,MYBILLS,REDEEM_POINT_HISTORY,
     COUPONCODE,CART_TOTAL,REDEEM__HISTORY_POINTS
 } from '../Utils/constant';
 import { apiurl, findServer } from '../Utils/baseurl';
@@ -228,11 +228,11 @@ export const RewardPoints=()=>async (dispatch)=>{
 export const RedeemedHistory=(total_point,redeem_point)=>async (dispatch)=>{
     const response=await axios({
          method:"post",
-         url:"http://vasanthamhypermart.in/api/redeemedhistory",
+         url:"https://vasanthamhypermart.in/api/redeemedhistory",
          data:{
             "mobile":JSON.parse(localStorage.getItem("data"))?.phone,
-            "redeem":redeem_point,
-            "previous":total_point
+            "redeem":redeem_point || "",
+            "previous":total_point || ""
          }
     });
     return dispatch({type:REDEEM__HISTORY_POINTS,payload:response.data})
@@ -250,6 +250,52 @@ export const Category_List=()=>async (dispatch)=>{
     return dispatch({type:CATEGORY_LIST,payload:response.data})
 }
 
+export const Contact_Us=()=>async (dispatch)=>{
+    const response=await axios({
+         method:"get",
+         url:"https://elancier.xyz/vasantham_stores/chit/app/settings.php",
+    });
+    return dispatch({type:CONTACT_US,payload:response.data.Response})
+}
+
+
+export const RedeemedHistoryApi=()=>async (dispatch)=>{
+    const response=await axios({
+         method:"post",
+         url:"https://vasanthamhypermart.in/api/pointsearnedhistory",
+         data:{
+            "mobile":JSON.parse(localStorage.getItem("data"))?.phone,
+         }
+    });
+    return dispatch({type:REDEEM_POINT_HISTORY,payload:response?.data?.success?.redeemed})
+}
+
+export const MyBillsApi=()=>async (dispatch)=>{
+    const response=await axios({
+         method:"post",
+         url:"https://vasanthamhypermart.in/api/salesbycustomer",
+         headers:{
+            'Access-Control-Allow-Origin' : '*',
+            'Access-Control-Allow-Methods':'GET,PUT,POST,DELETE,PATCH,OPTIONS',
+         },
+         data:{
+            mobile:JSON.parse(localStorage.getItem("data"))?.phone
+         }
+    });
+    return dispatch({type:MYBILLS,payload:response?.data?.success?.orders})
+}
+
+
+
 export const CartTotal=(value)=>async (dispatch)=>{
     return dispatch({type:CART_TOTAL,payload:value})
+}
+
+
+export const NotificationsApi=()=>async (dispatch)=>{
+    const response=await axios({
+         method:"get",
+         url:"https://vasanthamhypermart.in/vasantham/api/notification",
+    });
+    return dispatch({type:NOTIFICATIONS,payload:response?.data})
 }

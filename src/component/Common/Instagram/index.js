@@ -1,11 +1,6 @@
 import React,{useEffect,useState} from 'react'
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import Slider from "react-slick";
-import { InstgramData } from './InstgramData';
-import Heading from '../../Furniture/Heading'
-import HeadingTwo from '../../Fashion/Heading'
-import axios from 'axios'
 import { apiurl, ImageUrl } from '../../../Redux/Utils/baseurl';
 import { AdvertisementDetails } from '../../../Redux/Action/allActions';
 import { useDispatch, useSelector } from 'react-redux';

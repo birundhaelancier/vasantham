@@ -33,6 +33,7 @@ const WishlistComp = (props) => {
           {WishListData?.length
                                                 ?
             <section id="Wishlist_area" className="pt-3 wish_list_view "  >
+                <h4 className="text-center pb-3 pt-3">WishList</h4>
                 <div className="container">
                     <div className="row">
                         <div className="col-12 desktop_view_cart">
@@ -81,30 +82,33 @@ const WishlistComp = (props) => {
            <div className="cart_box_view" style={{padding:"10px"}}>
                                         {WishListData?.map((data,index) => {
                                             return (
+                                                <div className="cart_content_par">
                                                 <div className="cart_content">
-                                                
                                                     <Link to={`/product-details-one/${data.slug}/${data.id}`}>
                                                         <img src={ImageUrl+data.photo} alt="img" />
                                                     </Link>
                                                     <div className="pro_discription">
                                                         <ul>
                                                             <li>
-                                                                <div className="table_head">Product Name </div>
+                                                                {/* <div className="table_head">Product Name </div> */}
                                                                 <div className="table_val">{data.name}</div>
                                                             </li>
                 
-                                                            <li>
-                                                                <div className="table_head">Price </div>
+                                                            <li className="price_cont">
+                                                                {/* <div className="table_head">Price </div> */}
                                                                 <div className="table_val"><i class="fa fa-inr" aria-hidden="true"></i> {data.discount_price}.00</div>
+                                                                <div style={{ textAlign: "end" }}>
+                                                                <i className="fa fa-trash text-danger" onClick={() => rmProduct(data.id)} style={{ 'cursor': 'pointer',paddingRight:"10px"}}></i>
+                                                                 </div>
                                                             </li>
                                                           
                                                         
                                                         </ul>
                                                     </div>
-                                                    <div style={{ textAlign: "end" }}>
-                                                        <i className="fa fa-trash text-danger" onClick={() => rmProduct(data.id)} style={{ 'cursor': 'pointer',paddingRight:"10px"}}></i>
-                                                    </div>
+                                                 
                                                 </div>
+                                                 
+                                               </div>
                                             )
                                         })}
 

@@ -32,6 +32,9 @@ const Sidebar = () => {
 
                         <li><Link to="/my-account/addresslist" className={location.pathname === '/my-account/addresslist' || location.pathname.includes("/my-account/editaddresslist/")?'active':null}><i className="fa fa-address-card"></i>Address List</Link></li>
 
+                        <li><Link to="/redeemhistory" className={location.pathname === '/redeemhistory'?'active':null}><i className="fa fa-address-card"></i>Redeem History</Link></li>
+                    
+
                         <li><Link  onClick={(e)=>{e.preventDefault();logout()}}><i className="fa fa-sign-out"></i>logout</Link></li>
                     </ul>
                 </div>

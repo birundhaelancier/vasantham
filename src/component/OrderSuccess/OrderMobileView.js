@@ -1,19 +1,7 @@
 import React,{useEffect,useState} from 'react'
 import { useHistory,useParams } from 'react-router-dom'
 // import Img
-import img from '../../assets/img/common/delivery_success.png'
-import img1 from '../../assets/img/email/success.png'
-import img2 from '../../assets/img/email/order-success.png'
-import pro1 from '../../assets/img/email/pro-3.jpg'
-import pro2 from '../../assets/img/email/pro-5.jpg'
-import spoce from '../../assets/img/email/space.jpg'
-// Icon Import
-import facebook from '../../assets/img/email/facebook.png'
-import youtube from '../../assets/img/email/youtube.png'
-import twitter from '../../assets/img/email/twitter.png'
-import gplus from '../../assets/img/email/gplus.png'
-import linkedin from '../../assets/img/email/linkedin.png'
-import pinterest from '../../assets/img/email/pinterest.png'
+import img1 from '../../assets/img/success.png'
 import { Link } from 'react-router-dom'
 import { connect,useDispatch, useSelector } from 'react-redux'
 import { ImageUrl } from '../../Redux/Utils/baseurl'
@@ -55,7 +43,7 @@ const OrderMobile_View = (props) => {
 
 const headings={
     subtotal:"SubTotal",
-    // reward:"Reward Points",
+    reward:"Points",
     discount:"Discount",
     total:"Total",
     deliverycharge:"Delivery Charges",
@@ -64,7 +52,7 @@ const headings={
 
 const FooterValues={
     subtotal:Number(cartTotal()),
-    // reward:OrderDetails?.reward || 0,
+    reward:OrderDetails?.reward || 0,
     discount:OrderDetails?.discount || 0,
     total:Math.abs(Number(cartTotal())-Number(OrderDetails?.discount!=="[]" ? OrderDetails?.discount : 0)),
     deliverycharge:OrderDetails?.shipping?.price || 0,

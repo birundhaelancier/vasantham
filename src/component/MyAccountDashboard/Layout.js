@@ -5,9 +5,9 @@ import Sidebar from './Sidebar'
 const Layout = (props) => {
     let dispatch=useDispatch()
     const Reward=useSelector(state=>state.AllReducer.RewardPoints)
-    useEffect(()=>{
-     dispatch(RewardPoints())
-    },[])
+    // useEffect(()=>{
+    //  dispatch(RewardPoints())
+    // },[])
     return (
         <>
             

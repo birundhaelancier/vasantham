@@ -44,9 +44,11 @@ const routeChange = () => {
        useEffect(()=>{
         dispatch(Profile_Details())
        },[])
+       
        useEffect(()=>{
         setprofileDetails(props.ProfileData)
        },[props.ProfileData])
+
        useEffect(()=>{
         UserDetail.f_name=profileDetails?.first_name || ""
         UserDetail.l_name=profileDetails?.last_name || ""
@@ -57,11 +59,13 @@ const routeChange = () => {
         setupload(profileDetails?.photo || "")
       
        },[profileDetails])
+
        useEffect(()=>{
         if(UserDetail.new_password===UserDetail.confirm_pass){
             seterror_msg("")
         }
        },[UserDetail])
+
     const Submit=(e)=>{
         e.preventDefault();
         setloading(true)
@@ -94,7 +98,6 @@ const routeChange = () => {
        }
      }
     return (
-    <>
     <section id="account_edit" className="pt-100 pb-100">
         <div className="container">
             <div className="row">
@@ -108,9 +111,12 @@ const routeChange = () => {
                 <div className="col-lg-3">
                     <div className="account_thumd">
                         <div className="account_thumb_img">
+                            <div>
                             <img src={getImage===""&&upload===""?img1:upload!==""&&getImage!==""?getImage:ImageUrl+upload} alt="img" style={{width:"200px",height:"200px"}}/>
                             <div className="fixed_icon"><input type="file" onChange={OnUplodFileChange}/><i className="fa fa-camera"></i></div>
+                            </div>
                         </div>
+
                         <h4>{profileDetails?.users?.first_name}</h4>
                         <p>{profileDetails?.users?.last_name}</p>
                     </div>
@@ -174,9 +180,8 @@ const routeChange = () => {
                 </div>
             </div>
         </div>
-    </section>
     <Loading show={loading}/>
-        </>
+    </section>
     )
 }
 

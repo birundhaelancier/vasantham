@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom'
 const OrderComplete = () => {
     return (
         <>
-            <section id="order_complet_area" className="ptb-100 ">
+            <section id="order_complet_area" className="pt-5 pb-5 log_acc_form">
                 <div className="container">
                     <div className="row justify-content-center">
                         <div className="col-md-8">

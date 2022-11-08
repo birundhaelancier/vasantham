@@ -1,6 +1,5 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import avater from '../../../assets/img/common/avater.png'
 import { useSelector, useDispatch } from "react-redux";
 import { useHistory } from "react-router-dom"
 import Swal from 'sweetalert2';

@@ -50,6 +50,17 @@ import { ImageUrl } from "../Utils/baseurl";
     if(type==="products/clearCart"){
       state.ShoopingCarts=[]
     }
+
+    if(type==="products/updateCart"){
+      let { id,value } = action.payload;
+      for (var i = 0; i < state.ShoopingCarts.length; i++) {
+        if (Number(id) === state.ShoopingCarts[i].id) {
+          state.ShoopingCarts[i].quantity = value;
+          break;
+        }
+      }
+    }
+
     switch (type) {
       case "products/addToCart":
         return { ...state} 

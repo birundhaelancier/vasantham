@@ -19,11 +19,12 @@ const ProductDetailsOne = (props) => {
     const [cartChange,setcartChange]=useState(false)
     const [selectpack,setselectpack]=useState()
     const [filterPack,setfilterPack]=useState()
+    const [QuantityValues,setQuantityValues]=useState({})
     const Rewards=useSelector(state=>state.AllReducer.RewardPoints)
     const WishList=useSelector(state=>state.AllReducer.WishList)
     const ShoopingCarts=useSelector(state=>state.StoreProuct.ShoopingCarts)
     const ProfileData=useSelector(state=>state.AllReducer.ProfileData)
-    let { id } = useParams();
+    let { id,productid } = useParams();
     // dispatch({ type: "products/getProductById", payload: { id } });
     // let product = useSelector((state) => state?.products?.single);
 
@@ -107,15 +108,8 @@ const ProductDetailsOne = (props) => {
 
     const [img, setImg] = useState(product?.img)
 
-    const incNum = () => {
-       
-        // setqtyValue(qtyValue+1)
-    //     setQuantityValues((prevState) => ({
-    //        ...prevState,
-    //        ["test" + index]:val+1,
-    //    }));
+    const incNum = (id, stock,value) => {
      if (count > product.stock) {
- 
        Swal.fire({
            icon: 'warning',
            title: 'Warning',
@@ -125,14 +119,7 @@ const ProductDetailsOne = (props) => {
        })
        } else {
         setCount(count + 1)
-      
-         for (var i = 0; i < ShoopingCarts.length; i++) {
-           if (product.id === ShoopingCarts[i].id) {
-             ShoopingCarts[i].quantity = count;
-             break;
-           }
-         }
-         localStorage.setItem("carts", JSON.stringify(ShoopingCarts));  
+         
        }
     }
 
@@ -140,18 +127,27 @@ const ProductDetailsOne = (props) => {
     const decNum = () => {
         if (count > 1) {
             setCount(count - 1)
-                  for (var i = 0; i < ShoopingCarts.length; i++) {
-                    if (product.id === ShoopingCarts[i].id) {
-                      ShoopingCarts[i].quantity = count;
-                      break;
-                    }
-                  localStorage.setItem("carts", JSON.stringify(ShoopingCarts));  
-                }
         } else {
             Swal.fire('Sorry!', "Minimum Quantity Reached", 'warning')
             setCount(1)
         }
     }
+
+
+
+    const UpdateQty=()=>{
+      for (var i = 0; i < ShoopingCarts.length; i++) {
+        if (product.id === ShoopingCarts[i].id) {
+          ShoopingCarts[i].quantity = count;
+          break;
+        }
+      }
+      localStorage.setItem("carts", JSON.stringify(ShoopingCarts));  
+    }
+
+    useEffect(()=>{
+      UpdateQty()
+    },[ShoopingCarts,count])
 
     const ChangeAttribute=(data)=>{
         setselectpack(data)
@@ -187,7 +183,15 @@ const ProductDetailsOne = (props) => {
       })
       setShopIds(Ids)
       },[ShoopingCarts])
-
+      useEffect(()=>{
+        ShoopingCarts?.filter((data) => {
+          if(Number(data.id)===Number(productid)){
+            setCount(data.quantity)
+          }else{
+            setCount(1)
+          }
+         })
+    },[id,productid,ShoopingCarts])
     return (
         <>
         {!loading
@@ -229,13 +233,13 @@ const ProductDetailsOne = (props) => {
                                         <div className="product_count_one">
                                             <div className="plus-minus-input">
                                                 <div className="input-group-button">
-                                                    <button type="button" className="button" onClick={decNum}>
+                                                    <button type="button" className="button" onClick={()=>decNum(product.id)}>
                                                         <i className="fa fa-minus"></i>
                                                     </button>
                                                 </div>
-                                                <input className="form-control" type="number" value={count} readOnly />
+                                                <input className="form-control" type="number" value={count}  readOnly />
                                                 <div className="input-group-button">
-                                                    <button type="button" className="button" onClick={incNum}>
+                                                    <button type="button" className="button" onClick={()=>incNum(product.id, product.stock)}>
                                                         <i className="fa fa-plus"></i>
                                                     </button>
                                                 </div>

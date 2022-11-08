@@ -3,7 +3,6 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useHistory } from 'react-router-dom'
 import Swal from 'sweetalert2'
 import { CouponCode, CouponDetails } from '../../Redux/Action/allActions'
-import { COUPONCODE } from '../../Redux/Utils/constant'
 
 const Coupon = () => {
     const carts=useSelector(state=>state.StoreProuct.ShoopingCarts)
@@ -15,12 +14,11 @@ const Coupon = () => {
 
     const cartTotal = () => {
         return carts?.reduce(function (total, item) {
-            return total + (Number(item.quantity || 1) * item.dis_points)
+            return total + (Number(item.quantity || 1) * item.dis_prize)
         }, 0)
     }
     useEffect(()=>{
         dispatch(CouponCode())
-      
     },[])
 
     const CheckValdeCoupon=()=>{
@@ -54,7 +52,7 @@ const Coupon = () => {
                 Discount:DiscountAmt,
                 Details:Data
             }
-            dispatch(CouponDetails(Number(Coupons)))
+            DiscountAmt && dispatch(CouponDetails(Coupons))
       }
     return (
         <>

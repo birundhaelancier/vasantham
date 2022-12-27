@@ -42,19 +42,19 @@ const OrderMobile_View = (props) => {
 }
 
 const headings={
-    subtotal:"SubTotal",
-    reward:"Points",
-    discount:"Discount",
-    total:"Total",
-    deliverycharge:"Delivery Charges",
-    total_paid:"TOTAL PAID"
+    // subtotal:"SubTotal",
+    // // reward:"Points",
+    // discount:"Discount",
+    // total:"Total",
+    // deliverycharge:"Delivery Charges",
+    total_paid:"TOTAL POINTS"
 }
 
 const FooterValues={
-    subtotal:Number(cartTotal()),
-    reward:OrderDetails?.reward || 0,
+    subtotal:Number(cartTotal())?.toFixed(2),
+    // reward:OrderDetails?.reward || 0,
     discount:OrderDetails?.discount || 0,
-    total:Math.abs(Number(cartTotal())-Number(OrderDetails?.discount!=="[]" ? OrderDetails?.discount : 0)),
+    total:Math.abs(Number(cartTotal())-Number(OrderDetails?.discount!=="[]" ? OrderDetails?.discount : 0))?.toFixed(2),
     deliverycharge:OrderDetails?.shipping?.price || 0,
     total_paid:0
 }
@@ -109,11 +109,11 @@ const FooterValues={
                     </div>
                     <div className="offcanvas-wishlist-item-details">
                       <span className="offcanvas-wishlist-item-details-quantity">
-                        Price : <i class="fa fa-inr"/> {data.attribute_price?data.attribute_price:data.main_price}.00
+                        Points : {(data.attribute_price?data.attribute_price:data.main_price)?.toFixed(2)}
                       </span>
                     </div>
                    
-                    <div style={{color:"green"}}> Total: <i class="fa fa-inr"/> {(data.attribute_price?data.attribute_price:data.main_price)*data.qty}.00</div>
+                    <div style={{color:"green"}}> Total Points:  {((data.attribute_price?data.attribute_price:data.main_price)*data.qty)?.toFixed(2)}</div>
                       
                   </div>
                 </div>
@@ -127,7 +127,7 @@ const FooterValues={
             return(
           <>
             <span>{headings[data]}:</span>
-        <span><i class="fa fa-inr"/> {
+        <span>{
          data==="discount" ? (FooterValues["discount"]!=="[]" ? FooterValues[data] :0):
          data==="total_paid" ? (Number(FooterValues["total"]) + Number(FooterValues["deliverycharge"]) || 0) :
          FooterValues[data] && FooterValues[data] || 0

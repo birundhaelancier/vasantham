@@ -2,12 +2,13 @@ import React, { useEffect, useState } from "react";
 import { Link, useHistory } from "react-router-dom";
 
 import { useDispatch, connect, useSelector } from "react-redux";
-import img from "../../assets/img/wishlist.png";
-import { Get_Wishlist } from "../../Redux/Action/allActions";
-import { DeleteWishlist } from "../../Redux/Action/CreateActions";
-import { ImageUrl } from "../../Redux/Utils/baseurl";
+import img from "../assets/img/wishlist.png";
+import { Get_Wishlist } from "../Redux/Action/allActions";
+import { DeleteWishlist } from "../Redux/Action/CreateActions";
+import { ImageUrl } from "../Redux/Utils/baseurl";
 import Swal from "sweetalert2";
 import { notification } from "antd";
+import EmptyCart from "./Cart/EmptyCart";
 const WishlistComp = (props) => {
   let dispatch = useDispatch();
   const [WishListData, setWishListData] = useState([]);
@@ -20,18 +21,12 @@ const WishlistComp = (props) => {
   useEffect(() => {
     dispatch(Get_Wishlist());
   }, []);
-  useEffect(() => {
-    var Data = WishList.filter((data) => {
-      return data !== null;
-    });
-    setWishListData(Data);
-  }, [WishList]);
 
   return (
     <>
       {WishListData?.length ? (
         <section id="Wishlist_area" className="pt-3 wish_list_view ">
-          <h4 className="text-center pb-3 pt-3">WishList</h4>
+          <h4 className="text-center pb-3 pt-3">Recent Activities</h4>
           <div className="container">
             <div className="row">
               <div className="col-12 desktop_view_cart">
@@ -40,10 +35,9 @@ const WishlistComp = (props) => {
                     <table>
                       <thead>
                         <tr>
-                          <th className="product_remove">Remove</th>
                           <th className="product_thumb">Image</th>
-                          <th className="product_name">Product</th>
-                          <th className="product-price">Points</th>
+                          <th className="product_name">Product Name</th>
+                          <th className="product-price">Price</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -69,9 +63,7 @@ const WishlistComp = (props) => {
                               </Link>
                             </td>
 
-                            <td className="product-price">
-                              {data.point}
-                            </td>
+                            <td className="product-price">{data.point}</td>
                           </tr>
                         ))}
                       </tbody>
@@ -99,9 +91,7 @@ const WishlistComp = (props) => {
 
                         <li className="price_cont">
                           {/* <div className="table_head">Price </div> */}
-                          <div className="table_val">
-                            {data.point}
-                          </div>
+                          <div className="table_val">{data.point}</div>
                           <div style={{ textAlign: "end" }}>
                             <i
                               className="fa fa-trash text-danger"
@@ -122,25 +112,10 @@ const WishlistComp = (props) => {
           </div>
         </section>
       ) : (
-        <section id="empty_cart_area" className="ptb-100 parent_vas_div">
-          <div className="container">
-            <div className="row">
-              <div className="col-lg-6 offset-lg-3 col-md-6 offset-md-3 col-sm-12 col-12">
-                <div className="empaty_cart_area">
-                  <img src={img} alt="img" style={{ width: "70%" }} />
-                  {/* <h2>YOUR WISHLIST IS EMPTY</h2> */}
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
+        <EmptyCart Width={"80%"} />
       )}
     </>
   );
 };
 
-// const mapStateToProps = (state) =>
-// ({
-//     WishList: state.AllReducer.WishList || []
-// });
 export default WishlistComp;

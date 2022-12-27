@@ -14,7 +14,7 @@ const Coupon = () => {
 
     const cartTotal = () => {
         return carts?.reduce(function (total, item) {
-            return total + (Number(item.quantity || 1) * item.dis_prize)
+            return total + (Number(item.quantity || 1) * item.dis_points)
         }, 0)
     }
     useEffect(()=>{

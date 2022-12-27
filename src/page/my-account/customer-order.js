@@ -8,7 +8,6 @@ const CustomerOrder = () => {
     return (
         <>
             <Header />
-            {/* <Banner title="Customer Dashboard" /> */}
             <Layout>
                 <Order />
             </Layout>

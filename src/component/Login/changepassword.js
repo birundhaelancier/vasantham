@@ -3,50 +3,45 @@ import { Link, useParams } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import Swal from "sweetalert2";
 import { useHistory } from "react-router-dom";
-import { User_Login } from "../../Redux/Action/LoginActions";
+import { ChangePasswordApi } from "../../Redux/Action/LoginActions";
 import Loading from "../../page/Loading/Loading";
 import { useAuth } from "../../context/auth";
 import { Profile_Details, RewardPoints } from "../../Redux/Action/allActions";
-const LoginArea = () => {
+const ChangePassword = () => {
   let dispatch = useDispatch();
   let { type } = useParams();
   let history = useHistory();
-  const [register, setregister] = useState(false);
-  const [location, setlocation] = useState(false);
+  const [show2, setshow2] = useState(false);
   const [showPass, setshowPass] = useState(false);
   const [loading, setloading] = useState(false);
-  const [login, setlogin] = useState(false);
-  const [forgot, setforgot] = useState(false);
+  const [error, seterror] = useState("");
   const [UserDetail, setUserDetail] = useState({
     password: "",
-    mobileno: "",
-    email: "",
-  });
-  const { setAuthTokens } = useAuth();
+    confirm_pass: "",
+  })
   const onChangeData = (e) => {
+    if (e.target.name === "confirm_pass") {
+        e.target.value === UserDetail.password ? seterror("") : seterror("Password does't not match");
+    }
     setUserDetail((prevState) => ({
       ...prevState,
       [e.target.name]: e.target.value,
     }));
   };
   const Submit = (e) => {
-    e.preventDefault();
-    setloading(true);
-    dispatch(User_Login(UserDetail)).then((res) => {
-      setloading(false);
-      setregister(false);
+    e.preventDefault()
+    if(error===""){
+     setloading(true)
+    dispatch(ChangePasswordApi(UserDetail)).then((res) => {
+      setloading(false)
       if (res.payload.status === 1) {
         Swal.fire({
           icon: "success",
-          title: "Login Successfully",
+          title: res.payload.response,
           showConfirmButton: false,
           timer: 1500,
-        });
-        ClearState();
-        type === "cart" ? history.push("/cart") : history.push("/");
-        setAuthTokens(res.payload.response);
-        dispatch(Profile_Details());
-        dispatch(RewardPoints());
+        })
+        ClearState()
       } else if (res.payload.status === 0) {
         Swal.fire({
           icon: "warning",
@@ -63,31 +58,30 @@ const LoginArea = () => {
           timer: 1500,
         });
       }
-    });
+    })
+   }
 
     setUserDetail((prevState) => ({
       ...prevState,
-    }));
-  };
+    }))
+  }
   const ClearState = () => {
-    let key = Object.keys(UserDetail);
-    key.map((data) => {
-      UserDetail[data] = "";
-    });
     setUserDetail((prevState) => ({
-      ...prevState,
-    }));
-  };
+        ...prevState,
+        confirm_pass : '',
+        password: ''
+    }))
+  }
+
 
   return (
     <div className="parent_vas_div">
-      <section id="login_area" className="ptb-60 mtb-20">
+      <section id="login_area" className="mtb-20">
         <div className="container">
           <div className="row">
-            <div className="col-lg-3 col-md-12 col-sm-12 col-12"></div>
-            <div className="col-lg-6 col-md-12 col-sm-12 col-12 log_acc_form">
+            <div className="col-lg-8 offset-lg-2 col-md-12 col-sm-12 col-12 log_acc_form">
               <div className="account_form">
-                <h3>Login</h3>
+                <h3>Change Password</h3>
                 <form
                   onSubmit={(e) => {
                     Submit(e);
@@ -96,21 +90,7 @@ const LoginArea = () => {
                 >
                   <div className="default-form-box">
                     <label>
-                      Mobile Number or email
-                      <span className="text-danger">*</span>
-                    </label>
-                    <input
-                      type="text"
-                      name="mobileno"
-                      className="form-control"
-                      required
-                      onChange={(e) => onChangeData(e)}
-                      value={UserDetail.mobileno}
-                    />
-                  </div>
-                  <div className="default-form-box">
-                    <label>
-                      Password<span className="text-danger">*</span>
+                      New Password<span className="text-danger">*</span>
                     </label>
                     <input
                       type={showPass ? "text" : "password"}
@@ -131,27 +111,41 @@ const LoginArea = () => {
                       }
                     ></i>
                   </div>
-                  <div className="text-right pt-0 forgot_txt">
-                    <Link to="/forgot">Forgot password?</Link>
+                  <div className="default-form-box">
+                    <label>
+                      Confirm Password<span className="text-danger">*</span>
+                    </label>
+                    <input
+                      type={show2 ? "text" : "password"}
+                      name="confirm_pass"
+                      className="form-control"
+                      required
+                      minLength="6"
+                      maxLength="25"
+                      onChange={(e) => onChangeData(e)}
+                      value={UserDetail.confirm_pass}
+                    />
+                    <i
+                      onClick={() => setshow2(!show2)}
+                      class={
+                        show2
+                          ? "fa fa-eye icon_eye"
+                          : "fa fa-eye-slash icon_eye"
+                      }
+                    ></i>
                   </div>
+                  {error!=="" &&<div className="err_msg">{error}</div>}
                   <div className="login_submit text-end">
                     <button
                       className="theme-btn-one btn-black-overlay  btn_md "
                       type="submit"
                     >
-                      login
+                      Submit
                     </button>
-                  </div>
-
-                  <div className="text-center pt-3 active">
-                    <Link to="/mobile-verification" className="active  w-100">
-                      Create Your Account?
-                    </Link>
                   </div>
                 </form>
               </div>
             </div>
-            <div className="col-lg-4 col-md-12 col-sm-12 col-12"></div>
           </div>
         </div>
       </section>
@@ -160,4 +154,4 @@ const LoginArea = () => {
   );
 };
 
-export default LoginArea;
+export default ChangePassword;

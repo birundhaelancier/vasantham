@@ -50,7 +50,7 @@ const DashBoard = () => {
                                 <tr>
                                     <th scope="col">Order Id</th>
                                     <th scope="col">Date</th>
-                                    <th scope="col">Price</th>
+                                    <th scope="col">Points</th>
                                 </tr>
                             </thead>
 
@@ -60,7 +60,7 @@ const DashBoard = () => {
 
                                     <td><Link to={`/order-success/${data.txnid}`} className="text-primary">#{data.txnid}</Link></td>
                                     <td>{moment(data.created_at).format("DD-MM-YYYY")}</td>
-                                    <td><span><i class="fa fa-inr" aria-hidden="true"></i> {data.orderTotal}</span></td>
+                                    <td><span> {data.orderTotal}</span></td>
                                 </tr>
                                 </tbody>
                                 )}

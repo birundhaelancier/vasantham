@@ -1,14 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
-import logo from "../../../assets/img/vasanth1.jpg";
-import logoWhite from "../../../assets/img/vasanth1.jpg";
+import { Link, useLocation } from "react-router-dom";
 import { MenuData } from "./MenuData";
 import NaveItems from "./NaveItems";
 import TopHeader from "./TopHeader";
 import { useHistory } from "react-router-dom";
 import svg from "../../../assets/img/svg/cancel.svg";
 import svgsearch from "../../../assets/img/svg/search.svg";
-import logotest from "../../../assets/img/vasanthlogo.png";
 import home from "../../../assets/img/home.png";
 import category from "../../../assets/img/category.png";
 import order from "../../../assets/img/order.png";
@@ -22,7 +19,9 @@ import Youtube from "../../../assets/img/youtube1.png";
 import review from "../../../assets/img/review.png";
 import reward from "../../../assets/img/reward.png";
 import redeem from "../../../assets/img/redeem.png";
-import about from '../../../assets/img/about.png'
+import about from "../../../assets/img/about.png";
+import log from "../../../assets/img/logout.png";
+import logos from "../../../assets/img/logo.gif";
 import { Autocomplete, InputAdornment, Box, TextField } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { apiurl, ImageUrl } from "../../../Redux/Utils/baseurl";
@@ -34,7 +33,8 @@ import {
   Profile_Details,
   RewardPoints,
   SearchCategory,
-  NotificationsApi
+  NotificationsApi,
+  CartListApi,
 } from "../../../Redux/Action/allActions";
 import Avatar from "@mui/material/Avatar";
 import Slider from "react-slick";
@@ -55,14 +55,15 @@ import {
 // const MenuData = []
 const Header = () => {
   let dispatch = useDispatch();
-
+  let { pathname } = useLocation();
   const [click, setClick] = useState(false);
   const [show, setShow] = useState();
   const history = useHistory();
+  const [search, setSearch] = useState(false);
   const [Category, setCategory] = useState([]);
   const [NewMenuData, setNewMenuData] = useState([]);
   const [WishList, setWishList] = useState([]);
-  const ShoppingCarts = useSelector((state) => state.StoreProuct.ShoopingCarts);
+  const ShoppingCarts = useSelector((state) => state.AllReducer.CartLists);
   const profileDetails = useSelector(
     (state) => state.AllReducer.ProfileData?.users
   );
@@ -114,10 +115,10 @@ const Header = () => {
 
   useEffect(() => {
     dispatch(Profile_Details());
-    dispatch(RewardPoints());
+    JSON.parse(localStorage.getItem("UserId")) && dispatch(RewardPoints());
     dispatch(Category_List());
     dispatch(Get_Wishlist());
-    dispatch(NotificationsApi())
+    dispatch(NotificationsApi());
   }, []);
 
   useEffect(() => {
@@ -128,44 +129,9 @@ const Header = () => {
   }, [WishListData]);
 
   const handleClick = () => {
-    // if (click) {
-    //     document.querySelector("#offcanvas-add-cart").style = ("transform: translateX(100%);")
-    // } else {
-    //     document.querySelector("#offcanvas-add-cart").style = ("transform: translateX(0%);")
-    // }
-    // setClick(!click);
-    history.push("/wishlist");
-  };
-  const handleWish = () => {
-    // if (click) {
-    //     document.querySelector("/cart").style = ("transform: translateX(100%);")
-    // } else {
-    //     document.querySelector("/cart").style = ("transform: translateX(0);")
-    // }
-    // setClick(!click);
     history.push("/wishlist");
   };
 
-  const handleSearch = () => {
-    if (click) {
-      document.querySelector("#search").style =
-        "transform: translate(-100%, 0); opacity: 0";
-    } else {
-      document.querySelector("#search").style =
-        "transform: translate(0px, 0px); opacity: 1";
-    }
-    setClick(!click);
-  };
-  const handleabout = () => {
-    if (click) {
-      document.querySelector("#offcanvas-about").style =
-        "transform: translateX(100%);";
-    } else {
-      document.querySelector("#offcanvas-about").style =
-        "transform: translateX(0%);";
-    }
-    setClick(!click);
-  };
   const handlemenu = () => {
     if (click) {
       document.querySelector("#mobile-menu-offcanvas").style =
@@ -178,29 +144,13 @@ const Header = () => {
   };
 
   const logout = () => {
-    // Swal.fire({
-    //     icon: 'success',
-    //     title: 'Logout Sucessfully',
-    //     text: 'Thank You',
-    //     showConfirmButton: false,
-    //     timer: 1500
-    // })
     localStorage.removeItem("UserId");
-    // dispatch({ type: "user/logout" })
     history.push("/login");
   };
 
   const handleShow = (value) => {
     value === show ? setShow("") : setShow(value);
   };
-
-  // Sticky Menu Area
-  // useEffect(() => {
-  //     window.addEventListener('scroll', isSticky);
-  //     return () => {
-  //         window.removeEventListener('scroll', isSticky);
-  //     };
-  // });
 
   const [scrollPosition, setScrollPosition] = useState(0);
   const handleScroll = () => {
@@ -217,12 +167,7 @@ const Header = () => {
   }, []);
 
   const isSticky = (e) => {
-    const header = document.querySelector(".mobile-section");
     const header2 = document.querySelector(".header-section");
-    const scrollTop = window.scrollY;
-    scrollPosition >= 10
-      ? header.classList.add("is-sticky")
-      : header.classList.remove("is-sticky");
     scrollPosition >= 10
       ? header2.classList.add("is-sticky")
       : header2.classList.remove("is-sticky");
@@ -242,6 +187,7 @@ const Header = () => {
       setFilterData(res.payload);
       setSearchList(Data);
     });
+    dispatch(CartListApi());
   }, []);
 
   useEffect(() => {
@@ -284,16 +230,25 @@ const Header = () => {
     handlemenu();
   };
 
-  const Main_url = "https://dynamic-froyo-597702.netlify.app/";
+  const WindowOpen = (url) => {
+    window.open(url, "_self");
+  };
 
+  const handleSearch = (value) => {
+    dispatch({
+      type: "HandleSearch",
+      payload: { search: value, type: true },
+    });
+    history.push("/search");
+  };
 
-  const WindowOpen=(url)=>{
-    // alert("fghj")
-  //  var windowSize = "width=" + window.innerWidth + ",height=" + window.innerHeight + ",scrollbars=no";
-   window.open(url, '_self')
-
-  }
-
+  const HandleChange = (value) => {
+    setSearch(value);
+    if (value) dispatch({ type: "HandleSearch", payload: { type: true } });
+    else {
+      dispatch({ type: "HandleSearch", payload: { type: false } });
+    }
+  };
   return (
     <>
       <TopHeader />
@@ -306,12 +261,7 @@ const Header = () => {
                   <div className="agalogoImage">
                     <div className="logo">
                       <Link to="/">
-                        <img
-                          src={
-                            "https://elancier.in/vasantham/assets/images/1653572820logo.gif"
-                          }
-                          alt="logo"
-                        />
+                        <img src={logos} alt="logo" />
                       </Link>
                     </div>
                   </div>
@@ -319,8 +269,6 @@ const Header = () => {
                   <div className="SearchView">
                     <div className="search_space">
                       <div class="wrapper">
-                        {/* <div class="search-icon" >🔎︎</div>
-                                                <input class="search" placeholder="Search for products" type="text"/> */}
                         <div className="input-group md-form form-sm form-1 pl-0 auto_search">
                           <Autocomplete
                             onChange={(event, newValue) =>
@@ -355,9 +303,6 @@ const Header = () => {
                                 InputProps={{
                                   ...params.InputProps,
                                   type: "search",
-                                  //   startAdornment:
-                                  //     <InputAdornment
-                                  //         position="start">🔎︎</InputAdornment>,
                                   endAdornment: (
                                     <InputAdornment> Search </InputAdornment>
                                   ),
@@ -369,7 +314,6 @@ const Header = () => {
                         </div>
                       </div>
                     </div>
-
                   </div>
                   <ul className="right_list">
                     {!JSON.parse(localStorage.getItem("UserId")) ? (
@@ -446,7 +390,11 @@ const Header = () => {
                     <li>
                       <Link to="/notification" className="offcanvas-icon">
                         <i class="fa fa-bell bell_ic" aria-hidden="true"></i>
-                        <span className="item-count">{Notifications?.length || 0}</span>
+                        <span className="item-count">
+                          {pathname !== "/notification"
+                            ? Notifications?.length
+                            : 0}
+                        </span>
                       </Link>
                     </li>
                     <li>
@@ -497,16 +445,20 @@ const Header = () => {
             <div className="row">
               <div className="col-12 d-flex align-items-center justify-content-start">
                 <div className="main-menu menu-color--black menu-hover-color--golden  d-xl-block">
-                  <nav>
-                    <ul className="menus-list">
-                      {MenuData.map((item, index) => (
-                        <NaveItems item={item} key={index} />
-                      ))}
-                      {NewMenuData.slice(0, 6).map((item, index) => (
-                        <NaveItems item={item} key={index} />
-                      ))}
-                    </ul>
-                  </nav>
+                  {NewMenuData?.length > 0 ? (
+                    <nav>
+                      <ul className="menus-list">
+                        {MenuData.map((item, index) => (
+                          <NaveItems item={item} key={index} />
+                        ))}
+                        {NewMenuData.slice(0, 6).map((item, index) => (
+                          <NaveItems item={item} key={index} />
+                        ))}
+                      </ul>
+                    </nav>
+                  ) : (
+                    ""
+                  )}
                 </div>
               </div>
             </div>
@@ -515,7 +467,7 @@ const Header = () => {
         </div>
       </header>
 
-      <div className="mobile-header sticky-header mobile-section sticky-color--golden mobile-header-bg-color--golden section-fluid  d-xl-none is-sticky">
+      <div className="mobile-header  mobile-section sticky-color--golden mobile-header-bg-color--golden section-fluid  d-xl-none ">
         <div className="container">
           <div className="row">
             <div className="col-12 d-flex align-items-center justify-content-between">
@@ -525,12 +477,7 @@ const Header = () => {
                     <a href="/">
                       <div className="logo logospace ">
                         <div className="logo_child">
-                          <img
-                            src={
-                              "https://elancier.in/vasantham/assets/images/1653572820logo.gif"
-                            }
-                            alt="logo"
-                          />
+                          <img src={logos} alt="logo" />
                         </div>
                       </div>
                     </a>
@@ -540,10 +487,21 @@ const Header = () => {
 
               <div className="mobile-right-side">
                 <ul className="header-action-link action-color--black action-hover-color--golden">
+                  {!search && (
+                    <li>
+                      <i
+                        class="fa fa-search"
+                        style={{ fontSize: "18px" }}
+                        onClick={() => HandleChange(true)}
+                      ></i>
+                    </li>
+                  )}
                   <li>
                     <Link to="/notification" className="offcanvas-icon">
                       <i class="fa fa-bell bell_ic" aria-hidden="true"></i>
-                      <span className="item-count">{Notifications?.length || 0}</span>
+                      <span className="item-count">
+                        {Notifications?.length || 0}
+                      </span>
                     </Link>
                   </li>
                   <li>
@@ -591,6 +549,24 @@ const Header = () => {
                 </ul>
               </div>
             </div>
+            {search && (
+              <div className="search_div">
+                <div
+                  class="search-icon"
+                  onClick={() => {
+                    HandleChange(false);
+                  }}
+                >
+                  <i class="fa fa-close" />
+                </div>
+                <input
+                  class="search"
+                  placeholder="Search for products"
+                  type="text"
+                  onChange={(e) => handleSearch(e.target.value)}
+                />
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -602,12 +578,7 @@ const Header = () => {
         <div className="offcanvas-header text-right menu_header_view">
           <div className="logo logospace">
             <div className="logo_child">
-              <img
-                src={
-                  "https://elancier.in/vasantham/assets/images/1653572820logo.gif"
-                }
-                alt="logo"
-              />
+              <img src={logos} alt="logo" />
             </div>
           </div>
           <button className="offcanvas-close" onClick={handlemenu}>
@@ -671,11 +642,7 @@ const Header = () => {
                 {JSON.parse(localStorage.getItem("UserId")) && (
                   <>
                     <li>
-                      <a
-                        onClick={() =>
-                          NextPage("/my-account/customer-account-details")
-                        }
-                      >
+                      <a onClick={() => NextPage("/my-account")}>
                         <span>
                           <img src={account} /> {"My Account"}
                         </span>
@@ -715,7 +682,8 @@ const Header = () => {
                 </li>
                 <li>
                   <a
-                    onClick={ () =>WindowOpen("https://vasanthamstore.com/about/")
+                    onClick={() =>
+                      WindowOpen("https://vasanthamstore.com/about/")
                     }
                   >
                     <span>
@@ -725,39 +693,72 @@ const Header = () => {
                 </li>
                 <li>
                   <a
-                    onClick={() =>WindowOpen("https://g.page/r/CWQ1Hfkqod8GEAg/review")}
+                    onClick={() =>
+                      WindowOpen("https://g.page/r/CWQ1Hfkqod8GEAg/review")
+                    }
                   >
                     <span>
                       <img src={rate} /> {"Rate Us"}
                     </span>
                   </a>
                 </li>
+                <li>
+                  <a>
+                    <span>
+                      {!JSON.parse(localStorage.getItem("UserId")) ? (
+                        <span onClick={() => NextPage("/login")}>
+                          <img src={login} /> Login
+                        </span>
+                      ) : (
+                        <span onClick={() => logout()}>
+                          <img src={log} /> Log Out
+                        </span>
+                      )}
+                    </span>
+                  </a>
+                </li>
                 {/* <li><a ><span><img src={review}/>  {"Reviews"}</span></a></li> */}
                 <li>
-                  <WhatsappShareButton
-                    url={""}
-                    title={"Vasantham Shopping"}
-                  >
-                    <WhatsappIcon size={32} round onClick={()=>window.open("https://wa.me/919047183288","_self")}/>
+                  <WhatsappShareButton url={""} title={"Vasantham Shopping"}>
+                    <WhatsappIcon
+                      size={32}
+                      round
+                      onClick={() =>
+                        window.open("https://wa.me/919047183288", "_self")
+                      }
+                    />
                   </WhatsappShareButton>
-                  <FacebookShareButton
-                    quote={""}
-                    hashtag="#vasantham shopping"
-                  >
-                    <FacebookIcon size={32} round onClick={()=>window.open("https://www.facebook.com/Vasanthamsupermart","_self")}/>
+                  <FacebookShareButton quote={""} hashtag="#vasantham shopping">
+                    <FacebookIcon
+                      size={32}
+                      round
+                      onClick={() =>
+                        window.open(
+                          "https://www.facebook.com/Vasanthamsupermart",
+                          "_self"
+                        )
+                      }
+                    />
                   </FacebookShareButton>
-                  <TwitterShareButton
-                    url={""}
-                    title={"Vasantham Shopping"}
-                  >
-                    <TwitterIcon size={32} round onClick={()=>window.open("https://twitter.com/Vasanthamstore","_self")}/>
+                  <TwitterShareButton url={""} title={"Vasantham Shopping"}>
+                    <TwitterIcon
+                      size={32}
+                      round
+                      onClick={() =>
+                        window.open(
+                          "https://twitter.com/Vasanthamstore",
+                          "_self"
+                        )
+                      }
+                    />
                   </TwitterShareButton>
 
                   <img
                     src={insta}
                     onClick={() =>
                       window.open(
-                        "https://www.instagram.com/vasanthamsupermart","_self"
+                        "https://www.instagram.com/vasanthamsupermart",
+                        "_self"
                       )
                     }
                     className="img_play"
@@ -767,26 +768,15 @@ const Header = () => {
                     src={Youtube}
                     onClick={() =>
                       window.open(
-                        "https://www.youtube.com/channel/UCYIia86MKba5BBiy0YX7Yqw","_self"
+                        "https://www.youtube.com/channel/UCYIia86MKba5BBiy0YX7Yqw",
+                        "_self"
                       )
                     }
                     className="img_play"
                   />
                 </li>
-                <li>
-                  <a>
-                    <span>
-                      {!JSON.parse(localStorage.getItem("UserId")) ? (
-                        <span onClick={() => NextPage("/login")}>Login</span>
-                      ) : (
-                        <span onClick={() => logout()}>Log Out</span>
-                      )}
-                    </span>
-                  </a>
-                </li>
-                <li>
-            </li>
-               
+
+                <li></li>
               </ul>
             </div>
             <div></div>

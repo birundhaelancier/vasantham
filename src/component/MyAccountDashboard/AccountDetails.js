@@ -27,12 +27,12 @@ const Profile = (props) => {
                         <div className="row">
                             <div className="col-lg-2 col-md-2 col-sm-6 col-12">
                             <div className="profile_left">
-                                <h4>{ProfileData[data]}:</h4>
+                                <h4>{ProfileData[data] || "-"}:</h4>
                             </div>
                             </div>
                             <div className="col-lg-5 col-md-5 col-sm-6 col-12">
                             <div className="profile_right">
-                                <h4>{profileDetails && profileDetails[data]}</h4>
+                                <h4>{profileDetails && profileDetails[data] || "-"}</h4>
                             </div>
                             </div>
                         </div>

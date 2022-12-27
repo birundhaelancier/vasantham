@@ -28,7 +28,7 @@ const Order = (props) => {
                                     <tr>
                                         <th scope="col">Order Id</th>
                                         <th scope="col">Date</th>
-                                        <th scope="col">Price</th>
+                                        <th scope="col">Points</th>
                                     </tr>
                                 </thead>
                                 {OrderDetails?.map((data)=>
@@ -42,7 +42,7 @@ const Order = (props) => {
                                         </td>
                                  
                                     <td>{moment(data.created_at).format("DD-MM-YYYY")}</td>
-                                    <td><span><i class="fa fa-inr"/> {data.orderTotal || 0}</span></td>
+                                    <td><span>{data.orderTotal || 0}</span></td>
 
                                 </tr>
                                 

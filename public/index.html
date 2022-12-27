@@ -9,55 +9,87 @@
       name="description"
       content="Web site created using create-react-app"
     />
-    <link rel="stylesheet" href="/assets/css/bootstrap.min.css">
-   
+    <link rel="stylesheet" href="/assets/css/bootstrap.min.css" />
+
     <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
-    <link rel="stylesheet" type="text/css" charset="UTF-8" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.6.0/slick.min.css" /> 
-    <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.6.0/slick-theme.min.css" />
-    <link href='//fonts.googleapis.com/css?family=Poppins:thin,extra-light,light,100,200,300,400,500,600,700,800' 
-    rel='stylesheet' type='text/css'>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link
+      rel="stylesheet"
+      type="text/css"
+      charset="UTF-8"
+      href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.6.0/slick.min.css"
+    />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://cdnjs.cloudflare.com/ajax/libs/slick-carousel/1.6.0/slick-theme.min.css"
+    />
+    <link
+      href="//fonts.googleapis.com/css?family=Poppins:thin,extra-light,light,100,200,300,400,500,600,700,800"
+      rel="stylesheet"
+      type="text/css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@4.0.0/dist/css/bootstrap.min.css"
+      integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+      crossorigin="anonymous"
+    />
     <title>Vasantham Hyper Mart</title>
+    <!-- Google tag (gtag.js) - Google Analytics -->
+    <script
+      async
+      src="https://www.googletagmanager.com/gtag/js?id=G-LFQ8HEHB0C"
+    ></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag() {
+        dataLayer.push(arguments);
+      }
+      gtag("js", new Date());
+
+      gtag("config", "G-LFQ8HEHB0C");
+    </script>
   </head>
   <style>
-
+    @media screen and (max-width: 480px) {
+      .img_cont {
+        width: 80% !important;
+      }
+      .loader-container {
+        left: 64%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+      }
+    }
     .loader-container {
-    position: absolute;
-    left: 48%;
-    top: 45%;
-    transform: translate(-50%,-50%);
-    width: 3em;
-    height: 3em;
-    border: 5px solid #c6d75f;
-    border-left: 7px solid #fff;
-    border-radius: 50%;
-    animation: load8 1.1s infinite linear;
-    transition: opacity 0.3s;
-  }
-  
-  .loader--hide {
-    opacity: 0;
-  }
-  
-  @keyframes load8 {
-    0% {
-      transform: rotate(0deg);
+      position: absolute;
+      left: 64%;
+      top: 50%;
+      transform: translate(-64%, -50%);
+      border-radius: 50%;
     }
-    100% {
-      transform: rotate(360deg);
+
+    .loader--hide {
+      opacity: 0;
     }
+    .img_cont {
+      width: 45%;
+    }
+    .img_cont img {
+      width: 100%;
+      height: 100%;
     }
   </style>
   <body>
     <div className="loader_parent">
-       <div class="loader-container">
-         <div class="loader"></div>
+      <div class="loader-container">
+        <div class="img_cont"><img src="logo.gif" /></div>
       </div>
-   </div>
+    </div>
 
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
     <script src="/assets/js/jquery-3.6.0.min.js"></script>
-    <script src="/assets/js/bootstrap.min.js" ></script> 
+    <script src="/assets/js/bootstrap.min.js"></script>
   </body>
 </html>

@@ -23,17 +23,37 @@ const ContactUs = () => {
         {
             branch: "Kalavasal",
             address: "Vasantham Super Mart\r\n90/1, Theni Main Road,\r\nKalavasal, Madurai - 625016.",
-            phone: "0452 - 4353188"
+            phone: "0452 - 3500828,9095230051"
         },
         {
             branch: "Virattipathu",
-            address: "Vasantham Hyper Mart\r\n123/10, Theni  Main Road,\r\nVirattipathu, Madurai - 625016.",
+            address: "Vasantham Hyper Mart\r\n123/10, Theni  Main Road,\r\nVirattipathu, Madurai - 625016",
             phone: "0452 - 2323288"
         },
         {
-            branch: "Kpudur",
+            branch: "K pudur",
             address: "Vasantham Mini Mart\r\n20/1, Matha kovil Main Road,\r\nK.Pudur, Madurai - 625007.",
             phone: "0452 - 3559364"
+        },
+        {
+            branch: "Vilangudi",
+            address: " 23,Meenakshi Nagar,Solaimalai Building Basement, Vilangudi Madurai-625018",
+            phone: "9786660174"
+        },
+        {
+            branch: "SHANTHI NAGAR",
+            address: "VASANTHAM SUPER MARKET NO.48,PALAMEDU MAIN ROAD,SHANTHI NAGAR,MADURAI-625018 ",
+            phone: "9786660114"
+        },
+        {
+            branch: "Sikkandar Chavadi",
+            address: "3/305,Alanganallur main road, Sikkandar Chavadi,Madurai-625018.",
+            phone: "9786660711"
+        },
+        {
+            branch: "Moondrumavadi,K pudur",
+            address: "Moondrumavadi , Vasantham Hyper Mart 7, Annai Nagar 2 nd Street, parasurampatti Madurai North, Moondrumavadi, K pudur, Madurai - 625007",
+            phone: "8925802417"
         }
     ]
 

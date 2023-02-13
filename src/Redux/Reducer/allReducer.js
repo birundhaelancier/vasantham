@@ -73,6 +73,8 @@ const initialState = {
   SearchResults: [],
   CartLists: [],
   Branchlists: [],
+  Offerlists: [],
+  payType: "points",
 };
 export default function (state = initialState, action) {
   const { type, payload } = action;
@@ -155,6 +157,10 @@ export default function (state = initialState, action) {
       return { ...state, CartLists: payload };
     case "BranchList":
       return { ...state, Branchlists: payload };
+    case "OFFERLISTS":
+      return { ...state, Offerlists: payload };
+    case "PayType":
+      return { ...state, payType: payload };
 
     default:
       return state;

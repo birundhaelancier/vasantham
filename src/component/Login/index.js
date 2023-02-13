@@ -96,7 +96,7 @@ const LoginArea = () => {
                 >
                   <div className="default-form-box">
                     <label>
-                      Mobile Number or email
+                      Mobile Number or Email
                       <span className="text-danger">*</span>
                     </label>
                     <input
@@ -139,7 +139,7 @@ const LoginArea = () => {
                       className="theme-btn-one btn-black-overlay  btn_md "
                       type="submit"
                     >
-                      login
+                      Login
                     </button>
                   </div>
 

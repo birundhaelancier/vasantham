@@ -14,14 +14,16 @@ const YourOrders = () => {
   const ShippingDetails = useSelector((state) => state.AllReducer.Shipping);
   const Reward = useSelector((state) => state.AllReducer.RewardPoints);
   const Coupon = useSelector((state) => state.AllReducer.Coupon);
+  const payType = useSelector((state) => state.AllReducer.payType);
   const [FilterData, setFilterData] = useState([]);
   const dispatch = useDispatch();
   const Timer = (val) => {
     let timer = false;
+    var timeron = moment() >= moment(val.date);
     const startDate = moment();
-    const timeEnd = moment(val).local();
+    const timeEnd = moment(val.to_date).local();
     const diff = timeEnd.diff(startDate);
-    if (diff > 0) {
+    if (timeron && diff > 0) {
       timer = true;
     } else {
       timer = false;
@@ -33,9 +35,25 @@ const YourOrders = () => {
       return (
         total +
         Number(item.qty || 1) *
-          Number(Timer(item.date) ? item.deal_point : item?.point)
+          (payType === "points"
+            ? Number(
+                item.aid
+                  ? attributeFun(item)?.[0]?.point
+                  : Timer(item)
+                  ? item.deal_point
+                  : item?.point
+              )
+            : item.aid
+            ? attributeFun(item)?.[0]?.selling
+            : Timer(item)
+            ? item.deal_amount
+            : item.discount_price)
       );
     }, 0);
+  };
+
+  const attributeFun = (data) => {
+    return data?.attribute?.filter((datas) => datas.id === data.aid);
   };
 
   const pointscartTotal = () => {
@@ -43,7 +61,7 @@ const YourOrders = () => {
       return (
         total +
         Number(item.qty || 1) *
-          Number(Timer(item.date) ? item.deal_point : item?.point)
+          Number(Timer(item) ? item.deal_point : item?.point)
       );
     }, 0);
   };
@@ -53,24 +71,24 @@ const YourOrders = () => {
     dispatch(RewardPoints());
   }, []);
 
-  useEffect(() => {
-    let Total = Math.round(
-      Number(cartTotal()) - Number(Reward?.rewardpoint || 0)
-    );
-    if (Total > 1000) {
-      setFilterData(ShippingDetails[0]);
-    } else {
-      setFilterData(ShippingDetails[1]);
-    }
-  }, [cartTotal(), ShippingDetails, Reward]);
+  // useEffect(() => {
+  //   let Total = Math.round(
+  //     Number(cartTotal()) - Number(Reward?.rewardpoint || 0)
+  //   );
+  //   if (Total > 1000) {
+  //     setFilterData(ShippingDetails[0]);
+  //   } else {
+  //     setFilterData(ShippingDetails[1]);
+  //   }
+  // }, [cartTotal(), ShippingDetails, Reward]);
 
   useEffect(() => {
-    const Total = (
-      Number(FilterData?.price) +
-      Math.abs(Number(Coupon ? Coupon.Discount : Number(cartTotal())))
+    // Number(FilterData?.price) +
+    const Total = Math.abs(
+      Number(Coupon ? Coupon.Discount : Number(cartTotal()))
     ).toFixed(2);
     dispatch(CartTotal(Total));
-  }, [FilterData, Coupon, Reward]);
+  }, [FilterData, Coupon, Reward, payType]);
 
   return (
     <>
@@ -91,45 +109,84 @@ const YourOrders = () => {
                 ShoppingCarts.map((data) => (
                   <tr>
                     <td>
-                      {data.name}
+                      {data.name} -
                       <span className="product-qty">
                         {" "}
-                        {Number(
-                          Timer(data.date) ? data.deal_point : data?.point
+                        {payType !== "points" ? (
+                          <i class="fa fa-rupee"></i>
+                        ) : (
+                          ""
                         )}{" "}
+                        {payType === "points"
+                          ? Number(
+                              data.aid
+                                ? attributeFun(data)?.[0]?.point
+                                : Timer(data)
+                                ? data.deal_point
+                                : data?.point
+                            )
+                          : data.aid
+                          ? attributeFun(data)?.[0]?.selling
+                          : Timer(data)
+                          ? data.deal_amount
+                          : data.discount_price}
                         x {data.qty}
                       </span>
                     </td>
                     <td>
-                      {Number(
-                        Timer(data.date) ? data.deal_point : data?.point
-                      ) * data.qty}
+                      {payType !== "points" ? <i class="fa fa-rupee"></i> : ""}{" "}
+                      {(payType === "points"
+                        ? Number(
+                            data.aid
+                              ? attributeFun(data)?.[0]?.point
+                              : Timer(data)
+                              ? data.deal_point
+                              : data?.point
+                          )
+                        : data.aid
+                        ? attributeFun(data)?.[0]?.selling
+                        : Timer(data)
+                        ? data.deal_amount
+                        : data.discount_price) * data.qty}
                     </td>
                   </tr>
                 ))}
             </tbody>
             <tfoot>
-              {/* {Coupon && <tr>
-                                <th>Product Cost</th>
-                                <td className="product-subtotal"  align="end"><i class="fa fa-rupee"></i> {Number(cartTotal() || 0)}</td>
-                            </tr>} */}
+              {Coupon && (
+                <tr>
+                  <th>Product Cost</th>
+                  <td className="product-subtotal" align="end">
+                    {payType !== "points" ? <i class="fa fa-rupee"></i> : ""}{" "}
+                    {Number(cartTotal() || 0)}
+                  </td>
+                </tr>
+              )}
+              <tr>
+                <th>SubTotal</th>
+                <td className="product-subtotal" align="end">
+                  {payType !== "points" ? <i class="fa fa-rupee"></i> : ""}{" "}
+                  {Number(Coupon ? Coupon.Discount : cartTotal() || 0).toFixed(
+                    2
+                  )}
+                </td>
+              </tr>
               {/* <tr>
-                                <th>SubTotal</th>
-                                <td className="product-subtotal"  align="end"><i class="fa fa-rupee"></i> {Number(Coupon?Coupon.Discount:cartTotal() || 0).toFixed(2)}</td>
-                            </tr>
-                            <tr>
-                                <th>Points</th>
-                                <td>{(pointscartTotal() || 0).toFixed(2)}</td>
-                            </tr>  */}
+                <th>Points</th>
+                <td>{(pointscartTotal() || 0).toFixed(2)}</td>
+              </tr> */}
 
               {/* <tr>
-                                <th>Delivery Charges</th>
-                                <td><i class="fa fa-rupee"></i>  {FilterData?.price || 0}.00</td>
-                            </tr>  */}
+                <th>Delivery Charges</th>
+                <td>
+                  <i class="fa fa-rupee"></i> {FilterData?.price || 0}.00
+                </td>
+              </tr> */}
 
               <tr>
                 <th>Grand Total</th>
                 <td className="product-subtotal">
+                  {payType !== "points" ? <i class="fa fa-rupee"></i> : ""}{" "}
                   {(
                     Number(FilterData?.price || 0) +
                     Math.abs(
@@ -147,8 +204,8 @@ const YourOrders = () => {
               severity="success"
               style={{ marginTop: "20px" }}
             >
-              {Coupon.Details[0]?.title} {Coupon?.Details[0]?.discount}{" "}
-              {Coupon?.Details[0]?.type === "amount"
+              {Coupon.Details?.title} {Coupon?.Details?.discount}{" "}
+              {Coupon?.Details?.type === "amount"
                 ? "Rupees Amount"
                 : "Percentage"}{" "}
               Discount

@@ -62,19 +62,21 @@ const InvoiceOnes = (props) => {
     // discount:"Discount",
     // total:"Total",
     // deliverycharge:"Delivery Charges",
+    subtotal: "PRODUCT COST",
+    discount: "DISCOUNT",
     total_paid: "TOTAL POINTS",
   };
 
   const FooterValues = {
-    subtotal: Number(cartTotal())?.toFixed(2),
-    reward: OrderDetails?.reward,
-    discount: OrderDetails?.discount || 0,
-    total: Math.abs(
-      Number(cartTotal()) -
-        Number(OrderDetails?.discount !== "[]" ? OrderDetails?.discount : 0)
-    )?.toFixed(2),
+    subtotal: OrderDetails?.discount !== "null" ? Number(cartTotal()) : 0,
+    // reward:OrderDetails?.reward || 0,
+    discount:
+      (OrderDetails?.discount &&
+        JSON.parse(OrderDetails?.discount)?.discount) ||
+      0,
+    total: OrderDetails?.orderTotal,
     deliverycharge: OrderDetails?.shipping?.price || 0,
-    total_paid: 0,
+    total_paid: OrderDetails?.orderTotal,
   };
 
   return (
@@ -115,21 +117,30 @@ const InvoiceOnes = (props) => {
                         {/* <a className="mb-0" href="https://dynamic-froyo-597702.netlify.app/#/">info@example.com</a> */}
                       </div>
                     </div>
-                    <div className="col-md-6 text-md-right mt-md-0 mt-4">
-                      <h2>invoice</h2>
-                      <div className="">
-                        <h4 className="">
-                          <strong>Customer Address</strong>
-                        </h4>
-                        <h4>
-                          {Billing?.bill_first_name} {Billing?.bill_last_name}
-                        </h4>
-                        <h4>{Billing?.bill_address1}</h4>
-                        <h4>{dropdown(Billing?.bill_city)[0]?.name}</h4>
-                        <h4>
-                          {Billing?.bill_country}-{Billing?.bill_zip}
-                        </h4>
-                      </div>
+                    <div className="col-md-6 text-md-right mt-md-0 mt-4 cus_clr">
+                      <h2>INVOICE</h2>
+                      {Number(OrderDetails?.flag) === 0 ? (
+                        <div>
+                          <h4>
+                            <strong>Customer Address</strong>
+                          </h4>
+                          <h4>
+                            {Billing?.bill_first_name} {Billing?.bill_last_name}
+                          </h4>
+                          <h4>{Billing?.bill_address1}</h4>
+                          <h4>{dropdown(Billing?.bill_city)[0]?.name}</h4>
+                          <h4>
+                            {Billing?.bill_country}-{Billing?.bill_zip}
+                          </h4>
+                        </div>
+                      ) : (
+                        <div>
+                          <h4>
+                            <strong>Pickup Store Address</strong>
+                          </h4>
+                          <h4>{Billing?.bill_address1}</h4>
+                        </div>
+                      )}
                     </div>
                   </div>
                   <div className="detail-bottom">
@@ -191,24 +202,30 @@ const InvoiceOnes = (props) => {
 
                       <tfoot>
                         {Object.keys(headings).map((data) => (
-                          <tr>
-                            <td colSpan="3"></td>
-                            <td className="font-bold text-dark" colSpan="1">
-                              {headings[data]}
-                            </td>
-                            <td className="font-bold text-theme">
-                              {" "}
-                              {data === "discount"
-                                ? FooterValues["discount"] !== "[]"
-                                  ? FooterValues[data]
-                                  : 0
-                                : data === "total_paid"
-                                ? Number(FooterValues["total"]) +
-                                  Number(FooterValues["deliverycharge"])
-                                : (FooterValues[data] && FooterValues[data]) ||
-                                  0}
-                            </td>
-                          </tr>
+                          <>
+                            {FooterValues[data] > 0 && (
+                              <tr>
+                                <td colSpan="3"></td>
+                                <td className="font-bold text-dark" colSpan="1">
+                                  {headings[data]}
+                                </td>
+                                <td className="font-bold text-theme">
+                                  {" "}
+                                  {data === "discount"
+                                    ? FooterValues["discount"] !== "[]"
+                                      ? FooterValues[data]
+                                      : 0
+                                    : //  data === "total_paid"
+                                      // ? Number(FooterValues["total"]) +
+                                      //   Number(FooterValues["deliverycharge"])
+                                      // :
+                                      (FooterValues[data] &&
+                                        FooterValues[data]) ||
+                                      0}
+                                </td>
+                              </tr>
+                            )}
+                          </>
                         ))}
                       </tfoot>
                     </table>
@@ -277,19 +294,25 @@ const InvoiceOnes = (props) => {
                       {Object.keys(headings).map((data) => {
                         return (
                           <>
-                            <span>{headings[data]}:</span>
-                            <span>
-                              {" "}
-                              {data === "discount"
-                                ? FooterValues["discount"] !== "[]"
-                                  ? FooterValues[data]
-                                  : 0
-                                : data === "total_paid"
-                                ? Number(FooterValues["total"]) +
-                                    Number(FooterValues["deliverycharge"]) || 0
-                                : (FooterValues[data] && FooterValues[data]) ||
-                                  0}
-                            </span>
+                            {FooterValues[data] > 0 && (
+                              <>
+                                <span>{headings[data]}:</span>
+                                <span>
+                                  {" "}
+                                  {data === "discount"
+                                    ? FooterValues["discount"] !== "[]"
+                                      ? FooterValues[data]
+                                      : 0
+                                    : // data === "total_paid"
+                                      // ? Number(FooterValues["total"]) +
+                                      //     Number(FooterValues["deliverycharge"]) || 0
+                                      // :
+                                      (FooterValues[data] &&
+                                        FooterValues[data]) ||
+                                      0}
+                                </span>
+                              </>
+                            )}
                           </>
                         );
                       })}

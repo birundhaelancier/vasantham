@@ -121,13 +121,14 @@ export const Get_Wishlist = () => async (dispatch) => {
   return dispatch({ type: GET_WISH_LIST, payload: response.data });
 };
 
-export const Get_Single_Product_List = (id) => async (dispatch) => {
-  const response = await axios({
-    method: "GET",
-    url: apiurl + "product/" + id,
-  });
-  return dispatch({ type: GET_SINGLEPRODUCT_LIST, payload: response.data });
-};
+export const Get_Single_Product_List =
+  (url, id, productid) => async (dispatch) => {
+    const response = await axios({
+      method: "GET",
+      url: apiurl + `${url ? url : "product/"}` + id + `/${productid}`,
+    });
+    return dispatch({ type: GET_SINGLEPRODUCT_LIST, payload: response.data });
+  };
 
 export const Get_Shipping = (id) => async (dispatch) => {
   const response = await axios({
@@ -137,10 +138,11 @@ export const Get_Shipping = (id) => async (dispatch) => {
   return dispatch({ type: GET_SHIPPING_LIST, payload: response.data });
 };
 
-export const CouponCode = () => async (dispatch) => {
+export const CouponCode = (data) => async (dispatch) => {
   const response = await axios({
-    method: "GET",
-    url: apiurl + "promocode",
+    method: "post",
+    url: apiurl + "promocodeCheck",
+    data: data,
   });
   return dispatch({ type: GET_COUPONCODE, payload: response.data });
 };
@@ -364,6 +366,22 @@ export const BranchListsApi = () => async (dispatch) => {
     url: apiurl + "branchList",
   });
   return dispatch({ type: "BranchList", payload: response.data });
+};
+
+export const OffersLists = (point) => async (dispatch) => {
+  const response = await axios({
+    method: "post",
+    url: apiurl + "offers",
+    data: {
+      user_point: point || 0,
+      uid: JSON.parse(localStorage.getItem("UserId")),
+    },
+  });
+  return dispatch({ type: "OFFERLISTS", payload: response.data });
+};
+
+export const PayTypeCashOrPoints = (value) => async (dispatch) => {
+  return dispatch({ type: "PayType", payload: value });
 };
 
 export const TimerEnd = (date) => async (dispatch) => {

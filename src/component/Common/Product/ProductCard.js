@@ -5,9 +5,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { ImageUrl } from "../../../Redux/Utils/baseurl";
 import { AddToCartApi, AddWishlist } from "../../../Redux/Action/CreateActions";
 import Swal from "sweetalert2";
-import { CartListApi, TimerEnd } from "../../../Redux/Action/allActions";
+import { CartListApi } from "../../../Redux/Action/allActions";
 import moment from "moment";
-import { isMobile } from "react-device-detect";
 const ProductCard = (props) => {
   let dispatch = useDispatch();
   let history = useHistory();
@@ -24,11 +23,12 @@ const ProductCard = (props) => {
   const Rewards = useSelector((state) => state.AllReducer.RewardPoints);
   const ShoopingCarts = useSelector((state) => state.AllReducer.CartLists);
   const WishList = useSelector((state) => state.AllReducer.WishList);
-  const ProfileData = useSelector((state) => state.AllReducer.ProfileData);
-  const [qtyValue, setqtyValue] = useState(1);
   const [QuantityValues, setQuantityValues] = useState({});
   const [timer, settimer] = useState({});
-
+  const [days, setdays] = useState("00");
+  const [hours, setHours] = useState("00");
+  const [minutes, setMinutes] = useState("00");
+  const [seconds, setSeconds] = useState("00");
   const ChangeAttribute = (data) => {
     setselectpack(data);
     FilterData(data);
@@ -38,36 +38,44 @@ const ProductCard = (props) => {
     var Data = props.data.attribute.filter((data) => {
       return data.name === value;
     });
-    setfilterPack(Data[0]);
+    setfilterPack(Data?.[0]);
+  };
+
+  const OffersCountfun = (data, qty) => {
+    setupdate(false);
+
+    if (props.deals) {
+      if (data?.max_count >= data?.purchased_count) {
+        ProceedAddtoCart(data.id, qty);
+      } else {
+        Swal.fire({
+          icon: "warning",
+          title: "Warning",
+          text: "Maximum order reached",
+          showConfirmButton: false,
+          timer: 1000,
+        });
+      }
+    } else {
+      ProceedAddtoCart(data.id, qty);
+    }
   };
 
   // Add to cart
   const addToCart = async (id, data) => {
     if (JSON.parse(localStorage.getItem("UserId"))) {
-      if (Rewards?.rewardpoint) {
-        ProceedAddtoCart(id);
-      } else {
-        Swal.fire({
-          icon: "warning",
-          title: "Failed",
-          text: "Your Reward Points 0",
-          showConfirmButton: false,
-          timer: 1000,
-        });
-      }
+      OffersCountfun(data);
     } else {
       history.push("/login");
     }
   };
 
   const ProceedAddtoCart = (id, type) => {
-    setupdate(false);
     let product = {
       uid: JSON.parse(localStorage.getItem("UserId")),
       pid: props.data.id,
       qty: QuantityValues["test" + props.data.id] || 1,
       aid: filterPack?.id || "",
-      // flag: timer ? 1 : 0,
     };
     dispatch(AddToCartApi(product)).then((res) => {
       dispatch(CartListApi());
@@ -127,6 +135,32 @@ const ProductCard = (props) => {
     setShopIds(Ids);
   }, [ShoopingCarts]);
 
+  const OfferQtyCheck = (val, product, index) => {
+    if (props.deals) {
+      if (Math.abs(product?.max_count - product.purchased_count) >= val) {
+        setQuantityValues((prevState) => ({
+          ...prevState,
+          ["test" + index]: Number(val),
+        }));
+        setupdate(true);
+      } else {
+        Swal.fire({
+          icon: "warning",
+          title: "Warning",
+          text: "Maximum order reached",
+          showConfirmButton: false,
+          timer: 1000,
+        });
+      }
+    } else {
+      setQuantityValues((prevState) => ({
+        ...prevState,
+        ["test" + index]: Number(val),
+      }));
+      setupdate(true);
+    }
+  };
+
   const OnChangeQty = (val, product, index) => {
     setdisable(false);
 
@@ -139,11 +173,7 @@ const ProductCard = (props) => {
         timer: 1000,
       });
     } else {
-      setQuantityValues((prevState) => ({
-        ...prevState,
-        ["test" + index]: Number(val),
-      }));
-      setupdate(true);
+      OfferQtyCheck(val, product, index);
     }
   };
 
@@ -158,23 +188,29 @@ const ProductCard = (props) => {
   useEffect(() => {
     update &&
       ShopIds.includes(props.data.id) &&
-      ProceedAddtoCart(props?.product?.id, "qty");
+      OffersCountfun(props?.data, "qty");
   }, [update]);
   //  /
 
-  const [days, setdays] = useState("00");
-  const [hours, setHours] = useState("00");
-  const [minutes, setMinutes] = useState("00");
-  const [seconds, setSeconds] = useState("00");
-
   useEffect(() => {
     const intervalId = setInterval(() => {
-      const startDate = moment();
-      const timeEnd = moment(props.data.date).local();
-      const diff = timeEnd.diff(startDate);
-      const diffDuration = moment.duration(diff);
+      // const timeEnd = moment();
+      const timeEnd = moment(props.data.to_date);
+      // var maxDate = new Date(
+      //   Math.max.apply(null, [new Date(), new Date(props.data.date)])
+      // );
+      // var minDate = new Date(
+      //   Math.min.apply(null, [new Date(), new Date(props.data.date)])
+      // );
+      var diff = 0;
+      var diffDuration = "";
+      if (moment() >= moment(props.data.date)) {
+        const startDate = moment();
+        diff = timeEnd.diff(startDate);
+        diffDuration = moment.duration(diff);
+      }
+
       if (diff > 0) {
-        // settimer(true);
         settimer((prevState) => ({
           ...prevState,
           ["test" + props.data.id]: true,
@@ -184,7 +220,6 @@ const ProductCard = (props) => {
         setMinutes(String(diffDuration.minutes()).padStart(2, "0"));
         setSeconds(String(diffDuration.seconds()).padStart(2, "0"));
       } else {
-        // settimer(false);
         settimer((prevState) => ({
           ...prevState,
           ["test" + props.data.id]: false,
@@ -195,21 +230,17 @@ const ProductCard = (props) => {
     return () => {
       clearInterval(intervalId);
     };
-  });
+  }, [props.date]);
+
+  const outofStock =
+    Number(props?.data?.stock) > 0 && Number(props?.data?.out_of_stock) !== 1;
 
   return (
     <>
       <div
-        className="product_wrappers_one"
-        // style={{
-        //   height: !isMobile
-        //     ? ShopIds.includes(props.data.id)
-        //       ? "304px"
-        //       : "304px"
-        //     : ShopIds.includes(props.data.id)
-        //     ? "270px"
-        //     : "270px",
-        // }}
+        className={`product_wrappers_one ${
+          props.category && "categorycutomcss"
+        }`}
       >
         <div className="thumb">
           <Link
@@ -245,9 +276,29 @@ const ProductCard = (props) => {
             </Link>
             <div className="re_points">
               Points :{" "}
-              {timer["test" + props.data.id] && props.data.date
+              {filterPack
+                ? filterPack?.point
+                : timer["test" + props.data.id]
                 ? props.data.deal_point
                 : props.data.point}
+            </div>
+            <div style={{ paddingTop: "5px" }} className="price_crd">
+              <div>
+                <label>Price : </label>{" "}
+                <del>
+                  <i className="fa fa-inr" />{" "}
+                  {filterPack ? filterPack?.price : props?.data.previous_price}
+                </del>
+                {"  "}
+                <span>
+                  <i className="fa fa-inr" />{" "}
+                  {filterPack
+                    ? filterPack?.selling
+                    : timer["test" + props.data.id]
+                    ? props?.data?.deal_amount
+                    : props?.data.discount_price}
+                </span>
+              </div>
             </div>
           </h5>
         </div>
@@ -256,14 +307,23 @@ const ProductCard = (props) => {
         <div
           className="total_pro_card"
           style={{
+            height: outofStock ? "" : "49px",
+            alignItems: !outofStock && "baseline",
             justifyContent: ShopIds.includes(props.data.id)
-              ? "center"
+              ? "space-between"
               : "center",
           }}
         >
-          {Number(props?.data?.stock) !== 0 &&
-          ShopIds.includes(props.data.id) ? (
-            <div className="add_cart_qty">
+          <div
+            className="add_cart_qty"
+            style={{
+              marginRight:
+                !ShopIds.includes(props.data.id) &&
+                props.data.attribute &&
+                "5px",
+            }}
+          >
+            {outofStock && ShopIds.includes(props.data.id) ? (
               <input
                 min="1"
                 max="100"
@@ -271,42 +331,63 @@ const ProductCard = (props) => {
                 style={{
                   textAlign: "center",
                   padding: "0px 0px 0px 10px",
+                  marginRight:
+                    !ShopIds.includes(props.data.id) && props.data.aid
+                      ? "5px"
+                      : "5px",
+
+                  width: !props.data.aid && "80px",
                 }}
                 onChange={(e) =>
                   OnChangeQty(e.target.value, props.data, props.data.id)
                 }
                 value={QuantityValues["test" + props.data.id]}
               />
-              {props?.data?.attribute?.length > 0 && (
-                <div
-                  className="customs_selects"
-                  style={{ padding: "0px 0px 0px 8px", width: "65%" }}
+            ) : (
+              ""
+            )}
+            {props?.data?.attribute?.length > 0 && (
+              <div
+                className="customs_selects"
+                style={{ padding: "0px 0px 0px 8px" }}
+              >
+                <select
+                  name="product"
+                  className="customs_sel_box product_card_select"
+                  style={{
+                    minHeight: "28px",
+                    height: "28px",
+                    padding: "0px 5px",
+                  }}
+                  onChange={(e) => ChangeAttribute(e.target.value)}
+                  value={selectpack}
                 >
-                  <select
-                    name="product"
-                    className="customs_sel_box product_card_select"
-                    style={{ minHeight: "30px" }}
-                    onChange={(e) => ChangeAttribute(e.target.value)}
-                    value={selectpack}
-                  >
-                    {props.data.attribute.map((data) => {
-                      return (
-                        <option value={data.name}>
-                          {data.name} - &#x20B9; {data.price}
-                          {/* fdfdfd <i class="fa fa-caret-down" aria-hidden="true"></i> */}
-                        </option>
-                      );
-                    })}
-                  </select>
-                </div>
-              )}
-            </div>
-          ) : (
-            ""
-          )}
+                  {props.data.attribute.map((data) => {
+                    return (
+                      <option value={data.name}>
+                        {data.name}
+                        {/* fdfdfd <i class="fa fa-caret-down" aria-hidden="true"></i> */}
+                      </option>
+                    );
+                  })}
+                </select>
+              </div>
+            )}
+          </div>
+
           {/* qty end */}
-          {Number(props.data.out_of_stock) !== 1 ? (
-            <div style={{ textAlign: "center" }}>
+          {outofStock ? (
+            <div
+              style={{
+                textAlign: "center",
+                display:
+                  props?.data?.attribute?.length > 0 &&
+                  ShopIds.includes(props.data.id) &&
+                  props?.data.aid !== ""
+                    ? "none"
+                    : "block",
+              }}
+            >
               {ShopIds.includes(props.data.id) ? (
                 <button
                   type="button"
@@ -320,7 +401,7 @@ const ProductCard = (props) => {
                   type="button"
                   className="add-to-cart cart-btn"
                   style={{ width: "90px" }}
-                  onClick={() => addToCart(props.data.id, props.data)}
+                  onClick={() => addToCart(props.data, props.data)}
                 >
                   <i className="fa fa-shopping-cart" /> Buy
                 </button>
@@ -340,7 +421,7 @@ const ProductCard = (props) => {
             <span>{`${seconds}s `}</span>
           </div>
         )}
-        {Number(props.data.out_of_stock) !== 1 && (
+        {outofStock && (
           <div className="hurry_up">
             Hurry Up Only {props.data.stock} products Left!!!
           </div>

@@ -1,21 +1,14 @@
 import React, { useState, useEffect } from "react";
 import ProductInfo from "./ProductInfo";
-import RelatedProduct from "./RelatedProduct";
-import { Link, useHistory } from "react-router-dom";
+import { useHistory } from "react-router-dom";
 import { useSelector, useDispatch, connect } from "react-redux";
 import { useParams } from "react-router-dom";
-import { RatingStar } from "rating-star";
 import Swal from "sweetalert2";
 import {
   CartListApi,
   Get_Single_Product_List,
 } from "../../../Redux/Action/allActions";
-import { ImageUrl } from "../../../Redux/Utils/baseurl";
-import {
-  AddToCartApi,
-  AddWishlist,
-  ProductDelete,
-} from "../../../Redux/Action/CreateActions";
+import { AddToCartApi, AddWishlist } from "../../../Redux/Action/CreateActions";
 import EmptyProductLoading from "./EmptyProductLoading";
 import ImagesGalleryComp from "./ImageGallery";
 import moment from "moment";
@@ -33,23 +26,42 @@ const ProductDetailsOne = (props) => {
   const Rewards = useSelector((state) => state.AllReducer.RewardPoints);
   const WishList = useSelector((state) => state.AllReducer.WishList);
   const ShoopingCarts = useSelector((state) => state.AllReducer.CartLists);
-  const ProfileData = useSelector((state) => state.AllReducer.ProfileData);
   let { id, productid } = useParams();
   const [timer, settimer] = useState(false);
+  const [days, setdays] = useState("00");
+  const [hours, setHours] = useState("00");
+  const [minutes, setMinutes] = useState("00");
+  const [seconds, setSeconds] = useState("00");
+  const [deals, setdeals] = useState(false);
   // Add to cart
-  const addToCart = async (id, data) => {
-    if (JSON.parse(localStorage.getItem("UserId"))) {
-      if (Rewards?.rewardpoint) {
-        ProceedAddtoCart(id, data);
+  const OffersCountfun = (data, qty) => {
+    setupadte(false);
+
+    let qtyCheck =
+      Math.abs(data?.max_count - data?.purchased_count) >=
+      QuantityValues["test" + data.id];
+    if (data.is_type === "flash_deal") {
+      if (qty === "qty" ? qtyCheck : data?.max_count >= data?.purchased_count) {
+        ProceedAddtoCart(data.id, qty);
       } else {
+        setdeals(true);
         Swal.fire({
           icon: "warning",
-          title: "Failed",
-          text: "Your Reward Points 0",
+          title: "Warning",
+          text: "Maximum order reached",
           showConfirmButton: false,
           timer: 1000,
         });
       }
+    } else {
+      ProceedAddtoCart(data.id, qty);
+    }
+  };
+
+  const addToCart = async (data) => {
+    if (JSON.parse(localStorage.getItem("UserId"))) {
+      // if (Rewards?.rewardpoint) {
+      OffersCountfun(data);
     } else {
       history.push("/login");
     }
@@ -99,10 +111,11 @@ const ProductDetailsOne = (props) => {
   const [count, setCount] = useState(1);
 
   const incNum = (id, stock, value) => {
-    setQuantityValues((prevState) => ({
-      ...prevState,
-      ["test" + id]: Number(value) + 1,
-    }));
+    !deals &&
+      setQuantityValues((prevState) => ({
+        ...prevState,
+        ["test" + id]: Number(value) + 1,
+      }));
     if (count > product.stock) {
       Swal.fire({
         icon: "warning",
@@ -113,7 +126,6 @@ const ProductDetailsOne = (props) => {
       });
     } else {
       setupadte(true);
-      // setCount(count + 1);
     }
   };
 
@@ -133,20 +145,8 @@ const ProductDetailsOne = (props) => {
     }
   };
 
-  const UpdateQty = () => {
-    for (var i = 0; i < ShoopingCarts.length; i++) {
-      if (product.id === ShoopingCarts[i].id) {
-        ShoopingCarts[i].quantity = count;
-        break;
-      }
-    }
-    localStorage.setItem("carts", JSON.stringify(ShoopingCarts));
-  };
-
   useEffect(() => {
-    update &&
-      ShopIds.includes(product?.id) &&
-      ProceedAddtoCart(product.id, "qty");
+    update && ShopIds.includes(product?.id) && OffersCountfun(product, "qty");
   }, [update]);
 
   const ChangeAttribute = (data) => {
@@ -154,14 +154,20 @@ const ProductDetailsOne = (props) => {
     FilterData(data);
   };
   const FilterData = (value) => {
-    var Data = product.data.attribute.filter((data) => {
-      return data.name === value;
+    var Data = product?.attribute?.filter((data) => {
+      return data.id === Number(value);
     });
-    setfilterPack(Data[0]);
+    setfilterPack(Data?.[0]);
   };
 
   useEffect(() => {
-    dispatch(Get_Single_Product_List(id)).then((res) => {
+    dispatch(
+      Get_Single_Product_List(
+        productid === "offer" && "product_info/",
+        id,
+        productid
+      )
+    ).then((res) => {
       setloading(false);
       setgallery(res?.payload?.gallery);
       setselectpack(
@@ -169,17 +175,11 @@ const ProductDetailsOne = (props) => {
       );
       setfilterPack(res?.payload?.attribute && res?.payload?.attribute[0]);
     });
-  }, [id]);
+  }, [id, productid]);
 
   useEffect(() => {
     setProducts(props.SingleProduct);
   }, [props.SingleProduct, props?.WishList]);
-
-  const ProdcutRemove = (id) => {
-    dispatch(ProductDelete(id)).then((res) => {
-      NotifyFun(res);
-    });
-  };
 
   const NotifyFun = (res) => {
     if (res.payload.status === 1) {
@@ -214,32 +214,29 @@ const ProductDetailsOne = (props) => {
     setShopIds(Ids);
   }, [ShoopingCarts]);
 
-  const [days, setdays] = useState("00");
-  const [hours, setHours] = useState("00");
-  const [minutes, setMinutes] = useState("00");
-  const [seconds, setSeconds] = useState("00");
-
   useEffect(() => {
     const intervalId = setInterval(() => {
       const startDate = moment();
-      const timeEnd = moment(product.date).local();
+      const timeEnd = moment(product.to_date);
       const diff = timeEnd.diff(startDate);
       const diffDuration = moment.duration(diff);
-      if (diff > 0) {
-        settimer(true);
-        setHours(String(diffDuration.hours()).padStart(2, "0"));
-        setdays(String(diffDuration.days()).padStart(2, "0"));
-        setMinutes(String(diffDuration.minutes()).padStart(2, "0"));
-        setSeconds(String(diffDuration.seconds()).padStart(2, "0"));
-      } else {
-        settimer(false);
+      if (moment() >= moment(product.date)) {
+        if (diff > 0) {
+          settimer(true);
+          setHours(String(diffDuration.hours()).padStart(2, "0"));
+          setdays(String(diffDuration.days()).padStart(2, "0"));
+          setMinutes(String(diffDuration.minutes()).padStart(2, "0"));
+          setSeconds(String(diffDuration.seconds()).padStart(2, "0"));
+        } else {
+          settimer(false);
+        }
       }
     }, 1000);
 
     return () => {
       clearInterval(intervalId);
     };
-  });
+  }, [product]);
 
   return (
     <>
@@ -250,7 +247,6 @@ const ProductDetailsOne = (props) => {
               <div className="col-lg-1"></div>
               <div className="col-lg-3">
                 <div className="product_single_one_img">
-                  {/* <img src={ImageUrl+product.photo} alt="img" style={{height:"300px"}} /> */}
                   <ImagesGalleryComp image={gallery} />
                 </div>
               </div>
@@ -259,14 +255,40 @@ const ProductDetailsOne = (props) => {
                 <div className="product_details_right_one">
                   <div className="modal_product_content_one">
                     <h3>{product.name}</h3>
-                    {/* <h4><del><i class="fa fa-inr"></i>  {filterPack ? filterPack.price:product?.previous_price}.00</del> {""}<i class="fa fa-inr"></i>  {filterPack ? filterPack?.selling:product.discount_price}.00 </h4> */}
+
                     <p>{product.sort_details}</p>
-                    {/* <div className='size_view'> */}
                     <div className="re_points" style={{ fontSize: "16px" }}>
-                      Points : {timer ? product.deal_point : product.point}
+                      Points :{" "}
+                      {filterPack
+                        ? filterPack?.point
+                        : timer
+                        ? product.deal_point
+                        : product.point}
+                    </div>
+
+                    <div style={{ paddingTop: "5px" }} className="price_crd">
+                      <div>
+                        Price :{" "}
+                        <del>
+                          <i className="fa fa-inr" />{" "}
+                          {filterPack
+                            ? filterPack?.price
+                            : product.previous_price}
+                        </del>
+                        {"  "}
+                        <span>
+                          <i className="fa fa-inr" />{" "}
+                          {filterPack
+                            ? filterPack?.selling
+                            : timer
+                            ? product?.deal_amount
+                            : product.discount_price}
+                        </span>
+                      </div>
                     </div>
                     {product.attribute?.length > 0 &&
-                      product.out_of_stock !== 1 && (
+                      Number(product?.out_of_stock) !== 1 &&
+                      Number(product?.stock) > 0 && (
                         <div className="customs_selects">
                           <select
                             name="product"
@@ -277,15 +299,14 @@ const ProductDetailsOne = (props) => {
                           >
                             {product.attribute?.map((data) => {
                               return (
-                                <option value={data.name}>
-                                  {data.name} - &#x20B9; {data.price}
-                                </option>
+                                <option value={data.id}>{data.name}</option>
                               );
                             })}
                           </select>
                         </div>
                       )}
-                    {product.out_of_stock !== 1 &&
+                    {Number(product?.out_of_stock) !== 1 &&
+                      Number(product?.stock) > 0 &&
                       ShopIds.includes(product?.id) && (
                         <form id="product_count_form_two">
                           <div className="product_count_one">
@@ -343,7 +364,8 @@ const ProductDetailsOne = (props) => {
                         </li>
                       </ul>
                       <div>
-                        {product.out_of_stock !== 1 ? (
+                        {Number(product?.out_of_stock) !== 1 &&
+                        Number(product?.stock) > 0 ? (
                           <>
                             {ShopIds.includes(product.id) ? (
                               <a
@@ -357,7 +379,7 @@ const ProductDetailsOne = (props) => {
                               <a
                                 className="theme-btn-one btn-black-overlay btn_sm"
                                 style={{ color: "#fff" }}
-                                onClick={() => addToCart(product.id, product)}
+                                onClick={() => addToCart(product)}
                               >
                                 <i className="fa fa-shopping-cart" /> Buy
                               </a>
@@ -371,9 +393,9 @@ const ProductDetailsOne = (props) => {
                           </div>
                         )}
                       </div>
-                      {product?.date &&
-                        timer &&
-                        Number(product.out_of_stock) !== 1 && (
+                      {timer &&
+                        Number(product?.out_of_stock) !== 1 &&
+                        Number(product?.stock) > 0 && (
                           <div className="deal_msg">
                             <div>Deal of the day : </div>
                             {days > 0 && <span>{`${days}d`}</span>}
@@ -382,11 +404,12 @@ const ProductDetailsOne = (props) => {
                             <span>{`${seconds}s `}</span>
                           </div>
                         )}
-                      {Number(product?.out_of_stock) !== 1 && (
-                        <div className="hurry_up">
-                          Hurry Up Only {product?.stock} products Left!!!
-                        </div>
-                      )}
+                      {Number(product?.out_of_stock) !== 1 &&
+                        Number(product?.stock) > 0 && (
+                          <div className="hurry_up">
+                            Hurry Up Only {product?.stock} products Left!!!
+                          </div>
+                        )}
                     </div>
                   </div>
                 </div>

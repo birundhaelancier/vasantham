@@ -188,7 +188,8 @@ export const OrderPlaced_Create =
     shipping,
     balance_reward,
     rewardpoint,
-    payment_res
+    payment_res,
+    discount
   ) =>
   async (dispatch) => {
     // try {
@@ -206,20 +207,22 @@ export const OrderPlaced_Create =
         city: billing?.city,
         product: product,
         shipping: shipping || "",
-        payment: payment === "Cash on Delivery" ? "cash" : payment || "",
+        payment: payment === "points" ? "point" : payment,
         payment_id:
           payment_res?.razorpay_payment_id ||
           payment_res?.error?.metadata.payment_id,
         payment_status: payment_res?.error ? "Failed" : "Success",
         amount: total,
-        discount: "",
-        flag: "",
+        discount: discount || "",
+        flag: billing?.store_name ? 1 : 0,
+        branch: billing?.store_name ? billing?.id : "",
         amc: "",
         delivery: "",
         installation: "",
         award: "",
         premium: "",
         premium_amt: "",
+        payment_method: payment === "points" ? "point" : payment,
         reward: balance_reward || 0,
         total_reward: rewardpoint?.rewardpoint ? balance_reward : 0,
       },

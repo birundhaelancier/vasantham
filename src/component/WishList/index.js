@@ -20,6 +20,7 @@ const WishlistComp = (props) => {
   useEffect(() => {
     dispatch(Get_Wishlist());
   }, []);
+
   useEffect(() => {
     var Data = WishList.filter((data) => {
       return data !== null;
@@ -30,8 +31,12 @@ const WishlistComp = (props) => {
   return (
     <>
       {WishListData?.length ? (
-        <section id="Wishlist_area" className="pt-3 wish_list_view ">
-          <h4 className="text-center pb-3 pt-3">WishList</h4>
+        <section
+          id="Wishlist_area"
+          className="pt-3 wish_list_view"
+          style={{ height: WishListData?.length < 2 && "350px" }}
+        >
+          <h4 className="text-center pb-3 pt-3">Wishlist</h4>
           <div className="container">
             <div className="row">
               <div className="col-12 desktop_view_cart">
@@ -44,6 +49,7 @@ const WishlistComp = (props) => {
                           <th className="product_thumb">Image</th>
                           <th className="product_name">Product</th>
                           <th className="product-price">Points</th>
+                          <th className="product-price">Price</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -51,7 +57,7 @@ const WishlistComp = (props) => {
                           <tr key={index}>
                             <td className="product_remove">
                               <i
-                                className="fa fa-trash text-danger"
+                                className="fa fa-remove text-danger"
                                 onClick={() => rmProduct(data.id)}
                                 style={{ cursor: "pointer" }}
                               ></i>
@@ -69,8 +75,9 @@ const WishlistComp = (props) => {
                               </Link>
                             </td>
 
+                            <td className="product-price">{data.point}</td>
                             <td className="product-price">
-                              {data.point}
+                              <i className="fa fa-inr" /> {data.discount_price}
                             </td>
                           </tr>
                         ))}
@@ -99,12 +106,10 @@ const WishlistComp = (props) => {
 
                         <li className="price_cont">
                           {/* <div className="table_head">Price </div> */}
-                          <div className="table_val">
-                            {data.point}
-                          </div>
+                          <div className="table_val">{data.point}</div>
                           <div style={{ textAlign: "end" }}>
                             <i
-                              className="fa fa-trash text-danger"
+                              className="fa fa-remove text-danger"
                               onClick={() => rmProduct(data.id)}
                               style={{
                                 cursor: "pointer",

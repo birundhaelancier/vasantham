@@ -22,6 +22,8 @@ import redeem from "../../../assets/img/redeem.png";
 import about from "../../../assets/img/about.png";
 import log from "../../../assets/img/logout.png";
 import logos from "../../../assets/img/logo.gif";
+import fav from "../../../assets/img/fav.png";
+import logs from "../../../assets/img/log.png";
 import { Autocomplete, InputAdornment, Box, TextField } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { apiurl, ImageUrl } from "../../../Redux/Utils/baseurl";
@@ -41,8 +43,6 @@ import Slider from "react-slick";
 import {
   FacebookShareButton,
   TwitterShareButton,
-  LinkedinShareButton,
-  TelegramShareButton,
   WhatsappShareButton,
 } from "react-share";
 import {
@@ -71,47 +71,9 @@ const Header = () => {
   const Notifications = useSelector((state) => state.AllReducer.Notify);
   const Reward = useSelector((state) => state.AllReducer.RewardPoints);
   const WishListData = useSelector((state) => state.AllReducer.WishList);
-  let carts = useSelector((state) => state?.products?.carts);
-  let favorites = useSelector((state) => state?.products?.favorites);
   const [FilterData, setFilterData] = useState([]);
   const [searchValue, setsearchValue] = useState(null);
-  const [login, setlogin] = useState(false);
   const [SearchList, setSearchList] = useState([]);
-  var settings = {
-    dots: false,
-    arrow: false,
-    infinite: false,
-    speed: 500,
-    slidesToShow: 2,
-    slidesToScroll: 2,
-    initialSlide: 0,
-    responsive: [
-      {
-        breakpoint: 1024,
-        settings: {
-          slidesToShow: 3,
-          slidesToScroll: 3,
-          infinite: true,
-          dots: true,
-        },
-      },
-      {
-        breakpoint: 600,
-        settings: {
-          slidesToShow: 2,
-          slidesToScroll: 2,
-          initialSlide: 2,
-        },
-      },
-      {
-        breakpoint: 480,
-        settings: {
-          slidesToShow: 1,
-          slidesToScroll: 1,
-        },
-      },
-    ],
-  };
 
   useEffect(() => {
     dispatch(Profile_Details());
@@ -145,11 +107,8 @@ const Header = () => {
 
   const logout = () => {
     localStorage.removeItem("UserId");
+    localStorage.removeItem("notify");
     history.push("/login");
-  };
-
-  const handleShow = (value) => {
-    value === show ? setShow("") : setShow(value);
   };
 
   const [scrollPosition, setScrollPosition] = useState(0);
@@ -352,13 +311,13 @@ const Header = () => {
                             </li>
                             <li>
                               <Link to="/my-account/customer-order">
-                                <i className="fa fa-product-hunt"></i>
+                                <i className="fa fa-first-order"></i>
                                 <span>My Orders</span>
                               </Link>
                             </li>
                             <li>
-                              <Link to="/my-account/customer-order">
-                                <i className="fa fa-user"></i>
+                              <Link style={{ cursor: "auto" }}>
+                                <i className="fa fa-product-hunt"></i>
                                 <span>
                                   {" "}
                                   My Reward Points {Reward?.rewardpoint || 0}
@@ -385,17 +344,45 @@ const Header = () => {
                       </>
                     )}
                   </ul>
-
+                  {JSON.parse(localStorage.getItem("UserId")) ? (
+                    <Link to="/qrcode" className="qrscan-div">
+                      {/* <i class="fa fa-bell bell_ic" aria-hidden="true"></i> */}
+                      <div className="">
+                        <i class="fa fa-qrcode" />
+                        <div>Scan QR Code</div>
+                      </div>
+                    </Link>
+                  ) : (
+                    ""
+                  )}
                   <ul className="header-action-link action-color--black action-hover-color--golden">
+                    <li></li>
                     <li>
                       <Link to="/notification" className="offcanvas-icon">
                         <i class="fa fa-bell bell_ic" aria-hidden="true"></i>
                         <span className="item-count">
-                          {pathname !== "/notification"
+                          {!Boolean(localStorage.getItem("notify"))
                             ? Notifications?.length
                             : 0}
                         </span>
                       </Link>
+                    </li>
+                    <li>
+                      {WishList?.length > 0 ? (
+                        <a className="offcanvas-toggle" onClick={handleClick}>
+                          <i className="fa fa-heart"></i>
+                          <span className="item-count">
+                            {WishList?.length || 0}
+                          </span>
+                        </a>
+                      ) : (
+                        <a className="offcanvas-toggle" onClick={handleClick}>
+                          <i className="fa fa-heart"></i>
+                          <span className="item-count">
+                            {WishList?.length || 0}
+                          </span>
+                        </a>
+                      )}
                     </li>
                     <li>
                       {ShoppingCarts?.length ? (
@@ -415,24 +402,6 @@ const Header = () => {
                       )}
                     </li>
                     {/* <li>fghjk</li> */}
-
-                    <li>
-                      {WishList?.length > 0 ? (
-                        <a className="offcanvas-toggle" onClick={handleClick}>
-                          <i className="fa fa-heart"></i>
-                          <span className="item-count">
-                            {WishList?.length || 0}
-                          </span>
-                        </a>
-                      ) : (
-                        <a className="offcanvas-toggle" onClick={handleClick}>
-                          <i className="fa fa-heart"></i>
-                          <span className="item-count">
-                            {WishList?.length || 0}
-                          </span>
-                        </a>
-                      )}
-                    </li>
                   </ul>
                 </div>
               </div>
@@ -500,7 +469,9 @@ const Header = () => {
                     <Link to="/notification" className="offcanvas-icon">
                       <i class="fa fa-bell bell_ic" aria-hidden="true"></i>
                       <span className="item-count">
-                        {Notifications?.length || 0}
+                        {!Boolean(localStorage.getItem("notify"))
+                          ? Notifications?.length
+                          : 0}
                       </span>
                     </Link>
                   </li>
@@ -522,7 +493,7 @@ const Header = () => {
                     )}
                   </li>
                   <li>
-                    {WishList?.length ? (
+                    {/* {WishList?.length ? (
                       <a className="offcanvas-toggle" onClick={handleClick}>
                         <i className="fa fa-heart"></i>
                         <span className="item-count">
@@ -536,6 +507,17 @@ const Header = () => {
                           {WishList?.length || 0}
                         </span>
                       </a>
+                    )} */}
+                    {JSON.parse(localStorage.getItem("UserId")) ? (
+                      <Link to="/qrcode" className="qrscan-div">
+                        {/* <i class="fa fa-bell bell_ic" aria-hidden="true"></i> */}
+                        <div className="">
+                          <i class="fa fa-qrcode" />
+                          <div>Scan QR Code</div>
+                        </div>
+                      </Link>
+                    ) : (
+                      ""
                     )}
                   </li>
                   <li>
@@ -681,6 +663,13 @@ const Header = () => {
                   </a>
                 </li>
                 <li>
+                  <a onClick={() => NextPage("/wishlist")}>
+                    <span>
+                      <img src={fav} /> {"My Favorities"}
+                    </span>
+                  </a>
+                </li>
+                <li>
                   <a
                     onClick={() =>
                       WindowOpen("https://vasanthamstore.com/about/")
@@ -707,7 +696,7 @@ const Header = () => {
                     <span>
                       {!JSON.parse(localStorage.getItem("UserId")) ? (
                         <span onClick={() => NextPage("/login")}>
-                          <img src={login} /> Login
+                          <img src={logs} /> Login
                         </span>
                       ) : (
                         <span onClick={() => logout()}>
@@ -724,7 +713,7 @@ const Header = () => {
                       size={32}
                       round
                       onClick={() =>
-                        window.open("https://wa.me/919047183288", "_self")
+                        window.open("https://wa.me/916381594409", "_self")
                       }
                     />
                   </WhatsappShareButton>

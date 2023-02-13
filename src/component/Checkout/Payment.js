@@ -5,7 +5,9 @@ import Swal from "sweetalert2";
 import RazorpayPayment from "../../helpers/RazorPay";
 import {
   CartTotal,
+  CouponDetails,
   Get_Address_List,
+  PayTypeCashOrPoints,
   Profile_Details,
   RazorpayDetails,
   RedeemedHistory,
@@ -16,44 +18,77 @@ import { OrderPlaced_Create } from "../../Redux/Action/CreateActions";
 import logo from "../../assets/img/logo.gif";
 import Loading from "../../page/Loading/Loading";
 import moment from "moment";
+import ModalComp from "../../helpers/Modal";
+import ConfirmPopup from "./ConfirmPopup";
+import { Radio } from "antd";
 const Payment = () => {
   const [open, setopen] = useState(false);
-  const [value, setvalue] = useState("Cash on Delivery");
+  const [value, setvalue] = useState("");
+  const [showmodal, setshowmodal] = useState(false);
+  const [paytype, setpaytype] = useState(false);
   const [payment_id, setpayment_id] = useState();
+  const [checkadd, setcheckadd] = useState(false);
   // const ShoppingCarts=useSelector(state=>state.StoreProuct.ShoopingCarts)
   const ShoppingCarts = useSelector((state) => state.AllReducer.CartLists);
+  const Coupon = useSelector((state) => state.AllReducer.Coupon);
   const ProfileDetail = useSelector((state) => state.AllReducer.ProfileData);
   const Address_detail = useSelector((state) => state.AllReducer.Address_list);
+  const payType = useSelector((state) => state.AllReducer.payType);
   const Cart_Total_Value = useSelector(
     (state) => state.AllReducer.Cart_Total_Value
   );
   const Razorpay = useSelector((state) => state.AllReducer.KeyDetails);
   const BillingInformation = useSelector(
-    (state) => state.AllReducer.BillingInformation
+    (state) => state.AllReducer.BillingInformation || {}
   );
+
   const Reward = useSelector((state) => state.AllReducer.RewardPoints);
   const [loading, setloading] = useState(false);
-  const Payment = [{ id: 2, name: "Cash on Delivery" }];
+  const [Payments, setPayments] = useState([
+    { id: 1, name: "cash", label: "Cash on delivery" },
+    { id: 2, name: "points", label: "Vasantham reward points" },
+    { id: 3, name: "online", label: "Online payment" },
+  ]);
+
   let history = useHistory();
   let dispatch = useDispatch();
+
   const Timer = (val) => {
     let timer = false;
+    var timeron = moment() >= moment(val.date);
     const startDate = moment();
-    const timeEnd = moment(val).local();
+    const timeEnd = moment(val.to_date).local();
     const diff = timeEnd.diff(startDate);
-    if (diff > 0) {
+    if (timeron && diff > 0) {
       timer = true;
     } else {
       timer = false;
     }
     return timer;
   };
+
+  const attributeFun = (data) => {
+    return data?.attribute?.filter((datas) => datas.id === data.aid);
+  };
+
   const cartTotal = () => {
     return ShoppingCarts?.reduce(function (total, item) {
       return (
         total +
         Number(item.qty || 1) *
-          Number(Timer(item.date) ? item.deal_point : item?.point)
+          (payType === "points"
+            ? Number(
+                item.aid
+                  ? attributeFun(item)?.[0]?.point
+                  : Timer(item)
+                  ? item.deal_point
+                  : item?.point
+              )
+            : item.aid
+            ? attributeFun(item)?.[0]?.selling
+            : Timer(item)
+            ? item.deal_amount
+            : item.discount_price)
       );
     }, 0);
   };
@@ -62,7 +97,13 @@ const Payment = () => {
       return (
         total +
         Number(item.qty || 1) *
-          Number(Timer(item.date) ? item.deal_point : item?.point)
+          Number(
+            item.aid
+              ? attributeFun(item)?.[0]?.point
+              : Timer(item)
+              ? item.deal_point
+              : item?.point
+          )
       );
     }, 0);
   };
@@ -80,29 +121,40 @@ const Payment = () => {
     dispatch({ type: "products/clearCart" });
   };
 
-  const paymentType = (data) => {
-    setvalue(data);
-  };
   const handleChange = (pay_id) => {
     setpayment_id(pay_id);
     setopen(true);
   };
 
   const Submit = () => {
-    if (Address_detail.length > 0) {
+    setshowmodal(false);
+    if (Address_detail.length > 0 || BillingInformation) {
       if (value) {
-        if (value === "Online") {
-          // setloading(true)
+        if (value === "online") {
           openPayModal();
         } else {
           setloading(true);
+          setcheckadd(false);
           let product = [];
           ShoppingCarts.forEach((data) => {
             product.push({
               id: data.pid,
-              attributeName: data.pack || "",
-              attributeId: data.attributeId || "",
-              price: Number(Timer(data.date) ? data.deal_point : data?.point),
+              attributeName: attributeFun(data)?.[0]?.name || "",
+              attributeId: data.aid || "",
+              price:
+                paytype === "points"
+                  ? Number(
+                      data.aid
+                        ? attributeFun(data)?.[0]?.point
+                        : Timer(data)
+                        ? data.deal_point
+                        : data?.point
+                    )
+                  : data.aid
+                  ? attributeFun(data)?.[0]?.selling
+                  : Timer(data)
+                  ? data.deal_amount
+                  : data.discount_price,
               qty: data.qty,
             });
           });
@@ -119,17 +171,19 @@ const Payment = () => {
                 : 2,
               Reward_Points,
               Reward || "",
-              cartTotal()
+              cartTotal(),
+              Coupon?.Details?.id
             )
           ).then((res) => {
             setloading(false);
-
             if (res?.payload?.status === 1) {
               history.push("/order-complete");
               RemoveItems();
               setpayment_id("");
               dispatch(UserOrders());
-              dispatch(RedeemedHistory(Reward?.rewardpoint, RedeemTotal()));
+              dispatch(CouponDetails(""));
+              payType === "points" &&
+                dispatch(RedeemedHistory(Reward?.rewardpoint, RedeemTotal()));
               Swal.fire({
                 icon: "success",
                 title: "Success!",
@@ -169,7 +223,6 @@ const Payment = () => {
   };
   const Reward_Points = Reward?.rewardpoint ? RedeemTotal() : 0;
   const options = {
-    // Razorpay?.information?.key ||
     key: Razorpay?.information?.key,
     amount: Math.abs(Number(Cart_Total_Value) * 100).toFixed(2), //  = INR 1
     name: "Vasantham",
@@ -180,9 +233,22 @@ const Payment = () => {
       ShoppingCarts.forEach((data) => {
         product.push({
           id: data.pid,
-          attributeName: data.pack || "",
-          attributeId: data.attributeId || "",
-          price: Number(Timer(data.date) ? data.deal_point : data?.point),
+          attributeName: attributeFun(data)?.[0]?.name || "",
+          attributeId: data.aid || "",
+          price:
+            paytype === "points"
+              ? Number(
+                  data.aid
+                    ? attributeFun(data)?.[0]?.point
+                    : Timer(data)
+                    ? data.deal_point
+                    : data?.point
+                )
+              : data.aid
+              ? attributeFun(data)?.[0]?.selling
+              : Timer(data)
+              ? data.deal_amount
+              : data.discount_price,
           qty: data.qty,
         });
       });
@@ -200,15 +266,18 @@ const Payment = () => {
             : 2,
           Reward_Points,
           Reward || "",
-          response
+          response,
+          Coupon?.Details?.id
         )
       ).then((res) => {
         if (res?.payload?.status === 1) {
           history.push("/order-complete");
           RemoveItems();
+          setcheckadd(false);
           setpayment_id("");
           setloading(false);
           dispatch(UserOrders());
+          dispatch(CouponDetails(""));
           dispatch(RedeemedHistory(Reward?.rewardpoint, RedeemTotal()));
         } else {
           Swal.fire({
@@ -260,42 +329,127 @@ const Payment = () => {
     localStorage.setItem("carts", JSON.stringify(ShoppingCarts));
   }, [ShoppingCarts]);
 
+  const PointCheckFun = () => {
+    if (payType === "points") {
+      if (Reward.rewardpoint > cartTotal()) {
+        setshowmodal(true);
+      } else {
+        Swal.fire({
+          icon: "warning",
+          title: "Warning",
+          text:
+            Reward.rewardpoint > 0
+              ? `You have only ${
+                  Reward.rewardpoint || 0
+                } reward points.       you purchase  ${
+                  Reward.rewardpoint || 0
+                } above`
+              : "Your reward point is 0",
+        });
+      }
+    } else {
+      setshowmodal(true);
+    }
+  };
+
+  const AddressCheckProceed = () => {
+    if (Object.keys(BillingInformation && BillingInformation)?.length > 0)
+      PointCheckFun();
+    else
+      Swal.fire({
+        icon: "warning",
+        title: "warning!",
+        text: "Please provide billing address",
+        showConfirmButton: false,
+        timer: 1500,
+      });
+  };
+
+  const paymentType = (data) => {
+    setvalue(data);
+    dispatch(PayTypeCashOrPoints(data === "online" ? "cash" : data));
+  };
+
   return (
     <>
       <div className="order_review bg-white">
-        {/* <div className="check-heading">
-                    <h3>Payment</h3>
-                </div> */}
-        {/* <div className="payment_method">
-                    <form>
-                      
-                        <div className="accordion" id="accordionExample">
-                        {Payment.map((data,index)=>{
-                        return(
-                            <div className="payment_area_wrappers">
-                                <div className="heading_payment" id={`headingOne${index}`}>
-                                    <div className="" data-toggle="collapse" data-target={`#collapseOne${index}`} >
-                                        <input type="radio" name="payment" id={`html${index}`} value={value}  onChange={(e)=>paymentType(data.name)}/>
-                                        <label htmlFor={`html${index}`}>{data.name} </label>
-                                    </div>
-                                </div>
-                                
-                            </div>
-                            )})}
-                         
-                           
-                        </div> 
-                    </form>
-                </div> */}
+        <div className="check-heading">
+          <h3>Payment</h3>
+        </div>
+
+        <div className="payment_method">
+          <div className="pt-2 pb-3">
+            Total Order{" "}
+            <b>
+              {" "}
+              {payType !== "points" ? <i class="fa fa-rupee"></i> : ""}{" "}
+              {Cart_Total_Value}
+            </b>
+          </div>
+          <form>
+            <div className="accordion" id="accordionExample">
+              {Payments.map((data, index) => {
+                return (
+                  <div className="payment_area_wrappers">
+                    <div className="heading_payment" id={`headingOne${index}`}>
+                      <div
+                        data-toggle="collapse"
+                        data-target={`#collapseOne${index}`}
+                        class="accordion-collapse collapse show"
+                        aria-labelledby={`headingOne${index}`}
+                      >
+                        <input
+                          type="radio"
+                          name="payment"
+                          // id={`html${index}`}
+                          value={value}
+                          onChange={(e) => paymentType(data.name)}
+                        />
+                        <label
+                          htmlFor={`html${index}`}
+                          style={{ transform: "up" }}
+                        >
+                          {data.label}{" "}
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </form>
+        </div>
         <button
           className="theme-btn-one btn-black-overlay btn_sm"
-          onClick={Submit}
+          onClick={AddressCheckProceed}
         >
           Place Order
         </button>
       </div>
-      <RazorpayPayment show={open} OrderPlace={handleChange} />
+      {/* <RazorpayPayment show={open} OrderPlace={handleChange} /> */}
       <Loading show={loading} />
+
+      <ModalComp
+        showmodal={showmodal}
+        title={
+          <div className="header_tit">
+            <span>
+              {!BillingInformation?.store_name
+                ? "Delivery Address"
+                : "Pickup Store Details"}
+            </span>
+          </div>
+        }
+        size={checkadd ? "md" : "lg"}
+        handleClose={(key) => setshowmodal(key)}
+      >
+        <ConfirmPopup
+          Submit={Submit}
+          BillingInformation={BillingInformation}
+          ConfirmInform={(key) => setcheckadd(key)}
+          handleClose={(key) => setshowmodal(key)}
+        />
+      </ModalComp>
     </>
   );
 };

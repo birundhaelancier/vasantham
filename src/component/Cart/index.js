@@ -9,46 +9,50 @@ import Swal from "sweetalert2";
 import moment from "moment";
 import {
   CartListApi,
+  PayTypeCashOrPoints,
   Profile_Details,
   TimerEnd,
 } from "../../Redux/Action/allActions";
 import { AddToCartApi, ProductDelete } from "../../Redux/Action/CreateActions";
+import ModalComp from "../../helpers/Modal";
+import { Radio } from "antd";
 const CartArea = () => {
   let dispatch = useDispatch();
   const [timer, settimer] = useState(false);
   const [QuantityValues, setQuantityValues] = useState({});
   const ShoppingCarts = useSelector((state) => state.AllReducer.CartLists);
   const ProfileData = useSelector((state) => state.AllReducer.ProfileData);
-
+  const payType = useSelector((state) => state.AllReducer.payType);
   const columnss = [
     { field: "id", width: 50, headerName: "Remove" },
     { field: "", width: 130, headerName: "Image" },
     { field: "", width: 130, headerName: "Product" },
+    { field: "", width: 130, headerName: "Price" },
     { field: "", width: 130, headerName: "Points" },
-    // { field: '', width: 130, headerName: 'Price Discount' },
     { field: "", width: 130, headerName: "Quantity" },
-    { field: "", width: 130, headerName: "Total" },
+    { field: "", width: 130, headerName: "Total Price" },
+    { field: "", width: 130, headerName: "Total Points" },
   ];
   let carts = useSelector((state) => state?.products?.carts);
+
+  const attributeFun = (data) => {
+    return data?.attribute?.filter((datas) => datas.id === data.aid);
+  };
 
   // Remove from Cart
   const rmProduct = (id) => {
     dispatch(ProductDelete(id)).then((res) => {
       NotifyFun(res);
     });
-    // dispatch({ type: "products/removeCart", payload: { id } });
   };
-  // Clear
-  const clearCarts = () => {
-    dispatch({ type: "products/clearCart" });
-  };
+
   // Value Update
 
   useEffect(() => {
     dispatch(CartListApi());
   }, []);
 
-  const cartValUpdate = (val, index, id, stock) => {
+  const cartValUpdate = (val, index, data, stock) => {
     if (val > stock) {
       Swal.fire({
         icon: "warning",
@@ -58,27 +62,38 @@ const CartArea = () => {
         timer: 1000,
       });
     } else {
-      for (var i = 0; i < ShoppingCarts.length; i++) {
-        if (id === ShoppingCarts[i].id) {
-          ShoppingCarts[i].quantity = val;
-          break;
+      if (data.is_type === "flash_deal") {
+        if (Math.abs(data?.max_count - data.purchased_count) >= Number(val)) {
+          ProceedAddtoCart(data, val, "qty");
+          setQuantityValues((prevState) => ({
+            ...prevState,
+            ["test" + data?.id]: val,
+          }));
+        } else {
+          Swal.fire({
+            icon: "warning",
+            title: "Warning",
+            text: "Maximum order reached",
+            showConfirmButton: false,
+            timer: 1000,
+          });
         }
+      } else {
+        ProceedAddtoCart(data, val, "qty");
+        setQuantityValues((prevState) => ({
+          ...prevState,
+          ["test" + data?.id]: val,
+        }));
       }
-      // localStorage.setItem("carts", JSON.stringify(ShoppingCarts));
-      ProceedAddtoCart(id, val, "qty");
-      setQuantityValues((prevState) => ({
-        ...prevState,
-        ["test" + id]: val,
-      }));
     }
   };
 
-  const ProceedAddtoCart = (id, val, type) => {
+  const ProceedAddtoCart = (data, val, type) => {
     let product = {
       uid: JSON.parse(localStorage.getItem("UserId")),
-      pid: id,
+      pid: data?.id,
       qty: val || 1,
-      aid: "",
+      aid: data?.aid || "",
       // flag: timer ? 1 : 0,
     };
     dispatch(AddToCartApi(product)).then((res) => {
@@ -98,7 +113,7 @@ const CartArea = () => {
   }, [ShoppingCarts]);
 
   const NotifyFun = (res, type) => {
-    if (res.payload.status === 1) {
+    if (res?.payload?.status === 1) {
       dispatch(CartListApi());
       type !== "qty" &&
         Swal.fire({
@@ -108,7 +123,7 @@ const CartArea = () => {
           showConfirmButton: false,
           timer: 1000,
         });
-    } else if (res.payload.status === 0) {
+    } else if (res?.payload?.status === 0) {
       type !== "qty" &&
         Swal.fire({
           icon: "warning",
@@ -120,12 +135,13 @@ const CartArea = () => {
     }
   };
 
-  const Timer = (val) => {
+  const Timer = (fromdate, todate) => {
     let timer = false;
+    var timeron = moment() >= moment(fromdate);
     const startDate = moment();
-    const timeEnd = moment(val).local();
+    const timeEnd = moment(todate).local();
     const diff = timeEnd.diff(startDate);
-    if (diff > 0) {
+    if (timeron && diff > 0) {
       timer = true;
     } else {
       timer = false;
@@ -160,11 +176,12 @@ const CartArea = () => {
                           <tr key={index}>
                             <td className="product_remove">
                               <i
-                                className="fa fa-trash text-danger"
+                                className="fa fa-remove text-danger"
                                 onClick={() => rmProduct(data.id)}
                                 style={{ cursor: "pointer" }}
                               ></i>
                             </td>
+
                             <td className="product_thumb">
                               <Link
                                 to={`/product-details-one/${data.slug}/${data.pid}`}
@@ -177,19 +194,35 @@ const CartArea = () => {
                                 to={`/product-details-one/${data.slug}/${data.pid}`}
                               >
                                 <span>{data.name}</span>
-                                {/* <div style={{fontSize:"13px"}}><span>Points {" "}{data.points} - Prize <i class="fa fa-inr"/> {(data.discount_price)} </span></div> */}
+                                {/* <div style={{ fontSize: "13px" }}>
+                                  <span>
+                                    Points {data.points} - Prize{" "}
+                                    <i class="fa fa-inr" />{" "}
+                                    {data.discount_price}{" "}
+                                  </span>
+                                </div> */}
                               </Link>
+                            </td>
+
+                            <td className="product-price">
+                              <i class="fa fa-inr" />{" "}
+                              {data.aid
+                                ? attributeFun(data)?.[0]?.selling
+                                : Timer(data?.date, data?.to_date)
+                                ? data?.deal_amount
+                                : data.discount_price}
                             </td>
                             <td className="product_name">
                               <Link
                                 to={`/product-details-one/${data.slug}/${data.pid}`}
                               >
-                                {Timer(data.date)
+                                {data.aid
+                                  ? attributeFun(data)?.[0]?.point
+                                  : Timer(data?.date, data?.to_date)
                                   ? data.deal_point
                                   : data?.point}
                               </Link>
                             </td>
-                            {/* <td className="product-price"><i class="fa fa-inr"/> {(data.dis_prize*data.quantity).toFixed(2)}</td> */}
                             <td className="product_quantity">
                               <input
                                 min="1"
@@ -199,20 +232,36 @@ const CartArea = () => {
                                   cartValUpdate(
                                     e.target.value,
                                     index,
-                                    data.pid,
+                                    data,
                                     data.stock
                                   )
                                 }
                                 value={QuantityValues["test" + data.pid]}
                               />
                             </td>
-
+                            <td className="product_total">
+                              {" "}
+                              <i class="fa fa-inr" />
+                              {Math.abs(
+                                Number(
+                                  data.aid
+                                    ? attributeFun(data)?.[0]?.selling
+                                    : Timer(data?.date, data?.to_date)
+                                    ? data?.deal_amount
+                                    : data.discount_price
+                                ) * Number(data.qty)
+                              ).toFixed(2)}
+                            </td>
                             <td className="product_total">
                               {" "}
                               {Math.abs(
-                                Timer(data.date)
-                                  ? data.deal_point
-                                  : data?.point * Number(data.qty)
+                                Number(
+                                  data.aid
+                                    ? attributeFun(data)?.[0]?.point
+                                    : Timer(data?.date, data?.to_date)
+                                    ? data.deal_point
+                                    : data?.point
+                                ) * Number(data.qty)
                               ).toFixed(2)}
                             </td>
                           </tr>
@@ -242,15 +291,25 @@ const CartArea = () => {
                               <li>
                                 <div className="table_val">
                                   {" "}
-                                  {Timer(data.date)
+                                  {data.aid
+                                    ? attributeFun(data)?.[0]?.point
+                                    : Timer(data?.date, data?.to_date)
                                     ? data.deal_point
                                     : data?.point}
                                 </div>
                               </li>
-                              {/* <li>
-                                                            
-                                                                <div className="table_val"><i class="fa fa-inr" aria-hidden="true"></i> {(data.dis_points*data.quantity).toFixed(2) }</div>
-                                                            </li> */}
+                              <li>
+                                <div className="table_val">
+                                  <i class="fa fa-inr" />{" "}
+                                  {data.aid
+                                    ? attributeFun(data)?.[0]?.selling
+                                    : Timer(data?.date, data?.to_date)
+                                    ? data?.deal_amount
+                                    : Timer(data?.date, data?.to_date)
+                                    ? data?.deal_amount
+                                    : data.discount_price * data.qty}
+                                </div>
+                              </li>
                               <li>
                                 {/* <div className="table_head">Quantity </div> */}
                                 <div className="table_val">
@@ -258,12 +317,14 @@ const CartArea = () => {
                                     min="1"
                                     max="100"
                                     type="number"
-                                    style={{ textAlign: "center" }}
+                                    style={{
+                                      textAlign: "center",
+                                    }}
                                     onChange={(e) =>
                                       cartValUpdate(
                                         e.target.value,
                                         index,
-                                        data.pid,
+                                        data,
                                         data.stock
                                       )
                                     }
@@ -275,7 +336,9 @@ const CartArea = () => {
                                 <div className="table_val">
                                   Points{" "}
                                   {Number(
-                                    (Timer(data.date)
+                                    (data.aid
+                                      ? attributeFun(data)?.[0]?.point
+                                      : Timer(data?.date, data?.to_date)
                                       ? data.deal_point
                                       : data?.point) * (data.qty || 1)
                                   ).toFixed(2)}
@@ -285,7 +348,7 @@ const CartArea = () => {
                           </div>
                           <div style={{ textAlign: "end" }}>
                             <i
-                              className="fa fa-trash text-danger"
+                              className="fa fa-remove text-danger"
                               onClick={() => rmProduct(data.pid)}
                               style={{
                                 cursor: "pointer",

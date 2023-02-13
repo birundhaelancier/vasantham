@@ -7,12 +7,13 @@ import { useSelector } from "react-redux";
 import axios from "axios";
 import { apiurl } from "../../../Redux/Utils/baseurl";
 import { isMobile } from "react-device-detect";
+import Heading from "../../Fashion/Heading";
 const DealProduct = () => {
   let products = useSelector((state) => state?.products?.products);
   products = products?.filter((item) => item?.category === "electronics");
   // const [slideNumber, setSlideNumber] = useState(3)
   let settings = {
-    arrows: false,
+    arrows: true,
     dots: false,
     margin: 30,
     infinite: false,
@@ -25,6 +26,7 @@ const DealProduct = () => {
         breakpoint: 1024,
         settings: {
           slidesToShow: 3,
+          arrows: true,
         },
       },
       {
@@ -52,7 +54,10 @@ const DealProduct = () => {
     axios({
       method: "post",
       url: apiurl + "homeProduct",
-      data: { type: "deal" },
+      data: {
+        type: "deal",
+        user_id: JSON.parse(localStorage.getItem("UserId")),
+      },
     }).then((response) => {
       setProducts(response.data);
     });
@@ -64,14 +69,8 @@ const DealProduct = () => {
           <div className="container">
             <div className="row">
               <div className="col-lg-12">
-                <div className="left_heading_three text-center w-100">
-                  <h2
-                    className={`text-center w-100 pb-2 pt-4 ${
-                      isMobile ? "h4" : "h2"
-                    }`}
-                  >
-                    Today's Deals
-                  </h2>
+                <div className="left_heading_three text-center w-100 mt-1">
+                  <Heading heading={"Today's Deals"} />
                 </div>
               </div>
             </div>
@@ -80,7 +79,12 @@ const DealProduct = () => {
                 <div className="elce_weekly_slider">
                   <Slider {...settings}>
                     {Products?.map((data, index) => (
-                      <ProductCard data={data} key={index} styles={"slider"} />
+                      <ProductCard
+                        data={data}
+                        key={index}
+                        styles={"slider"}
+                        deals={true}
+                      />
                     ))}
                   </Slider>
                 </div>

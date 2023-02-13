@@ -12,6 +12,7 @@ const Sidebar = () => {
   const logout = () => {
     localStorage.removeItem("UserId");
     history.push("/");
+    localStorage.removeItem("notify");
   };
   return (
     <>
@@ -45,7 +46,7 @@ const Sidebar = () => {
                     : null
                 }
               >
-                <i className="fa fa-product-hunt"></i>My Orders
+                <i className="fa fa-first-order"></i>My Orders
               </Link>
             </li>
 

@@ -42,7 +42,6 @@ const OrderSuccess = (props) => {
     });
   };
 
-  const Billing = OrderDetails?.billing_info;
   const OrderDetail =
     Object.values(OrderDetails?.cart || "") || OrderDetails.cart;
   const cartTotal = () => {
@@ -50,7 +49,7 @@ const OrderSuccess = (props) => {
       return (
         total +
         (item.qty || 1) *
-          (item.attribute_price ? item.attribute_price : item.main_price)
+          (item.attribute_price ? item.attribute_price : item.price)
       );
     }, 0);
   };
@@ -61,20 +60,23 @@ const OrderSuccess = (props) => {
     // discount:"Discount",
     // total:"Total",
     // deliverycharge:"Delivery Charges",
+    subtotal: "PRODUCT COST",
+    discount: "DISCOUNT",
     total_paid: "TOTAL POINTS",
   };
 
   const FooterValues = {
-    subtotal: Number(cartTotal())?.toFixed(2),
+    subtotal: OrderDetails?.discount !== "null" ? Number(cartTotal()) : 0,
     // reward:OrderDetails?.reward || 0,
-    discount: OrderDetails?.discount || 0,
-    total: Math.abs(
-      Number(cartTotal()) -
-        Number(OrderDetails?.discount !== "[]" ? OrderDetails?.discount : 0)
-    )?.toFixed(2),
+    discount:
+      (OrderDetails?.discount &&
+        JSON.parse(OrderDetails?.discount)?.discount) ||
+      0,
+    total: OrderDetails?.orderTotal,
     deliverycharge: OrderDetails?.shipping?.price || 0,
-    total_paid: 0,
+    total_paid: OrderDetails?.orderTotal,
   };
+
   return (
     <>
       <OrderMobile_View />
@@ -265,45 +267,54 @@ const OrderSuccess = (props) => {
                       );
                     })}
                     {Object.keys(headings).map((data) => (
-                      <tr>
-                        <td
-                          colSpan="2"
-                          style={{
-                            lineHeight: "49px",
-                            fontSize: "13px",
-                            color: "#000000",
-                            paddingLeft: "20px",
-                            textAlign: "left",
-                            borderRight: " unset",
-                          }}
-                        >
-                          {headings[data]}:
-                        </td>
-                        <td
-                          colSpan="3"
-                          className="price"
-                          style={{
-                            lineHeight: "49px",
-                            textAlign: "right",
-                            paddingRight: "28px",
-                            fontSize: "13px",
-                            color: "#000000",
-                            TextAlign: "right",
-                            borderLeft: "unset",
-                          }}
-                        >
-                          <b>
-                            {data === "discount"
-                              ? FooterValues["discount"] !== "[]"
-                                ? FooterValues[data]
-                                : 0
-                              : data === "total_paid"
-                              ? Number(FooterValues["total"]) +
-                                  Number(FooterValues["deliverycharge"]) || 0
-                              : (FooterValues[data] && FooterValues[data]) || 0}
-                          </b>
-                        </td>
-                      </tr>
+                      <>
+                        {FooterValues[data] > 0 && (
+                          <tr>
+                            <td
+                              colSpan="2"
+                              style={{
+                                lineHeight: "49px",
+                                fontSize: "13px",
+                                color: "#000000",
+                                paddingLeft: "20px",
+                                textAlign: "left",
+                                borderRight: " unset",
+                              }}
+                            >
+                              {headings[data]}:
+                            </td>
+                            <td
+                              colSpan="3"
+                              className="price"
+                              style={{
+                                lineHeight: "49px",
+                                textAlign: "right",
+                                paddingRight: "28px",
+                                fontSize: "13px",
+                                color: "#000000",
+                                TextAlign: "right",
+                                borderLeft: "unset",
+                              }}
+                            >
+                              <b>
+                                {
+                                  // data === "discount"
+                                  //   ? FooterValues["discount"] !== "[]"
+                                  //     ? FooterValues[data]
+                                  //     : 0
+                                  //   : data === "total_paid"
+                                  //   ? Number(FooterValues["total"]) +
+                                  //       Number(FooterValues["deliverycharge"]) ||
+                                  //     0
+                                  //   :
+                                  (FooterValues[data] && FooterValues[data]) ||
+                                    0
+                                }
+                              </b>
+                            </td>
+                          </tr>
+                        )}
+                      </>
                     ))}
                   </tbody>
                 </table>
@@ -318,112 +329,96 @@ const OrderSuccess = (props) => {
                     marginBottom: "30px",
                   }}
                 >
-                  <tbody>
-                    <tr>
-                      <td
-                        style={{
-                          fontSize: "13px",
-                          fontWeight: "400",
-                          color: "#444444",
-                          letterSpacing: "0.2px",
-                          width: " 50%",
-                        }}
-                      >
-                        <h5
+                  {Number(OrderDetails?.flag) === 0 ? (
+                    <tbody>
+                      <tr>
+                        <td
                           style={{
-                            fontSize: "16px",
-                            fontWeight: "500",
-                            color: "#000",
-                            lineHeight: "16px",
-                            paddingBottom: "13px",
-                            borderBottom: "1px solid #e6e8eb",
-                            letterSpacing: "-0.65px",
-                            marginTop: "0",
-                            marginBottom: "13px",
+                            fontSize: "13px",
+                            fontWeight: "400",
+                            color: "#444444",
+                            letterSpacing: "0.2px",
+                            width: " 50%",
                           }}
                         >
-                          DELIVERY ADDRESS
-                        </h5>
-                        <p
+                          <h5 className="orderheading">DELIVERY ADDRESS</h5>
+                          <p
+                            style={{
+                              textAlign: "left",
+                              fontWeight: "normal",
+                              fontSize: "14px",
+                              color: "#000000",
+                              lineHeight: "21px",
+                              marginTop: "0",
+                            }}
+                          >
+                            {OrderDetails?.billing_info?.bill_first_name}{" "}
+                            {OrderDetails?.billing_info?.bill_last_name},<br />
+                            {OrderDetails?.billing_info?.bill_address1},<br />{" "}
+                            {
+                              dropdown(OrderDetails?.billing_info?.bill_city)[0]
+                                ?.name
+                            }{" "}
+                            <br />
+                            {OrderDetails?.billing_info?.bill_country}-
+                            {OrderDetails?.billing_info?.bill_zip}
+                            <br />
+                            <strong>Mobile No:</strong>
+                            {OrderDetails?.billing_info?.bill_phone}
+                          </p>
+                        </td>
+                        <td width="57" height="25" className="user-info">
+                          <img src={spoce} alt="img" height="25" width="57" />
+                        </td>
+                        <td
+                          className="user-info"
                           style={{
-                            textAlign: "left",
-                            fontWeight: "normal",
-                            fontSize: "14px",
-                            color: "#000000",
-                            lineHeight: "21px",
-                            marginTop: "0",
+                            fontSize: "13px",
+                            fontWeight: "400",
+                            color: "#444444",
+                            letterSpacing: "0.2px",
+                            width: "50%",
                           }}
                         >
-                          {OrderDetails?.billing_info?.bill_first_name}{" "}
-                          {OrderDetails?.billing_info?.bill_last_name},<br />
-                          {OrderDetails?.billing_info?.bill_address1},<br />{" "}
-                          {
-                            dropdown(OrderDetails?.billing_info?.bill_city)[0]
-                              ?.name
-                          }{" "}
-                          <br />
-                          {OrderDetails?.billing_info?.bill_country}-
-                          {OrderDetails?.billing_info?.bill_zip}
-                          <br />
-                          <strong>Mobile No:</strong>
-                          {OrderDetails?.billing_info?.bill_phone}
-                        </p>
-                      </td>
-                      <td width="57" height="25" className="user-info">
-                        <img src={spoce} alt="img" height="25" width="57" />
-                      </td>
-                      <td
-                        className="user-info"
-                        style={{
-                          fontSize: "13px",
-                          fontWeight: "400",
-                          color: "#444444",
-                          letterSpacing: "0.2px",
-                          width: "50%",
-                        }}
-                      >
-                        <h5
-                          style={{
-                            fontSize: "16px",
-                            fontWeight: "500",
-                            color: "#000",
-                            lineHeight: "16px",
-                            paddingBottom: "13px",
-                            borderBottom: "1px solid #e6e8eb",
-                            letterSpacing: "-0.65px",
-                            marginTop: "0",
-                            marginBottom: "13px",
-                          }}
-                        >
-                          SHIPPING ADDRESS
-                        </h5>
-                        <p
-                          style={{
-                            textAlign: "left",
-                            fontWeight: "normal",
-                            fontSize: "14px",
-                            color: "#000000",
-                            lineHeight: "21px",
-                            marginTop: "0",
-                          }}
-                        >
-                          {OrderDetails?.shipping_info?.ship_first_name}{" "}
-                          {OrderDetails?.shipping_info?.ship_last_name},<br />
-                          {OrderDetails?.shipping_info?.ship_address1},<br />{" "}
-                          {
-                            dropdown(OrderDetails?.shipping_info?.ship_city)[0]
-                              ?.name
-                          }{" "}
-                          <br />
-                          {OrderDetails?.shipping_info?.ship_country}-
-                          {OrderDetails?.shipping_info?.ship_zip}
-                          <br />
-                          <strong>Mobile No:</strong>
-                          {OrderDetails?.shipping_info?.ship_phone}
-                        </p>
-                      </td>
-                    </tr>
-                  </tbody>
+                          <h5 className="orderheading">SHIPPING ADDRESS</h5>
+                          <p
+                            style={{
+                              textAlign: "left",
+                              fontWeight: "normal",
+                              fontSize: "14px",
+                              color: "#000000",
+                              lineHeight: "21px",
+                              marginTop: "0",
+                            }}
+                          >
+                            {OrderDetails?.shipping_info?.ship_first_name}{" "}
+                            {OrderDetails?.shipping_info?.ship_last_name},<br />
+                            {OrderDetails?.shipping_info?.ship_address1},<br />{" "}
+                            {
+                              dropdown(
+                                OrderDetails?.shipping_info?.ship_city
+                              )[0]?.name
+                            }{" "}
+                            <br />
+                            {OrderDetails?.shipping_info?.ship_country}-
+                            {OrderDetails?.shipping_info?.ship_zip}
+                            <br />
+                            <strong>Mobile No:</strong>
+                            {OrderDetails?.shipping_info?.ship_phone}
+                          </p>
+                        </td>
+                      </tr>
+                    </tbody>
+                  ) : (
+                    <tbody>
+                      <tr>
+                        <td>
+                          <h5 className="orderheading">PICKUP STORE ADDRESS</h5>
+                          <p> {OrderDetails?.billing_info?.bill_address1}</p>
+                        </td>
+                      </tr>
+                    </tbody>
+                  )}
                 </table>
               </td>
             </tr>

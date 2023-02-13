@@ -43,6 +43,8 @@ import MobileNumberVerification from "./page/verification";
 import SearchComp from "./component/Common/Header/search";
 import Time from "./component/Time";
 import RecentActivity from "./page/Recentactivities";
+import Qrcode from "./Qrcode";
+import Offers from "./page/offers";
 export default function Routes() {
   const PrivateRoute = ({ component: Component, ...rest }) => (
     <Route
@@ -67,6 +69,7 @@ export default function Routes() {
           exact
           component={ProductDetails}
         />
+
         <PrivateRoute
           path="/my-account/editaddresslist/:id?/:type?"
           exact
@@ -74,7 +77,7 @@ export default function Routes() {
         />
         <Route path="/cart" exact component={Cart} />
         <Route path="/empty-cart" exact component={EmptyCarts} />
-        <Route path="/checkout-one" exact component={CheckoutOne} />
+        <Route path="/checkout" exact component={CheckoutOne} />
         <Route path="/wishlist" exact component={WishLists} />
         <PrivateRoute path="/order-complete" exact component={OrderComplete} />
         <Route path="/privacy-policy" exact component={PrivacyPolicy} />
@@ -135,6 +138,9 @@ export default function Routes() {
           exact
           component={MobileNumberVerification}
         />
+        <Route path="/qrcode" component={Qrcode} />
+        <Route path="/offers" component={Offers} />
+
         {/* <PrivateRoute path='/my-profile' exact component={MyAccounts}/>
       <PrivateRoute path='/my-profile' exact component={MyAccounts}/> */}
         <Route exact path="*" component={Electronics} />

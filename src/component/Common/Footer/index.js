@@ -29,7 +29,7 @@ const FooterData = [
     ],
   },
   {
-    title: "Our Branches",
+    title: "Our branches",
     links: [
       { linkTitle: "Kalavasal - Madurai" },
       { linkTitle: "Bypass Road - Madurai" },
@@ -263,7 +263,7 @@ const Footer = ({ hide }) => {
               </div>
               <div className="col-lg-3 col-md-12 col-sm-12 col-12">
                 <div className="footer_one_widget">
-                  <h3>NEWSLETTER</h3>
+                  <h3>News letter</h3>
                   <div id="mc_embed_signup" className="subscribe-form">
                     <form
                       onSubmit={(e) => {
@@ -317,16 +317,14 @@ const Footer = ({ hide }) => {
               <i className="fa fa-arrow-up"></i>
             </div>
           )}
-          {/* {showScroll && ( */}
           <div className="whatsic">
             <img
               src={whatsapp}
               onClick={() =>
-                window.open("https://wa.me/919047183288", "_blank")
+                window.open("https://wa.me/916381594409", "_blank")
               }
             />
           </div>
-          {/* )} */}
         </footer>
 
         <section id="copyright_one">
@@ -347,8 +345,6 @@ const Footer = ({ hide }) => {
             </div>
           </div>
         </section>
-
-        {/* <NewsletterModal show={promoCenter} stop={stopPromoModal} start={startPromoModal} /> */}
       </div>
     </>
   );

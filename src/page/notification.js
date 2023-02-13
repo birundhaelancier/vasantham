@@ -42,6 +42,7 @@ const NotificationComp = () => {
   ];
   useEffect(() => {
     dispatch(NotificationsApi());
+    localStorage.setItem("notify", true);
   }, []);
 
   return (
@@ -65,8 +66,20 @@ const NotificationComp = () => {
 
             {/* <span><img src={data.icon} className="notify-ic"/></span> */}
             <div>
-              <span className="head_or">{data.title}</span>
-              <p>{data.description}</p>
+              <span className="head_or">
+                <a href={data?.url}>{data.title}</a>
+              </span>
+              <p>
+                <a href={data?.url}>{data.description}</a>
+              </p>
+              <a>
+                {moment(
+                  moment(data.created_at).format("YYYY-MM-DD hh:mm:ss")
+                ).fromNow()}
+              </a>
+              {/* <a href={data.url} className="linka">
+                More Details
+              </a> */}
               {/* <label>{(new Date(data.updated_at)) / (1000 * 60 * 60 * 24)} days ago</label> */}
             </div>
           </div>

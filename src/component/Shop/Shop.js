@@ -1,15 +1,22 @@
 import React, { useEffect, useState } from "react";
 import ProductCard from "../Common/Product/ProductCard";
-import { useSelector, useDispatch, connect } from "react-redux";
+import { useDispatch, connect } from "react-redux";
 import Slider from "react-slick";
 import { useParams } from "react-router-dom";
 import { CategoryList_api } from "../../Redux/Action/allActions";
 import EmptyCart from "../Cart/EmptyCart";
-
+import "react-awesome-slider/dist/custom-animations/cube-animation.css";
+import Heading from "../Fashion/Heading";
+import Pagination from "@mui/material/Pagination";
+import Stack from "@mui/material/Stack";
+import { isMobile } from "react-device-detect";
 const Shop = (props) => {
   let { slug } = useParams();
   let [loading, setloading] = useState(true);
   const [products, setProducts] = useState([]);
+  const [page, setpage] = useState(1);
+  const [pagen, setpagen] = useState(0);
+  const [count, setcount] = useState(12);
   let dispatch = useDispatch();
   const [product_slide, setproduct_slide] = useState(0);
 
@@ -29,6 +36,11 @@ const Shop = (props) => {
     }
   }, [props.Category_List]);
 
+  const handleChange = (e, val) => {
+    setpage(val);
+    setpagen(0 + val);
+  };
+
   let settings = {
     customPaging: function (i) {
       return (
@@ -42,12 +54,11 @@ const Shop = (props) => {
         </div>
       );
     },
-    arrows: false,
-    dots: true,
+    arrows: products?.products?.length > 30 ? true : false,
+    dots: products?.products?.length > 30 ? false : true,
     infinite: false,
     slidesToShow: 5,
     slidesToScroll: 1,
-    accessibility: false,
     rows: products?.products?.length > 6 ? 2 : 1,
     responsive: [
       {
@@ -97,7 +108,8 @@ const Shop = (props) => {
         settings: {
           slidesToShow: 2,
           rows: 2,
-          dots: true,
+          dots: false,
+          arrows: false,
           customPaging: function (i) {
             return (
               <div className="">
@@ -118,22 +130,42 @@ const Shop = (props) => {
   return (
     <>
       <section id="shop_main_area" className="pb-100">
+        <Heading heading={products?.categoryDetail?.name} />
         {products?.products?.length > 0 ? (
-          <div className="container">
-            {!loading ? (
-              <div>
-                <Slider {...settings}>
-                  {products?.products?.map((data, index) => (
-                    <ProductCard data={data} />
-                  ))}
-                </Slider>
-              </div>
-            ) : (
-              <div className="shop_loader">
-                <i class="fa fa-circle-o-notch fa-spin"></i>
-              </div>
-            )}
-          </div>
+          <>
+            <div className="container">
+              {!loading ? (
+                <>
+                  <div className="row mobileshop p-0">
+                    {/* <Slider {...settings}> */}
+                    {products?.products
+                      ?.slice((page - 1) * count, (page - 1) * count + count)
+                      .map((data, index) => (
+                        <div className="col-md-2 col-6 p-0">
+                          <ProductCard data={data} category={true} />
+                        </div>
+                      ))}
+                    {/* </Slider> */}
+                  </div>
+                  {products?.products?.length > 8 && (
+                    <div className="pag-item">
+                      <Pagination
+                        count={Math.round(products?.products?.length / 12)}
+                        variant="outlined"
+                        color="secondary"
+                        page={page}
+                        onChange={(e, val) => handleChange(e, val)}
+                      />
+                    </div>
+                  )}
+                </>
+              ) : (
+                <div className="shop_loader">
+                  <i class="fa fa-circle-o-notch fa-spin"></i>
+                </div>
+              )}
+            </div>
+          </>
         ) : (
           <EmptyCart Width={"80%"} />
         )}
@@ -146,3 +178,23 @@ const mapStateToProps = (state) => ({
   Category_List: state.AllReducer.Category_List || [],
 });
 export default connect(mapStateToProps)(Shop);
+
+// {/* <div className="container">
+//             {!loading ? (
+//               <div className="row">
+//                 {/* <Slider {...settings}> */}
+//                 {products?.products
+//                   ?.slice(pagen, count)
+//                   .map((data, index) => (
+//                     <div className="col-md-3 col-6">
+//                       <ProductCard data={data} category={true} />
+//                     </div>
+//                   ))}
+//                 {/* </Slider> */}
+//               </div>
+//             ) : (
+//               <div className="shop_loader">
+//                 <i class="fa fa-circle-o-notch fa-spin"></i>
+//               </div>
+//             )}
+//           </div>

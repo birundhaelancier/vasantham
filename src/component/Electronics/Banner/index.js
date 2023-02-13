@@ -73,8 +73,11 @@ const Banner = (props) => {
                     <div>
                       <div>
                         <img
-                          src={ImageUrl + data?.photo}
+                          src={`${ImageUrl}${
+                            isMobile ? data?.mobile : data?.photo
+                          }`}
                           style={{ width: "100%" }}
+                          className="responsive"
                         />
                       </div>
                     </div>

@@ -2279,7 +2279,7 @@ button {
   position: relative;
   display: block;
   overflow: hidden;
-  height: 110px;
+  height: 170px;
 }
 
 .product_wrappers_one .thumb .image img {
@@ -2288,7 +2288,7 @@ button {
   transition: all 0.3s ease 0s;
   // width: 100%;
   // max-height: 100%;
-  max-height: 110px;
+  max-height: 170px;
   position: absolute;
   top: 0;
   left: 0;
@@ -2434,26 +2434,28 @@ button {
   z-index: 10;
   display: flex;
   flex-direction: column;
-  /* padding: 20px 15px 23px 15px; */
   transition: all 0.3s ease 0s;
-  text-align: center;
-  background-color: #fff;
   padding: 5px 10px;
 }
 
 .product_wrappers_one .content .title {
   font-size: 14px;
   margin: 0px 0 10px;
+  font-family: "Trirong", serif;
 }
 
 .product_wrappers_one .content .title a {
   text-decoration: none;
   color: #1d1d1d;
-  white-space: nowrap;
+  // white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   display: block;
-  font-size: 16px;
+  font-size: 14px;
+  font-weight: 700;
+  max-height: 32px;
+  margin: 0 0 8px;
+  min-height: 32px;
 }
 
 .product_wrappers_one .content .price {
@@ -8120,12 +8122,25 @@ table {
     width: 100%;
     height: 164px !important;
   }
+  .grcery_support_boxed {
+    justify-content: start !important;
+    height: auto !important;
+    margin-bottom: 15px;
+  }
   .mobileshop {
     width: auto;
     margin: 0;
     padding: 0;
   }
-
+  .price_crd > div {
+    > del {
+      font-size: 3vw !important;
+      padding-left: 2px;
+    }
+    > span {
+      font-size: 4vw !important;
+    }
+  }
   .total_pro_card .add_cart_qty {
     margin-right: 8px !important;
     > input {
@@ -9083,7 +9098,7 @@ body.modal-open {
 }
 
 .categorycutomcss {
-  height: 270px;
+  // height: 410px;
 }
 .custom_tab {
   .check-heading {
@@ -9334,7 +9349,7 @@ body.modal-open {
     > span {
       padding-left: 3px;
       // color: #afc814;
-      font-size: 16px;
+      font-size: 18px;
       font-weight: 800;
     }
   }
@@ -9381,4 +9396,92 @@ body.modal-open {
       }
     }
   }
+}
+
+.slider-customcss {
+  .slick-slider {
+    .slick-prev {
+      // left: -13px;
+      /* background: red; */
+      z-index: 2;
+      background: #fff;
+      width: 25px;
+      height: 80px;
+
+      &:hover {
+        background: #c6d75f;
+      }
+    }
+    .slick-next {
+      // right: -14px;
+      background: #c6d75f;
+      width: 25px;
+      height: 80px;
+      &:hover {
+        background: #c6d75f;
+      }
+    }
+    .slick-prev,
+    .slick-next {
+      height: 80px;
+      width: 43px;
+      background-color: hsla(0, 0%, 100%, 0.98);
+      box-shadow: 0 1px 5px 0 rgb(0 0 0 / 11%);
+      transition: opacity 0.1s ease-in;
+    }
+
+    .slick-prev:before,
+    .slick-next:before {
+      color: #6c757d;
+    }
+  }
+}
+
+.banner-slider {
+  .slick-prev {
+    left: 0px;
+  }
+  .slick-next {
+    right: 0px;
+  }
+}
+.today-deal {
+  background-color: #fff;
+}
+.save-txt {
+  color: #28a745;
+  font-weight: 700;
+  margin-top: 3px;
+}
+
+.grcery_support_boxed {
+  display: flex;
+  background: #f1f2ff94;
+  padding: 30px 20px;
+  border-radius: 5px;
+  transition: 0.4s all ease-in-out;
+  height: 145px;
+  align-items: center;
+  justify-content: center;
+  > img {
+    height: 40px;
+  }
+}
+.support_boxed_grocery_content {
+  padding-left: 20px;
+  > h5 {
+    font-size: 18px;
+    font-weight: 600;
+  }
+  > p {
+    padding-top: 2px;
+    font-size: 14px;
+  }
+}
+
+.categorymenu {
+  max-height: 350px;
+  height: 350px;
+  overflow: auto;
+  overflow-x: hidden;
 }

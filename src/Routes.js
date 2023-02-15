@@ -5,6 +5,8 @@ import {
   Route,
   Redirect,
 } from "react-router-dom";
+import Electronics from "./page/electronics";
+import ScrollToTop from "./component/Common/ScrollToTop";
 import AddressList from "./component/MyAccountDashboard/AddressList";
 import EditAddressListComp from "./component/MyAccountDashboard/EditAddressDetails";
 import TermsAndCondition from "./page/terms";
@@ -26,8 +28,7 @@ import Register from "./page/register";
 import Error from "./page/error";
 import PrivacyPolicy from "./page/privacy-policy";
 import Faqs from "./page/faqs";
-import Electronics from "./page/electronics";
-import ScrollToTop from "./component/Common/ScrollToTop";
+
 import ShopGrid from "./page/shop";
 import Refund from "./page/refund";
 import AllCategory from "./page/AllCategory";
@@ -141,8 +142,6 @@ export default function Routes() {
         <Route path="/qrcode" component={Qrcode} />
         <Route path="/offers" component={Offers} />
 
-        {/* <PrivateRoute path='/my-profile' exact component={MyAccounts}/>
-      <PrivateRoute path='/my-profile' exact component={MyAccounts}/> */}
         <Route exact path="*" component={Electronics} />
       </Switch>
     </Router>

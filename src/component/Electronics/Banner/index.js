@@ -9,17 +9,19 @@ import axios from "axios";
 import { apiurl } from "../../../Redux/Utils/baseurl";
 import Skeleton from "@mui/material/Skeleton";
 import { isMobile } from "react-device-detect";
+import Carosal from "../../Carosal";
 const Banner = (props) => {
   let dispatch = useDispatch();
   const [Sliderlist, setSliderlist] = useState([]);
-  let settings = {
-    arrows: false,
+  const [settings, setsettings] = useState({
+    arrows: true,
     dots: false,
     infinite: true,
-    // autoplay: true,
-    // autoplaySpeed:1000,
-    speed: 1000,
+    autoplay: true,
+    autoplaySpeed: 2000,
+    speed: 500,
     slidesToShow: 1,
+    fade: true,
     // slide: 'div',
     slidesToScroll: 1,
     swipeToSlide: true,
@@ -40,10 +42,11 @@ const Banner = (props) => {
         breakpoint: 480,
         settings: {
           slidesToShow: 1,
+          arrows: false,
         },
       },
     ],
-  };
+  });
 
   useEffect(() => {
     axios({
@@ -55,59 +58,33 @@ const Banner = (props) => {
   }, []);
 
   return (
-    <section id="furniture_banner" className="banner_slide">
-      <div
-      // className="furniture_slider_box"
-      >
-        {Sliderlist.length > 0 ? (
-          <Slider {...settings}>
-            {Sliderlist.map((data, index) => {
+    <section id="furniture_banner" className="banner_slide container p-0">
+      {Sliderlist.length > 0 ? (
+        <div>
+          <Carosal
+            customsettings={settings}
+            customcss="banner-slider"
+            autoplay={true}
+            content={Sliderlist.map((data, index) => {
               return (
-                <div>
-                  <div
-                  // className="furniture_slider background_bg"
-                  // style={{
-                  //   backgroundImage: `url(${ImageUrl + data?.photo})`,
-                  // }}
-                  >
-                    <div>
-                      <div>
-                        <img
-                          src={`${ImageUrl}${
-                            isMobile ? data?.mobile : data?.photo
-                          }`}
-                          style={{ width: "100%" }}
-                          className="responsive"
-                        />
-                      </div>
-                    </div>
-                    {/* <div className="container">
-                      <div className="row">
-                        <div className="col-lg-9 col-md-9 col-sm-12 col-12">
-                          <div className="furniture_slider_content">
-                            <h2> {data.title}</h2>
-                            <p>{data?.details}</p>
-                            <a
-                              className="theme-btn-one bg-black btn_sm"
-                              onClick={() =>
-                                window.open(data.link, isMobile ? "_self" : "")
-                              }
-                            >
-                              Shop Now
-                            </a>
-                          </div>
-                        </div>
-                      </div>
-                    </div> */}
-                  </div>
-                </div>
+                <img
+                  src={`${ImageUrl}${isMobile ? data?.mobile : data?.photo}`}
+                  style={{
+                    width: "100%",
+                    height: "520px",
+                  }}
+                />
               );
             })}
-          </Slider>
-        ) : (
-          <Skeleton variant="rectangular" width={"100%"} height={350} />
-        )}
-      </div>
+          />
+        </div>
+      ) : (
+        <Skeleton
+          variant="rectangular"
+          width={"100%"}
+          height={isMobile ? 200 : 320}
+        />
+      )}
     </section>
   );
 };

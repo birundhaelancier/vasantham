@@ -59,9 +59,7 @@ const App = () => {
           >
             <div
               style={{
-                padding: `${
-                  SearchValue?.type ? "120px" : "80px"
-                } 0px 100px 0px`,
+                padding: `${SearchValue?.type ? "120px" : "80px"} 0px 0px 0px`,
               }}
             >
               <Routes />

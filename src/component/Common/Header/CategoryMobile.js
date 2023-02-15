@@ -5,13 +5,16 @@ import { Category_List } from "../../../Redux/Action/allActions";
 import Image from "../../../assets/img/dummy.jpg";
 import { ImageUrl } from "../../../Redux/Utils/baseurl";
 import { useHistory } from "react-router-dom";
-const CategoryComp = ({ home_offers }) => {
+import { BrowserView, MobileView } from "react-device-detect";
+import ProductCardOne from "../Product/ProductCardOne";
+import Carosal from "../../Carosal";
+import Heading from "../../Heading";
+import { colorSet } from "../../../helpers/ListData";
+const CategoryComp = () => {
   const AllCategory = useSelector((state) => state.AllReducer.AllCategory);
   let dispatch = useDispatch();
   let history = useHistory();
   const [Products, setProducts] = useState([]);
-  const [feed_list, setFeed_list] = useState([]);
-  let imagealt = "image";
   const [slideNumber, setSlideNumber] = useState(3);
   var settings = {
     arrows: false,
@@ -70,27 +73,61 @@ const CategoryComp = ({ home_offers }) => {
     });
     setProducts(Data);
   }, [AllCategory]);
+  const Colors = ["back1", "back2", "back3", "back4", "back5", "back6"];
 
   return (
-    <div className="ltn__testimonial-area section-bg-1--- bg-image-top pt-115 pb-70 mblcart">
-      {/* <div className="row ltn__testimonial-slider-5-active slick-arrow-1"> */}
-      <div className="">
-        <div className="product-slider-container pt-2">
-          <Slider {...settings}>
-            {Products.map((item) => {
-              return (
-                <div className="pl-2 pr-2 mobile_category">
-                  <div onClick={() => history.push(`/shop/${item.slug}`)}>
-                    <img src={ImageUrl + item.photo || Image} />
+    <>
+      <MobileView>
+        <div className="ltn__testimonial-area section-bg-1--- bg-image-top pt-115 pb-70 mblcart">
+          <div className="product-slider-container pt-2">
+            <Slider {...settings}>
+              {Products.map((item) => {
+                return (
+                  <div className="pl-2 pr-2 mobile_category">
+                    <div onClick={() => history.push(`/shop/${item.slug}`)}>
+                      <img src={ImageUrl + item.photo || Image} />
+                    </div>
+                    <p>{item.name}</p>
                   </div>
-                  <p>{item.name}</p>
-                </div>
-              );
-            })}
-          </Slider>
+                );
+              })}
+            </Slider>
+          </div>
         </div>
-      </div>
-    </div>
+      </MobileView>
+      <BrowserView>
+        <section
+          id="product_variation_one"
+          className="pt-4 sort_list container"
+        >
+          <div className="container-fluid">
+            <Heading heading="Top Categories" />
+            {Products?.length > 0 && (
+              <div>
+                {/* {console.log(
+                  ["back1", "back2", "back3", "back4"][Mat],
+                  Math.round(Math.random() * 2)
+                )} */}
+                <Carosal
+                  content={Products?.map((data, index) => {
+                    return (
+                      <div key={index} className={"p-2"}>
+                        <ProductCardOne
+                          data={data}
+                          key={index}
+                          classNames={colorSet()}
+                          customcss="mobile-category"
+                        />
+                      </div>
+                    );
+                  })}
+                />
+              </div>
+            )}
+          </div>
+        </section>
+      </BrowserView>
+    </>
   );
 };
 

@@ -1,0 +1,91 @@
+body {
+  // background: #f2f3f7;
+}
+
+.newarrival {
+  background: #ffff;
+  border: 0;
+  border-radius: 5px;
+  // .slick-slider {
+  .slick-prev {
+    left: -13px;
+    /* background: red; */
+    z-index: 2;
+    background: #c6d75f;
+    width: 25px;
+    height: 80px;
+    &:hover {
+      background: #c6d75f;
+    }
+  }
+  .slick-next {
+    right: -14px;
+    background: #c6d75f;
+    width: 25px;
+    height: 80px;
+    &:hover {
+      background: #c6d75f;
+    }
+  }
+  // }
+}
+.center_heading_two {
+  > h2 {
+    text-transform: capitalize;
+    color: #333;
+  }
+  .heading_border {
+    display: none;
+  }
+}
+
+// mobile category
+.mobile-category {
+  border-radius: 10px 30px 0px 30px;
+  .content {
+    background-color: transparent;
+  }
+  .title a {
+    color: #fff !important;
+  }
+}
+.back1 {
+  background-color: #47525d59;
+}
+
+.back2 {
+  background-color: #ffc10769;
+}
+.back3 {
+  background-color: #17a2b84a;
+}
+.back4 {
+  background-color: #c6d75f66;
+}
+.back5 {
+  background-color: #28a74580;
+}
+.back6 {
+  background-color: hsl(11deg 80% 45% / 37%);
+}
+
+@supports (-webkit-backdrop-filter: none) or (backdrop-filter: none) {
+  .back6 {
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+  }
+}
+.rounded {
+  // border-radius: 50% !important;
+  padding: 10px;
+  // height: 120px;
+  // width: auto;
+}
+
+.deals {
+  transition: 0.4s all ease-in-out;
+  cursor: pointer;
+  &:hover {
+    background: #e2e2e2;
+  }
+}

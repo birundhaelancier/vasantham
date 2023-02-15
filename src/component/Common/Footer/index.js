@@ -333,7 +333,7 @@ const Footer = ({ hide }) => {
               <div className="col-lg-6 col-md-6 col-sm-6 col-12">
                 <div className="copyright_left">
                   <h6>
-                    © Copyright 2022 <span>Vasantham</span>
+                    © Copyright 2023 <span>Vasantham</span>
                   </h6>
                 </div>
               </div>

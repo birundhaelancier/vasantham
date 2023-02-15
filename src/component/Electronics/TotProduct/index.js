@@ -7,6 +7,10 @@ import {
   AdvertisementDetails,
   Get_HotProducts_List,
 } from "../../../Redux/Action/allActions";
+import Carosal from "../../Carosal";
+import ProductCardOne from "../../Common/Product/ProductCardOne";
+import { colorSet } from "../../../helpers/ListData";
+import ProdcutAdvertisement from "../../PorductAdvertisement";
 const TopPRoduct = () => {
   let dispatch = useDispatch();
   const Advertisement = useSelector((state) => state.AllReducer.Advertisement);
@@ -43,6 +47,8 @@ const TopPRoduct = () => {
     }
   };
 
+  const Types = [1, 2, 0];
+
   return (
     <>
       <section
@@ -60,7 +66,7 @@ const TopPRoduct = () => {
                 <div className="tabs_el_wrapper">
                   <div className="tab-content">
                     <div className="tab-pane fade show in active">
-                      <div className="row lists_product">
+                      <div className="lists_product">
                         {ProductsData?.length > 0 &&
                           ProductsData?.map((datas, dd) => (
                             <>
@@ -74,21 +80,68 @@ const TopPRoduct = () => {
                                 </div>
                               </div>
                               {/* header end */}
-                              {ProductsData[dd]?.map((pro, ind) => (
+                              {Types.includes(dd) ? (
                                 <div
-                                  className="col-lg-2 col-md-4 col-sm-6 col-6"
-                                  key={ind}
+                                  className="col-lg-12"
+                                  style={{
+                                    background: dd == 0 && "#fff",
+                                    padding: dd == 0 && "5px",
+                                  }}
                                 >
-                                  <ProductCard data={pro} />
+                                  <Carosal
+                                    content={ProductsData[dd]?.map(
+                                      (pro, ind) => {
+                                        return (
+                                          <div key={ind} className={"p-2"}>
+                                            <ProductCard
+                                              data={pro}
+                                              customcss={
+                                                dd === 2
+                                                  ? "newarrival"
+                                                  : dd === 0
+                                                  ? "rounded"
+                                                  : "mobile-category"
+                                              }
+                                              key={ind}
+                                              classNames={
+                                                dd === 1 && colorSet(ind)
+                                              }
+                                            />
+                                          </div>
+                                        );
+                                      }
+                                    )}
+                                  />
                                 </div>
-                              ))}
+                              ) : (
+                                ""
+                                // <>
+                                //   {ProductsData[dd]?.map((pro, ind) => (
+                                //     <>
+                                //       <div
+                                //         className="col-lg-2 col-md-4 col-sm-6 col-6"
+                                //         key={ind}
+                                //       >
+                                //         <ProductCard data={pro} />
+                                //       </div>
+                                //     </>
+                                //   ))}
+                                // </>
+                              )}
+                              <div
+                                style={{
+                                  margin: dd === 0 ? "10px 0px" : "10px 0px",
+                                }}
+                              >
+                                <ProdcutAdvertisement />
+                              </div>
 
                               {Advertisement[FilterDataFun(dd)] && (
                                 <div className="advedisement-content">
                                   <div className="container">
                                     <div className="row">
                                       {/* start */}
-                                      <div className="col-lg-6   ads-image">
+                                      <div className="col-lg-6  ads-image">
                                         <img
                                           src={
                                             ImageUrl +

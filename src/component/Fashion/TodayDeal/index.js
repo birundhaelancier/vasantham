@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useRef } from "react";
 import { useSelector } from "react-redux";
 import ProductCard from "../../Common/Product/ProductCard";
 import "slick-carousel/slick/slick.css";
@@ -8,14 +8,16 @@ import Heading from "../Heading";
 
 const TodayDeal = () => {
   let products = useSelector((state) => state.products.products);
-  let settings = {
+  const slider1 = useRef(null);
+  const [settings, setsettings] = useState({
     arrows: false,
-    dots: true,
     margin: 30,
     infinite: true,
     speed: 500,
     slidesToShow: 4,
     slidesToScroll: 1,
+    autoplaySpeed: 3000,
+    autoplay: true,
     responsive: [
       {
         breakpoint: 1024,
@@ -42,7 +44,7 @@ const TodayDeal = () => {
         },
       },
     ],
-  };
+  });
   return (
     <>
       <section id="to_days_area" className="ptb-100 slider_arrows_one">
@@ -54,9 +56,9 @@ const TodayDeal = () => {
           <div className="row">
             <div className="col-lg-12">
               <div className="todays_slider">
-                <Slider {...settings}>
-                  {products.slice(6, 13).map((data, index) => (
-                    <ProductCard data={data} key={index} />
+                <Slider {...settings} swipeToSlide={true} ref={slider1}>
+                  {products.map((data, index) => (
+                    <ProductCard data={data} key={index} customcss="deals" />
                   ))}
                 </Slider>
               </div>

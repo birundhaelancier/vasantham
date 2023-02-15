@@ -10,13 +10,14 @@ import Heading from "../Fashion/Heading";
 import Pagination from "@mui/material/Pagination";
 import Stack from "@mui/material/Stack";
 import { isMobile } from "react-device-detect";
+import SideBar from "./SideBar";
 const Shop = (props) => {
   let { slug } = useParams();
   let [loading, setloading] = useState(true);
   const [products, setProducts] = useState([]);
   const [page, setpage] = useState(1);
   const [pagen, setpagen] = useState(0);
-  const [count, setcount] = useState(12);
+  const [count, setcount] = useState(30);
   let dispatch = useDispatch();
   const [product_slide, setproduct_slide] = useState(0);
 
@@ -129,46 +130,58 @@ const Shop = (props) => {
 
   return (
     <>
-      <section id="shop_main_area" className="pb-100">
-        <Heading heading={products?.categoryDetail?.name} />
-        {products?.products?.length > 0 ? (
-          <>
-            <div className="container">
-              {!loading ? (
-                <>
-                  <div className="row mobileshop p-0">
-                    {/* <Slider {...settings}> */}
-                    {products?.products
-                      ?.slice((page - 1) * count, (page - 1) * count + count)
-                      .map((data, index) => (
-                        <div className="col-md-2 col-6 p-0">
-                          <ProductCard data={data} category={true} />
+      <section id="shop_main_area" className="pb-100 container">
+        <div className="row">
+          <div className="col-md-3 col-lg-3 col-12 pt-5">
+            <SideBar />
+          </div>
+          <div className="col-md-9 col-lg-9 col-12">
+            <Heading heading={products?.categoryDetail?.name} />
+
+            {products?.products?.length > 0 ? (
+              <>
+                <div className="container">
+                  {!loading ? (
+                    <>
+                      <div className="row mobileshop p-0">
+                        {/* <Slider {...settings}> */}
+
+                        {products?.products
+                          ?.slice(
+                            (page - 1) * count,
+                            (page - 1) * count + count
+                          )
+                          .map((data, index) => (
+                            <div className="col-md-3 col-6 p-0">
+                              <ProductCard data={data} category={true} />
+                            </div>
+                          ))}
+                        {/* </Slider> */}
+                      </div>
+                      {products?.products?.length > 8 && (
+                        <div className="pag-item">
+                          <Pagination
+                            count={Math.round(products?.products?.length / 30)}
+                            variant="outlined"
+                            color="secondary"
+                            page={page}
+                            onChange={(e, val) => handleChange(e, val)}
+                          />
                         </div>
-                      ))}
-                    {/* </Slider> */}
-                  </div>
-                  {products?.products?.length > 8 && (
-                    <div className="pag-item">
-                      <Pagination
-                        count={Math.round(products?.products?.length / 12)}
-                        variant="outlined"
-                        color="secondary"
-                        page={page}
-                        onChange={(e, val) => handleChange(e, val)}
-                      />
+                      )}
+                    </>
+                  ) : (
+                    <div className="shop_loader">
+                      <i class="fa fa-circle-o-notch fa-spin"></i>
                     </div>
                   )}
-                </>
-              ) : (
-                <div className="shop_loader">
-                  <i class="fa fa-circle-o-notch fa-spin"></i>
                 </div>
-              )}
-            </div>
-          </>
-        ) : (
-          <EmptyCart Width={"80%"} />
-        )}
+              </>
+            ) : (
+              <EmptyCart Width={"80%"} />
+            )}
+          </div>
+        </div>
       </section>
     </>
   );

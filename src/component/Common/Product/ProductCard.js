@@ -240,7 +240,9 @@ const ProductCard = (props) => {
       <div
         className={`product_wrappers_one ${
           props.category && "categorycutomcss"
-        }`}
+        } ${props.customcss} ${props.classNames}`}
+        for="product"
+        title={props.data.name}
       >
         <div className="thumb">
           <Link
@@ -283,7 +285,12 @@ const ProductCard = (props) => {
                 : props.data.point}
             </div>
             <div style={{ paddingTop: "5px" }} className="price_crd">
-              <div>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                }}
+              >
                 <label>Price : </label>{" "}
                 <del>
                   <i className="fa fa-inr" />{" "}
@@ -298,6 +305,18 @@ const ProductCard = (props) => {
                     ? props?.data?.deal_amount
                     : props?.data.discount_price}
                 </span>
+              </div>
+              <div className="save-txt">
+                Save : <i className="fa fa-inr" />{" "}
+                {Math.round(
+                  filterPack ? filterPack?.price : props?.data.previous_price
+                ) -
+                  (filterPack
+                    ? filterPack?.selling
+                    : timer["test" + props.data.id]
+                    ? props?.data?.deal_amount
+                    : props?.data.discount_price
+                  )?.toFixed(2)}{" "}
               </div>
             </div>
           </h5>
@@ -403,7 +422,7 @@ const ProductCard = (props) => {
                   style={{ width: "90px" }}
                   onClick={() => addToCart(props.data, props.data)}
                 >
-                  <i className="fa fa-shopping-cart" /> Buy
+                  <i className="fa fa-shopping-cart" /> Buy Now
                 </button>
               )}
             </div>

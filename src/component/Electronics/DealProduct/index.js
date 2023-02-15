@@ -65,7 +65,7 @@ const DealProduct = () => {
   return (
     <>
       {Products.length > 0 && (
-        <section id="elce_weekly_deal" className="mb-2">
+        <section id="elce_weekly_deal" className="mb-2 today-deal">
           <div className="container">
             <div className="row">
               <div className="col-lg-12">
@@ -84,6 +84,7 @@ const DealProduct = () => {
                         key={index}
                         styles={"slider"}
                         deals={true}
+                        customcss={"deals"}
                       />
                     ))}
                   </Slider>

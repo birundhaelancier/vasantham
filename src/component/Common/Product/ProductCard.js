@@ -235,6 +235,17 @@ const ProductCard = (props) => {
   const outofStock =
     Number(props?.data?.stock) > 0 && Number(props?.data?.out_of_stock) !== 1;
 
+  const SaveAmount = () => {
+    return Math.round(
+      (filterPack ? filterPack?.price : props?.data.previous_price) -
+        (filterPack
+          ? filterPack?.selling
+          : timer["test" + props.data.id]
+          ? props?.data?.deal_amount
+          : props?.data.discount_price)
+    );
+  };
+
   return (
     <>
       <div
@@ -243,8 +254,17 @@ const ProductCard = (props) => {
         } ${props.customcss} ${props.classNames}`}
         for="product"
         title={props.data.name}
+        style={
+          {
+            // linearGradient: "rgba(43, 52, 69, 0.8),rgba(43, 52, 69, 0.8)",
+            // backgroundImage: `url(${ImageUrl + props.data.photo})`,
+          }
+        }
       >
-        <div className="thumb">
+        <div className="ribbon-corner ribbon-fold">
+          <span>₹ {SaveAmount()} OFF</span>
+        </div>
+        <div className="thumb" style={{ background: props.backGrounds }}>
           <Link
             to={`/product-details-one/${props.data.slug}/${props.data.id}`}
             className="image"
@@ -257,7 +277,7 @@ const ProductCard = (props) => {
             />
           </Link>
 
-          <div className="actions">
+          {/* <div className="actions">
             <a
               className={`action wishlist ${
                 WishListData.includes(props.data.id) ? "change_clr_wis" : ""
@@ -267,7 +287,7 @@ const ProductCard = (props) => {
             >
               <AiOutlineHeart />
             </a>
-          </div>
+          </div> */}
         </div>
         <div className="content">
           <h5 className="title" style={{ marginBottom: "0px" }}>
@@ -307,16 +327,7 @@ const ProductCard = (props) => {
                 </span>
               </div>
               <div className="save-txt">
-                Save : <i className="fa fa-inr" />{" "}
-                {Math.round(
-                  filterPack ? filterPack?.price : props?.data.previous_price
-                ) -
-                  (filterPack
-                    ? filterPack?.selling
-                    : timer["test" + props.data.id]
-                    ? props?.data?.deal_amount
-                    : props?.data.discount_price
-                  )?.toFixed(2)}{" "}
+                Save : <i className="fa fa-inr" /> {SaveAmount()}{" "}
               </div>
             </div>
           </h5>

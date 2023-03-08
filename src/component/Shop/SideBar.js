@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory, useParams } from "react-router-dom";
 // Import Img
@@ -27,30 +27,41 @@ const SideBar = (props) => {
   //   }, [props]);
 
   const [price, setPrice] = useState(100);
+
+  const ProductsFilter = [
+    {
+      name: "Offers",
+      slug: "deal",
+    },
+    {
+      name: "Top products",
+      slug: "hot",
+    },
+    { name: "Best products", slug: "best" },
+    { name: "Featured products", slug: "feature" },
+    { name: "New arrivals", slug: "new" },
+  ];
+
   return (
-    <>
+    <div className="backgr-shop">
       <h3>Filter</h3>
-      <div className="shop_sidebar_wrapper">
-        <div className="shop_Search">
+      <div>
+        {/* <div className="shop_Search">
           <form>
             <input
               type="text"
               className="form-control"
               placeholder="Search..."
+              onChange={(e) => props.SearchFun(e.target.value)}
             />
             <button>
               <img src={search} alt="img" />
             </button>
           </form>
-        </div>
+        </div> */}
         <div className="shop_sidebar_boxed">
           <h4>Categories</h4>
           <form className="categorymenu">
-            <label className="custom_boxed">
-              ALL
-              <input type="radio" name="radio" defaultChecked />
-              <span className="checkmark"></span>
-            </label>
             {Categorys.map((data) => (
               <label className="custom_boxed">
                 {data.name}
@@ -60,7 +71,9 @@ const SideBar = (props) => {
                   checked={menu ? menu === data.slug : data.slug === slug}
                   onChange={() => {
                     setmenu(data.slug);
+                    props.HandleChange("");
                     history.push(`/shop/${data.slug}`);
+                    props.executeScroll();
                   }}
                 />
                 <span className="checkmark"></span>
@@ -72,38 +85,28 @@ const SideBar = (props) => {
         <div className="shop_sidebar_boxed">
           <h4>Products</h4>
           <form>
-            <label className="custom_boxed">
-              Offers
-              <input type="radio" name="radio" />
-              <span className="checkmark"></span>
-            </label>
-            <label className="custom_boxed">
-              Top products
-              <input type="radio" name="radio" />
-              <span className="checkmark"></span>
-            </label>
-            <label className="custom_boxed">
-              Best products
-              <input type="radio" name="radio" defaultChecked />
-              <span className="checkmark"></span>
-            </label>
-            <label className="custom_boxed">
-              Featured products
-              <input type="radio" name="radio" />
-              <span className="checkmark"></span>
-            </label>
-            <label className="custom_boxed">
-              New arrivals
-              <input type="radio" name="radio" />
-              <span className="checkmark"></span>
-            </label>
+            {ProductsFilter.map((data) => (
+              <label className="custom_boxed">
+                {data.name}
+
+                <input
+                  type="radio"
+                  name="radio"
+                  onChange={() => {
+                    props.HandleChange(data);
+                    props.executeScroll();
+                  }}
+                />
+                <span className="checkmark"></span>
+              </label>
+            ))}
 
             <div className="clear_button">
               <button
                 className="theme-btn-one btn_sm btn-black-overlay"
                 type="button"
                 onClick={() => {
-                  props.filterEvent(1);
+                  setmenu("");
                 }}
               >
                 Clear Filter
@@ -111,7 +114,7 @@ const SideBar = (props) => {
             </div>
           </form>
         </div>
-        <div className="shop_sidebar_boxed">
+        {/* <div className="shop_sidebar_boxed">
           <h4>Price</h4>
           <div className="price_filter">
             <input
@@ -126,9 +129,9 @@ const SideBar = (props) => {
               <span>Price : {price}</span>
             </div>
           </div>
-        </div>
+        </div> */}
       </div>
-    </>
+    </div>
   );
 };
 

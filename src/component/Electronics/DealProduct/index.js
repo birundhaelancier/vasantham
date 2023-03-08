@@ -8,6 +8,7 @@ import axios from "axios";
 import { apiurl } from "../../../Redux/Utils/baseurl";
 import { isMobile } from "react-device-detect";
 import Heading from "../../Fashion/Heading";
+import { colorSet, DealColors } from "../../../helpers/ListData";
 const DealProduct = () => {
   let products = useSelector((state) => state?.products?.products);
   products = products?.filter((item) => item?.category === "electronics");
@@ -19,7 +20,7 @@ const DealProduct = () => {
     infinite: false,
     autoplay: true,
     speed: 500,
-    slidesToShow: 6,
+    slidesToShow: 5,
     slidesToScroll: 2,
     responsive: [
       {
@@ -62,6 +63,7 @@ const DealProduct = () => {
       setProducts(response.data);
     });
   }, []);
+
   return (
     <>
       {Products.length > 0 && (

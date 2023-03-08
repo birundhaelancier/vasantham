@@ -4,7 +4,8 @@ import Carosal from "./Carosal";
 import Ads from "../assets/img/advertise.png";
 import Ads2 from "../assets/img/ads.png";
 import { BannerImgs } from "../helpers/ListData";
-export default function ProdcutAdvertisement() {
+import { ImageUrl } from "../Redux/Utils/baseurl";
+export default function ProdcutAdvertisement({ ImageData }) {
   const [settings, setsettings] = useState({
     arrows: true,
     dots: false,
@@ -16,7 +17,7 @@ export default function ProdcutAdvertisement() {
     fade: true,
     // slide: 'div',
     slidesToScroll: 1,
-    swipeToSlide: true,
+    swipeToSlide: false,
     responsive: [
       {
         breakpoint: 1024,
@@ -28,6 +29,7 @@ export default function ProdcutAdvertisement() {
         breakpoint: 600,
         settings: {
           slidesToShow: 1,
+          swipeToSlide: true,
         },
       },
       {
@@ -35,22 +37,18 @@ export default function ProdcutAdvertisement() {
         settings: {
           slidesToShow: 1,
           arrows: false,
+          swipeToSlide: true,
         },
       },
     ],
   });
-  const Urs = [Ads, Ads2];
   return (
-    <div className={`container ${!isMobile && "pl-0 pr-0"}`}>
+    <div className={`container ${!isMobile ? "pl-0 pr-0" : "pl-3 pr-3"}`}>
       <Carosal
         customsettings={settings}
-        content={BannerImgs.map((data, index) => (
+        content={ImageData?.map((data, index) => (
           <>
-            <img
-              src={data}
-              key={index}
-              style={{ width: "100%", height: "200px" }}
-            />
+            <img src={ImageUrl + data} key={index} style={{ width: "100%" }} />
           </>
         ))}
       />

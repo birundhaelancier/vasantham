@@ -12,7 +12,6 @@ const Coupon = () => {
   const payType = useSelector((state) => state.AllReducer.payType);
   const [coupon, setcoupon] = useState("");
   let dispatch = useDispatch();
-  let history = useHistory();
 
   const attributeFun = (data) => {
     return data?.attribute?.filter((datas) => datas.id === data.aid);
@@ -30,6 +29,20 @@ const Coupon = () => {
       timer = false;
     }
     return timer;
+  };
+
+  const cartTotalPrice = () => {
+    return carts?.reduce(function (total, item) {
+      return (
+        total +
+        Number(item.qty || 1) *
+          (item.aid
+            ? attributeFun(item)?.[0]?.selling
+            : Timer(item)
+            ? item.deal_amount
+            : item.discount_price)
+      );
+    }, 0);
   };
 
   const cartTotal = () => {
@@ -53,14 +66,15 @@ const Coupon = () => {
       );
     }, 0);
   };
+
   const CheckValdeCoupon = () => {
-    let Total = Math.round(Number(cartTotal()));
+    let Total = Math.round(Number(cartTotalPrice()));
     let DiscountAmt = 0;
 
     let payload = {
       code: coupon,
       uid: JSON.parse(localStorage.getItem("UserId")),
-      amount: cartTotal(),
+      amount: cartTotalPrice(),
     };
     dispatch(CouponCode(payload)).then((data) => {
       const code = data?.payload?.response;
@@ -93,6 +107,7 @@ const Coupon = () => {
       }
     });
   };
+
   return (
     <>
       <div className="col-lg-6 col-md-6">

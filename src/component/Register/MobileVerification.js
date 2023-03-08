@@ -62,10 +62,7 @@ const MobileNumberVerification = () => {
 
   const VerifyOtp = (e) => {
     e.preventDefault();
-    if (
-      Number(Verificationcode?.msg) === Number(UserDetail?.password) ||
-      Number(UserDetail?.password) === 123456
-    ) {
+    if (Number(Verificationcode?.msg) === Number(UserDetail?.password)) {
       setconfirm(false);
       Swal.fire({
         icon: "success",

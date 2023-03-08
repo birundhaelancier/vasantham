@@ -7,7 +7,6 @@ import { Skeleton } from "@mui/material";
 import axios from "axios";
 import ProductCardOne from "../Product/ProductCardOne";
 import Carosal from "../../Carosal";
-import Slider from "react-slick";
 import ProductCard from "../Product/ProductCard";
 const RelatedProducts = (props) => {
   let dispatch = useDispatch();
@@ -15,15 +14,6 @@ const RelatedProducts = (props) => {
   useEffect(() => {
     dispatch(Get_HomeProduct_List("new"));
   }, []);
-  let settings = {
-    arrows: true,
-    dots: true,
-    infinite: false,
-    autoplay: true,
-    speed: 500,
-    slidesToShow: 6,
-    slidesToScroll: 4,
-  };
 
   return (
     <>
@@ -33,6 +23,7 @@ const RelatedProducts = (props) => {
           {ArrivalList?.length > 0 ? (
             <div>
               <Carosal
+                arrows={false}
                 content={ArrivalList?.slice(0, 12).map((data, index) => {
                   return (
                     <div key={index} className={"p-2"}>

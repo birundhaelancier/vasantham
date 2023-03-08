@@ -2452,7 +2452,7 @@ button {
   text-overflow: ellipsis;
   display: block;
   font-size: 14px;
-  font-weight: 700;
+  font-weight: 900;
   max-height: 32px;
   margin: 0 0 8px;
   min-height: 32px;
@@ -4146,12 +4146,12 @@ button {
 
 .product_details_tabs .nav-tabs li a {
   font-size: 18px;
-  font-weight: 500;
+  font-weight: bold;
   color: #afafaf;
 }
 
 .product_details_tabs ul li a.active {
-  color: var(--main-theme-color);
+  color: #28a745;
   /* font-weight: 500; */
 }
 
@@ -8122,6 +8122,10 @@ table {
     width: 100%;
     height: 164px !important;
   }
+  .headingtitle .center_heading {
+    padding: 3px 25px !important;
+    border-radius: 0px 30px;
+  }
   .grcery_support_boxed {
     justify-content: start !important;
     height: auto !important;
@@ -9423,11 +9427,17 @@ body.modal-open {
     }
     .slick-prev,
     .slick-next {
-      height: 80px;
-      width: 43px;
       background-color: hsla(0, 0%, 100%, 0.98);
       box-shadow: 0 1px 5px 0 rgb(0 0 0 / 11%);
       transition: opacity 0.1s ease-in;
+
+      width: 48px;
+      height: 48px;
+      border-width: 1px;
+      border-radius: 50px;
+      min-height: 3em;
+      border-style: solid;
+      border-color: #e0e0e0;
     }
 
     .slick-prev:before,
@@ -9480,8 +9490,35 @@ body.modal-open {
 }
 
 .categorymenu {
-  max-height: 350px;
-  height: 350px;
+  // max-height: 350px;
+  // height: 350px;
   overflow: auto;
   overflow-x: hidden;
+}
+.backgr-shop {
+  background-color: #fff;
+  box-shadow: rgba(0, 0, 0, 0.09) 0px 3px 12px;
+  padding: 15px;
+}
+
+.headingtitle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  width: 100%;
+  .center_heading {
+    background: linear-gradient(#c6d75f, #ffc107c4);
+    content: "";
+    border-radius: 0px 50px;
+    margin: 10px 0px;
+    // width: max-content;
+    padding: 5px 100px;
+    > h2 {
+      margin-top: 0;
+      color: #fff;
+      padding-top: 0;
+      line-height: 25px;
+    }
+  }
 }

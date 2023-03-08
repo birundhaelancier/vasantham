@@ -25,6 +25,7 @@ const App = () => {
       }
     });
   }, []);
+
   const fakeRequest = () => {
     return new Promise((resolve) => setTimeout(() => resolve(), 0));
   };
@@ -43,30 +44,23 @@ const App = () => {
 
   return (
     <div>
-      <BrowserView>
-        <AuthContext.Provider value={{ authTokens, setAuthTokens: setTokens }}>
-          <Routes />
-        </AuthContext.Provider>
-      </BrowserView>
-      <MobileView>
+      <AuthContext.Provider value={{ authTokens, setAuthTokens: setTokens }}>
         <PullToRefresh
           onRefresh={handleRefresh}
-          isPullable={true}
+          isPullable={isMobile && true}
           triggerHeight={50}
         >
-          <AuthContext.Provider
-            value={{ authTokens, setAuthTokens: setTokens }}
+          <div
+            style={{
+              padding: `${
+                isMobile && (SearchValue?.type ? "120px" : "80px")
+              } 0px 0px 0px`,
+            }}
           >
-            <div
-              style={{
-                padding: `${SearchValue?.type ? "120px" : "80px"} 0px 0px 0px`,
-              }}
-            >
-              <Routes />
-            </div>
-          </AuthContext.Provider>
+            <Routes />
+          </div>
         </PullToRefresh>
-      </MobileView>
+      </AuthContext.Provider>
     </div>
   );
 };

@@ -12,9 +12,16 @@ import { isMobile } from "react-device-detect";
 import Advertisement from "../component/Advertisement";
 import ProdcutAdvertisement from "../component/PorductAdvertisement";
 import Advertisement2 from "../component/Advertisement2";
+import { useDispatch, useSelector } from "react-redux";
+import { AdvertisementDetails } from "../Redux/Action/allActions";
 
 const Electronics = () => {
-  let history = useHistory();
+  const Advertise = useSelector((state) => state.AllReducer.Advertisement);
+  let dispatch = useDispatch();
+  useEffect(() => {
+    dispatch(AdvertisementDetails());
+  }, []);
+
   return (
     <div style={{ background: "#f2f3f7" }}>
       <Header />
@@ -27,9 +34,10 @@ const Electronics = () => {
 
       <NewArrival />
       <div style={{ margin: !isMobile && "0px 30px" }}>
-        <ProdcutAdvertisement />
+        <ProdcutAdvertisement
+          ImageData={[Advertise?.[0]?.image1, Advertise?.[0]?.image2]}
+        />
       </div>
-      <InstgramSlider />
       <TopPRoduct />
       <Advertisement2 />
 

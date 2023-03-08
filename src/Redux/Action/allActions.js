@@ -79,10 +79,11 @@ export const Get_HotProducts_List = (type) => async (dispatch) => {
     );
 };
 
-export const CategoryList_api = (slug) => async (dispatch) => {
+export const CategoryList_api = (slug, url, payload) => async (dispatch) => {
   const response = await axios({
-    method: "GET",
-    url: apiurl + "category/" + slug,
+    method: url ? "GET" : "Post",
+    url: `${apiurl}${url ? "category/" : "homeProduct"}${url ? slug : ""}`,
+    data: payload,
   });
   return dispatch({ type: GET_CATEGORY_LISTITEM, payload: response.data });
 };

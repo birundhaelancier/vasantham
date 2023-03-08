@@ -286,6 +286,21 @@ const ProductDetailsOne = (props) => {
                         </span>
                       </div>
                     </div>
+
+                    <div className="save-txt">
+                      Save : <i className="fa fa-inr" />{" "}
+                      {Math.abs(
+                        (filterPack
+                          ? filterPack?.price
+                          : product?.previous_price) -
+                          (filterPack
+                            ? filterPack?.selling
+                            : timer["test" + product.id]
+                            ? product?.deal_amount
+                            : product.discount_price)
+                      )?.toFixed(2)}{" "}
+                    </div>
+
                     {product.attribute?.length > 0 &&
                       Number(product?.out_of_stock) !== 1 &&
                       Number(product?.stock) > 0 && (

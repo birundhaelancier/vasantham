@@ -14,7 +14,7 @@ const Banner = (props) => {
   let dispatch = useDispatch();
   const [Sliderlist, setSliderlist] = useState([]);
   const [settings, setsettings] = useState({
-    arrows: true,
+    arrows: false,
     dots: false,
     infinite: true,
     autoplay: true,
@@ -58,7 +58,11 @@ const Banner = (props) => {
   }, []);
 
   return (
-    <section id="furniture_banner" className="banner_slide container p-0">
+    <section
+      id="furniture_banner"
+      className="banner_slide container p-0"
+      style={{ width: "100%" }}
+    >
       {Sliderlist.length > 0 ? (
         <div>
           <Carosal
@@ -71,7 +75,6 @@ const Banner = (props) => {
                   src={`${ImageUrl}${isMobile ? data?.mobile : data?.photo}`}
                   style={{
                     width: "100%",
-                    height: "520px",
                   }}
                 />
               );

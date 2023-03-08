@@ -9,10 +9,11 @@ export default function Carosal(props) {
     autoplay: false,
     speed: 500,
     autoplaySpeed: 3000,
-    swipeToSlide: true,
+    swipeToSlide: false,
     // fade: true,
     slidesToShow: 6,
     slidesToScroll: 6,
+
     // rows: 2,
     responsive: [
       {
@@ -32,6 +33,7 @@ export default function Carosal(props) {
         breakpoint: 600,
         settings: {
           slidesToShow: 2,
+          swipeToSlide: true,
         },
       },
       {
@@ -40,6 +42,9 @@ export default function Carosal(props) {
           slidesToShow: 2,
           slidesToScroll: 2,
           arrows: false,
+          swipeToSlide: true,
+          swipe: true,
+          touchMove: true,
         },
       },
     ],

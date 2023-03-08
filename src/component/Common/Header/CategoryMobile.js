@@ -104,10 +104,6 @@ const CategoryComp = () => {
             <Heading heading="Top Categories" />
             {Products?.length > 0 && (
               <div>
-                {/* {console.log(
-                  ["back1", "back2", "back3", "back4"][Mat],
-                  Math.round(Math.random() * 2)
-                )} */}
                 <Carosal
                   content={Products?.map((data, index) => {
                     return (
@@ -116,7 +112,7 @@ const CategoryComp = () => {
                           data={data}
                           key={index}
                           classNames={colorSet()}
-                          customcss="mobile-category"
+                          customcss="mobile-category customfont"
                         />
                       </div>
                     );

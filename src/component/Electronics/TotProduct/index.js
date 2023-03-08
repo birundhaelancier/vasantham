@@ -18,7 +18,6 @@ const TopPRoduct = () => {
 
   useEffect(() => {
     dispatch(Get_HotProducts_List());
-    dispatch(AdvertisementDetails());
   }, []);
 
   const FilterDataFun = (value) => {
@@ -48,6 +47,24 @@ const TopPRoduct = () => {
   };
 
   const Types = [1, 2, 0];
+
+  var flag2 = 1;
+
+  const DealColors = (index) => {
+    if (flag2 === 1) {
+      flag2 = flag2 + 1;
+      return "#e0e7ff";
+    } else if (flag2 == 2) {
+      flag2 = flag2 + 1;
+      return "#f1f5f9";
+    } else if (flag2 == 3) {
+      flag2 = flag2 + 1;
+      return "#e0f2fe";
+    } else if (flag2 == 4) {
+      flag2 = 1;
+      return "#ffedd5";
+    }
+  };
 
   return (
     <>
@@ -99,12 +116,15 @@ const TopPRoduct = () => {
                                                 dd === 2
                                                   ? "newarrival"
                                                   : dd === 0
-                                                  ? "rounded"
+                                                  ? "feature-product"
                                                   : "mobile-category"
                                               }
                                               key={ind}
                                               classNames={
                                                 dd === 1 && colorSet(ind)
+                                              }
+                                              backGrounds={
+                                                dd === 0 && DealColors()
                                               }
                                             />
                                           </div>
@@ -128,40 +148,19 @@ const TopPRoduct = () => {
                                 //   ))}
                                 // </>
                               )}
-                              <div
-                                style={{
-                                  margin: dd === 0 ? "10px 0px" : "10px 0px",
-                                }}
-                              >
-                                <ProdcutAdvertisement />
-                              </div>
 
                               {Advertisement[FilterDataFun(dd)] && (
-                                <div className="advedisement-content">
-                                  <div className="container">
-                                    <div className="row">
-                                      {/* start */}
-                                      <div className="col-lg-6  ads-image">
-                                        <img
-                                          src={
-                                            ImageUrl +
-                                            Advertisement[FilterDataFun(dd)]
-                                              ?.image1
-                                          }
-                                        />
-                                      </div>
-                                      <div className="col-lg-6  ads-image">
-                                        <img
-                                          src={
-                                            ImageUrl +
-                                            Advertisement[FilterDataFun(dd)]
-                                              ?.image2
-                                          }
-                                        />
-                                      </div>
-                                      {/* end */}
-                                    </div>
-                                  </div>
+                                <div
+                                  style={{
+                                    margin: dd === 0 ? "10px 0px" : "10px 0px",
+                                  }}
+                                >
+                                  <ProdcutAdvertisement
+                                    ImageData={[
+                                      Advertisement[FilterDataFun(dd)]?.image1,
+                                      Advertisement[FilterDataFun(dd)]?.image2,
+                                    ]}
+                                  />
                                 </div>
                               )}
                             </>

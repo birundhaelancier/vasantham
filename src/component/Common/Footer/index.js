@@ -6,16 +6,9 @@ import { useDispatch } from "react-redux";
 import Swal from "sweetalert2";
 import axios from "axios";
 import { apiurl } from "../../../Redux/Utils/baseurl";
-import { browserName, isBrowser } from "react-device-detect";
 import logo from "../../../assets/img/logo.gif";
 import whatsapp from "../../../assets/img/whatsapp.png";
-import {
-  FacebookShareButton,
-  TwitterShareButton,
-  LinkedinShareButton,
-  TelegramShareButton,
-  WhatsappShareButton,
-} from "react-share";
+import { FacebookShareButton, TwitterShareButton } from "react-share";
 const FooterData = [
   {
     title: "Company",
@@ -84,18 +77,6 @@ const Footer = ({ hide }) => {
     }
   };
 
-  const stopPromoModal = () => {
-    dispatch({ type: "settings/stopPromo" });
-  };
-
-  const cancelCookie = () => {
-    dispatch({ type: "settings/cookie" });
-  };
-
-  const acceptCookie = () => {
-    // Write your function there
-    dispatch({ type: "settings/cookie" });
-  };
   const SubscribeNews = () => {
     setloading(true);
     axios({
@@ -136,7 +117,6 @@ const Footer = ({ hide }) => {
   };
 
   window.addEventListener("scroll", checkScrollTop);
-  const AppUrl = "https://vasanthamstore.com/";
   return (
     <>
       <div className="footer_hide">

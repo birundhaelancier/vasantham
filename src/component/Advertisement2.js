@@ -1,24 +1,27 @@
 import React from "react";
-
+import free from "../assets/img/free.svg";
+import refund from "../assets/img/refund.svg";
+import secure from "../assets/img/secure.svg";
+import support from "../assets/img/support.svg";
 export default function Advertisement2() {
   const Details = [
     {
-      icon: "https://andit.co/projects/html/andshop/andshop_frontend/assets/img/grocery/icon/free.svg",
+      icon: free,
       name: "Free Delivery",
       para: "For all oders over ₹100",
     },
     {
-      icon: "https://andit.co/projects/html/andshop/andshop_frontend/assets/img/grocery/icon/refund.svg",
+      icon: refund,
       name: "Refundable",
       para: "If your item have no damage.",
     },
     {
-      icon: "https://andit.co/projects/html/andshop/andshop_frontend/assets/img/grocery/icon/secure.svg",
+      icon: secure,
       name: "Secure Payment",
       para: "100% secure payment",
     },
     {
-      icon: "https://andit.co/projects/html/andshop/andshop_frontend/assets/img/grocery/icon/support.svg",
+      icon: support,
       name: "24/7 Customer Support",
       para: "We have dedicated support",
     },

@@ -77,16 +77,6 @@ const TotalCart = (props) => {
     }, 0);
   };
 
-  const Discount_price = () => {
-    return carts?.reduce(function (total, item) {
-      return (
-        total +
-        Number(item.qty || 1) *
-          Number(Timer(item) ? item.deal_point : item.point)
-      );
-    }, 0);
-  };
-
   const PayTypefun = () => {
     setpaytype(false);
     // if (payType === "points") {
@@ -143,15 +133,27 @@ const TotalCart = (props) => {
         <div className="coupon_code right">
           <h3>Cart Total</h3>
           <div className="coupon_inner">
+            <div className="cart_subtotal">
+              <p>{`Total ${"points"}`}</p>
+              <p className="cart_amount">
+                {" "}
+                {Number(cartTotal() || 0).toFixed(2)}
+              </p>
+            </div>
+            <div className="cart_subtotal">
+              <p>{`${
+                Number(Coupon?.Details?.discount)
+                  ? "Product cost"
+                  : "Total price"
+              }`}</p>
+              <p className="cart_amount">
+                <i class="fa fa-inr" />
+                {Number(cartTotalPrice() || 0).toFixed(2)}
+              </p>
+            </div>
+
             {Coupon?.Discount && (
               <>
-                <div className="cart_subtotal">
-                  <p>Product Cost</p>
-                  <p className="cart_amount">
-                    {Number(cartTotal() || 0).toFixed(2)}
-                  </p>
-                </div>
-
                 <div className="cart_subtotal">
                   <p>Coupon</p>
                   <p className="cart_amount">
@@ -159,24 +161,15 @@ const TotalCart = (props) => {
                     {Number(Coupon?.Details?.discount).toFixed(2)}
                   </p>
                 </div>
+                <div className="cart_subtotal">
+                  <p>Total price</p>
+                  <p className="cart_amount">
+                    <i class="fa fa-inr" />
+                    {Number(Coupon?.Discount)?.toFixed(2)}
+                  </p>
+                </div>
               </>
             )}
-
-            <div className="cart_subtotal">
-              <p>{`Total ${"price"}`}</p>
-              <p className="cart_amount">
-                <i class="fa fa-inr" />
-                {Number(cartTotalPrice() || 0).toFixed(2)}
-              </p>
-            </div>
-
-            <div className="cart_subtotal">
-              <p>{`Total ${"points"}`}</p>
-              <p className="cart_amount">
-                {" "}
-                {Number(Coupon ? Coupon.Discount : cartTotal() || 0).toFixed(2)}
-              </p>
-            </div>
 
             {Coupon && (
               <Alert

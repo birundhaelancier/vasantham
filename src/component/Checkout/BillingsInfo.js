@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   Add_Address,
-  DeleteAddressDetails,
   EditAddressDetails,
 } from "../../Redux/Action/CreateActions";
 import {
@@ -10,15 +9,18 @@ import {
   City_List,
   Profile_Details,
   BillingDetails,
+  PincodeListsApi,
 } from "../../Redux/Action/allActions";
 import { Radio } from "antd";
 import Swal from "sweetalert2";
 import Loading from "../../page/Loading/Loading";
-const BillingsInfo = () => {
+import { PincodeValidation } from "../../helpers/ListData";
+const BillingsInfo = ({ PincodeList, OrderBranchs }) => {
   let dispatch = useDispatch();
   const [mobileerr, setmobileerr] = useState("");
   const [loading, setloading] = useState(false);
   const [emailerr, setemailerr] = useState("");
+  const [pincodeerr, setpincodeerr] = useState("");
   const [addAddress, setaddAddress] = useState();
   const [changeAddress, setchangeAddress] = useState(false);
   const [AddressId, setAddressId] = useState("");
@@ -26,6 +28,7 @@ const BillingsInfo = () => {
   const [profile, setprofile] = useState(true);
   const Address_list = useSelector((state) => state.AllReducer.Address_list);
   const CityList = useSelector((state) => state.AllReducer.City_List);
+  const ContactDetails = useSelector((state) => state.AllReducer.Branchlists);
   const [Billing_Info, setBilling_Info] = useState({
     firstname: "",
     lastname: "",
@@ -34,6 +37,7 @@ const BillingsInfo = () => {
     address: "",
     pincode: "",
     city: "",
+    branch_id: "",
   });
 
   const ProfileData = useSelector((state) => state.AllReducer.ProfileData);
@@ -42,6 +46,11 @@ const BillingsInfo = () => {
     if (key === "pincode") {
       if (Number(data)) {
         Billing_Info.pincode = data;
+        OrderBranchs?.filter((dtas) => {
+          if (dtas?.code === Billing_Info?.pincode) {
+            Billing_Info.branch_id = dtas?.branch_id;
+          }
+        });
       } else {
         Billing_Info.pincode = "";
       }
@@ -76,39 +85,43 @@ const BillingsInfo = () => {
   };
 
   const Add_Address_Detail = (e) => {
-    setloading(true);
-    dispatch(Add_Address(Billing_Info)).then((res) => {
-      setloading(false);
-      window.scroll(0, 0);
-      if (res?.payload?.status === 1) {
-        dispatch(Get_Address_List());
-        setchangeAddress(false);
-        setaddAddress("");
-        Swal.fire({
-          icon: "success",
-          title: "Success!",
-          text: res?.payload?.response,
-          showConfirmButton: false,
-          timer: 2000,
-        });
-        setchangeAddress(false);
-      }
-      if (res?.payload?.status === 0) {
-        Swal.fire({
-          icon: "warning",
-          title: "Failed!",
-          text: res?.payload?.response,
-          showConfirmButton: false,
-          timer: 2000,
-        });
-      }
-    });
+    if (PincodeList.includes(Billing_Info.pincode)) {
+      setloading(true);
+
+      dispatch(Add_Address(Billing_Info)).then((res) => {
+        setloading(false);
+        window.scroll(0, 0);
+        if (res?.payload?.status === 1) {
+          dispatch(Get_Address_List());
+          setchangeAddress(false);
+          setaddAddress("");
+          Swal.fire({
+            icon: "success",
+            title: "Success!",
+            text: res?.payload?.response,
+            showConfirmButton: false,
+            timer: 2000,
+          });
+          setchangeAddress(false);
+        }
+        if (res?.payload?.status === 0) {
+          Swal.fire({
+            icon: "warning",
+            title: "Failed!",
+            text: res?.payload?.response,
+            showConfirmButton: false,
+            timer: 2000,
+          });
+        }
+      });
+    }
   };
 
   useEffect(() => {
     dispatch(Profile_Details());
     dispatch(Get_Address_List());
     dispatch(City_List());
+    dispatch(PincodeListsApi());
   }, []);
 
   const OnChangeAddressDetails = (id) => {
@@ -158,32 +171,35 @@ const BillingsInfo = () => {
   };
 
   const UpdateAddress = () => {
-    dispatch(EditAddressDetails(Billing_Info, AddressId)).then((res) => {
-      setloading(false);
-      window.scroll(0, 0);
-      setchangeAddress(false);
-      if (res?.payload?.status === 1) {
-        dispatch(Get_Address_List());
-        setaddAddress("");
-        setAddressId("");
-        Swal.fire({
-          icon: "success",
-          title: "Success!",
-          text: res?.payload?.response,
-          showConfirmButton: false,
-          timer: 2000,
-        });
-      }
-      if (res?.payload?.status === 0) {
-        Swal.fire({
-          icon: "warning",
-          title: "Failed!",
-          text: res?.payload?.response,
-          showConfirmButton: false,
-          timer: 2000,
-        });
-      }
-    });
+    if (PincodeList.includes(Billing_Info.pincode)) {
+      setloading(true);
+      dispatch(EditAddressDetails(Billing_Info, AddressId)).then((res) => {
+        setloading(false);
+        window.scroll(0, 0);
+        setchangeAddress(false);
+        if (res?.payload?.status === 1) {
+          dispatch(Get_Address_List());
+          setaddAddress("");
+          setAddressId("");
+          Swal.fire({
+            icon: "success",
+            title: "Success!",
+            text: res?.payload?.response,
+            showConfirmButton: false,
+            timer: 2000,
+          });
+        }
+        if (res?.payload?.status === 0) {
+          Swal.fire({
+            icon: "warning",
+            title: "Failed!",
+            text: res?.payload?.response,
+            showConfirmButton: false,
+            timer: 2000,
+          });
+        }
+      });
+    }
   };
 
   useEffect(() => {
@@ -354,6 +370,9 @@ const BillingsInfo = () => {
                         }
                         value={Billing_Info.pincode}
                       />
+                      <div>
+                        {PincodeValidation(PincodeList, Billing_Info.pincode)}
+                      </div>
                     </div>
                   </div>
                 </div>

@@ -57,26 +57,28 @@ const InvoiceOnes = (props) => {
   };
 
   const headings = {
-    // subtotal:"SubTotal",
-    // // reward:"Points",
-    // discount:"Discount",
-    // total:"Total",
-    // deliverycharge:"Delivery Charges",
     subtotal: "PRODUCT COST",
     discount: "DISCOUNT",
-    total_paid: "TOTAL POINTS",
+    subtot: "SUBTOTAL",
+    deliverycharge: "DELIVERY CHARGES",
+    total_paid:
+      OrderDetails?.payment_method === "cash" ? "TOTAL AMOUNT" : "TOTAL POINTS",
   };
 
   const FooterValues = {
-    subtotal: OrderDetails?.discount !== "null" ? Number(cartTotal()) : 0,
-    // reward:OrderDetails?.reward || 0,
+    subtotal: Number(cartTotal()),
     discount:
       (OrderDetails?.discount &&
         JSON.parse(OrderDetails?.discount)?.discount) ||
+      OrderDetails?.offer_value ||
       0,
     total: OrderDetails?.orderTotal,
     deliverycharge: OrderDetails?.shipping?.price || 0,
     total_paid: OrderDetails?.orderTotal,
+    subtot: Math.abs(
+      Number(OrderDetails?.orderTotal) -
+        Number(OrderDetails?.shipping?.price || 0)
+    ),
   };
 
   return (
@@ -203,7 +205,10 @@ const InvoiceOnes = (props) => {
                       <tfoot>
                         {Object.keys(headings).map((data) => (
                           <>
-                            {FooterValues[data] > 0 && (
+                            {["discount", "subtot"].includes(data) &&
+                            OrderDetails?.payment_method === "point" ? (
+                              ""
+                            ) : (
                               <tr>
                                 <td colSpan="3"></td>
                                 <td className="font-bold text-dark" colSpan="1">
@@ -211,15 +216,31 @@ const InvoiceOnes = (props) => {
                                 </td>
                                 <td className="font-bold text-theme">
                                   {" "}
+                                  {FooterValues[data] > 0 && (
+                                    <span
+                                      style={{
+                                        color:
+                                          data === "discount"
+                                            ? "green"
+                                            : data === "deliverycharge"
+                                            ? "red"
+                                            : "",
+                                      }}
+                                    >
+                                      {data === "discount"
+                                        ? data?.offer_type === "amount"
+                                          ? "- "
+                                          : "%"
+                                        : data === "deliverycharge"
+                                        ? "+ "
+                                        : ""}
+                                    </span>
+                                  )}{" "}
                                   {data === "discount"
                                     ? FooterValues["discount"] !== "[]"
                                       ? FooterValues[data]
                                       : 0
-                                    : //  data === "total_paid"
-                                      // ? Number(FooterValues["total"]) +
-                                      //   Number(FooterValues["deliverycharge"])
-                                      // :
-                                      (FooterValues[data] &&
+                                    : (FooterValues[data] &&
                                         FooterValues[data]) ||
                                       0}
                                 </td>
@@ -268,7 +289,9 @@ const InvoiceOnes = (props) => {
                                 </div>
                                 <div className="offcanvas-wishlist-item-details">
                                   <span className="offcanvas-wishlist-item-details-quantity">
-                                    Points :{" "}
+                                    {OrderDetails?.payment_method === "cash"
+                                      ? "MRP - "
+                                      : "Points - "}{" "}
                                     {(data.attribute_price
                                       ? data.attribute_price
                                       : data.main_price
@@ -278,7 +301,10 @@ const InvoiceOnes = (props) => {
 
                                 <div style={{ color: "green" }}>
                                   {" "}
-                                  Total Points:{" "}
+                                  Total{" "}
+                                  {OrderDetails?.payment_method === "cash"
+                                    ? "Amount - "
+                                    : "Points - "}{" "}
                                   {(
                                     (data.attribute_price
                                       ? data.attribute_price
@@ -294,11 +320,34 @@ const InvoiceOnes = (props) => {
                       {Object.keys(headings).map((data) => {
                         return (
                           <>
-                            {FooterValues[data] > 0 && (
+                            {["discount", "subtot"].includes(data) &&
+                            OrderDetails?.payment_method === "point" ? (
+                              ""
+                            ) : (
                               <>
                                 <span>{headings[data]}:</span>
                                 <span>
                                   {" "}
+                                  {FooterValues[data] > 0 && (
+                                    <span
+                                      style={{
+                                        color:
+                                          data === "discount"
+                                            ? "green"
+                                            : data === "deliverycharge"
+                                            ? "red"
+                                            : "",
+                                      }}
+                                    >
+                                      {data === "discount"
+                                        ? data?.offer_type === "amount"
+                                          ? "- "
+                                          : "%"
+                                        : data === "deliverycharge"
+                                        ? "+ "
+                                        : ""}
+                                    </span>
+                                  )}{" "}
                                   {data === "discount"
                                     ? FooterValues["discount"] !== "[]"
                                       ? FooterValues[data]
@@ -324,7 +373,7 @@ const InvoiceOnes = (props) => {
                       <ReactToPrint
                         trigger={() => (
                           <button className="theme-btn-one btn-black-overlay btn_sm ml-2">
-                            print
+                            Print
                           </button>
                         )}
                         content={() => componentRef.current}

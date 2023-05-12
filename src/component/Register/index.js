@@ -48,7 +48,7 @@ const RegisterArea = () => {
   };
 
   useEffect(() => {
-    dispatch(BranchListsApi());
+    dispatch(BranchListsApi("branchList"));
   }, []);
 
   const Submit = (e) => {

@@ -2,7 +2,11 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 import Swal from "sweetalert2";
-import { CouponCode, CouponDetails } from "../../Redux/Action/allActions";
+import {
+  CouponCode,
+  CouponDetails,
+  PayTypeCashOrPoints,
+} from "../../Redux/Action/allActions";
 import moment from "moment";
 const Coupon = () => {
   const carts = useSelector((state) => state.AllReducer.CartLists);
@@ -45,29 +49,24 @@ const Coupon = () => {
     }, 0);
   };
 
-  const cartTotal = () => {
+  const PointsTotal = () => {
     return carts?.reduce(function (total, item) {
       return (
         total +
         Number(item.qty || 1) *
-          (payType === "points"
-            ? Number(
-                item.aid
-                  ? attributeFun(item)?.[0]?.point
-                  : Timer(item)
-                  ? item.deal_point
-                  : item?.point
-              )
-            : item.aid
-            ? attributeFun(item)?.[0]?.selling
-            : Timer(item)
-            ? item.deal_amount
-            : item.discount_price)
+          Number(
+            item.aid
+              ? attributeFun(item)?.[0]?.point
+              : Timer(item)
+              ? item.deal_point
+              : item?.point
+          )
       );
     }, 0);
   };
 
   const CheckValdeCoupon = () => {
+    dispatch(CouponDetails(""));
     let Total = Math.round(Number(cartTotalPrice()));
     let DiscountAmt = 0;
 
@@ -75,33 +74,52 @@ const Coupon = () => {
       code: coupon,
       uid: JSON.parse(localStorage.getItem("UserId")),
       amount: cartTotalPrice(),
+      user_point: PointsTotal(),
     };
     dispatch(CouponCode(payload)).then((data) => {
-      const code = data?.payload?.response;
-
-      if (data?.payload?.status === 0) {
+      const code = data?.payload?.response || data?.payload?.[0];
+      if (data?.payload?.status === 0 || data?.payload === "") {
         Swal.fire({
           icon: "warning",
-          title: data?.payload?.message,
+          title: data?.payload?.message || "Promocode Invalid",
           showConfirmButton: false,
           timer: 1500,
         });
+        setcoupon("");
       } else {
         Swal.fire({
           icon: "success",
-          title: data?.payload?.message,
+          title:
+            data?.payload?.length > 0
+              ? "Promocode valid"
+              : data?.payload?.message,
           showConfirmButton: false,
           timer: 1500,
         });
-        if (code.type === "amount") {
-          DiscountAmt = Math.abs(Number(Total) - Number(code.discount));
-        } else {
-          let calculate = Number(code.discount) / 100;
-          DiscountAmt = Total - Total * calculate;
-        }
+        setcoupon("");
+        dispatch(PayTypeCashOrPoints("cash"));
+        if (code?.slab_details?.discount_type !== "product")
+          if (code?.type || code?.slab_details?.discount_type === "amount") {
+            DiscountAmt = Math.abs(
+              Number(Total) -
+                Number(code?.discount || Number(code?.slab_details?.discount))
+            );
+          } else {
+            let calculate =
+              Number(code?.discount || Number(code?.slab_details?.discount)) /
+              100;
+            DiscountAmt = Total - Total * calculate;
+          }
         let Coupons = {
           Discount: DiscountAmt,
           Details: code,
+          type: code?.slab_details?.discount_type
+            ? code?.slab_details?.discount_type
+            : code?.type,
+          title: code?.name || code?.title,
+          discount: code?.discount || Number(code?.slab_details?.discount),
+          id: code?.id,
+          offer_type: code?.types,
         };
         DiscountAmt && dispatch(CouponDetails(Coupons));
       }

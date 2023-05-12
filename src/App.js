@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { AuthContext } from "./context/auth";
-import "./assets/css/style.scss";
 import PullToRefresh from "react-simple-pull-to-refresh";
 import Routes from "./Routes";
-import { BrowserView, isMobile, MobileView } from "react-device-detect";
-import { useSelector } from "react-redux";
-import Time from "./component/Time";
+import { isMobile } from "react-device-detect";
+import { useDispatch, useSelector } from "react-redux";
+
 const App = () => {
+  let dispatch = useDispatch();
   const [loading, setloading] = useState(true);
   const existingTokens = JSON.parse(localStorage.getItem("data"));
   const [authTokens, setAuthTokens] = useState(existingTokens);
@@ -25,7 +25,6 @@ const App = () => {
       }
     });
   }, []);
-
   const fakeRequest = () => {
     return new Promise((resolve) => setTimeout(() => resolve(), 0));
   };
@@ -49,17 +48,17 @@ const App = () => {
           onRefresh={handleRefresh}
           isPullable={isMobile && true}
           triggerHeight={50}
+          pullingContent={""}
         >
           <div
             style={{
-              padding: `${
-                isMobile && (SearchValue?.type ? "120px" : "80px")
-              } 0px 0px 0px`,
+              padding: `${isMobile ? "130px" : "0px"} 0px 0px 0px`,
             }}
           >
             <Routes />
           </div>
         </PullToRefresh>
+        {/* <DesktopNotication /> */}
       </AuthContext.Provider>
     </div>
   );

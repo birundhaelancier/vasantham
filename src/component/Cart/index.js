@@ -7,22 +7,13 @@ import { ImageUrl } from "../../Redux/Utils/baseurl";
 import emp_img from "../../assets/img/empty-cart.webp";
 import Swal from "sweetalert2";
 import moment from "moment";
-import {
-  CartListApi,
-  PayTypeCashOrPoints,
-  Profile_Details,
-  TimerEnd,
-} from "../../Redux/Action/allActions";
+import { CartListApi } from "../../Redux/Action/allActions";
 import { AddToCartApi, ProductDelete } from "../../Redux/Action/CreateActions";
-import ModalComp from "../../helpers/Modal";
-import { Radio } from "antd";
 const CartArea = () => {
   let dispatch = useDispatch();
   const [timer, settimer] = useState(false);
   const [QuantityValues, setQuantityValues] = useState({});
   const ShoppingCarts = useSelector((state) => state.AllReducer.CartLists);
-  const ProfileData = useSelector((state) => state.AllReducer.ProfileData);
-  const payType = useSelector((state) => state.AllReducer.payType);
   const columnss = [
     { field: "id", width: 50, headerName: "Remove" },
     { field: "", width: 130, headerName: "Image" },
@@ -79,11 +70,25 @@ const CartArea = () => {
           });
         }
       } else {
-        ProceedAddtoCart(data, val, "qty");
-        setQuantityValues((prevState) => ({
-          ...prevState,
-          ["test" + data?.id]: val,
-        }));
+        if (
+          Number(data?.pmax_count) > 0
+            ? Number(val) <= Number(data?.pmax_count)
+            : true
+        ) {
+          ProceedAddtoCart(data, val, "qty");
+          setQuantityValues((prevState) => ({
+            ...prevState,
+            ["test" + data?.id]: val,
+          }));
+        } else {
+          Swal.fire({
+            icon: "warning",
+            title: "Warning",
+            text: "Maximum order reached",
+            showConfirmButton: false,
+            timer: 1000,
+          });
+        }
       }
     }
   };
@@ -301,13 +306,19 @@ const CartArea = () => {
                               <li>
                                 <div className="table_val">
                                   <i class="fa fa-inr" />{" "}
-                                  {data.aid
-                                    ? attributeFun(data)?.[0]?.selling
-                                    : Timer(data?.date, data?.to_date)
-                                    ? data?.deal_amount
-                                    : Timer(data?.date, data?.to_date)
-                                    ? data?.deal_amount
-                                    : data.discount_price * data.qty}
+                                  <b>
+                                    {data.aid
+                                      ? attributeFun(data)?.[0]?.selling
+                                      : Timer(data?.date, data?.to_date)
+                                      ? data?.deal_amount
+                                      : Timer(data?.date, data?.to_date)
+                                      ? data?.deal_amount
+                                      : data.discount_price * data.qty}
+                                  </b>
+                                  <del style={{ paddingLeft: "5px" }}>
+                                    <i class="fa fa-inr" />{" "}
+                                    {data.previous_price}
+                                  </del>
                                 </div>
                               </li>
                               <li>
@@ -348,7 +359,7 @@ const CartArea = () => {
                           </div>
                           <div style={{ textAlign: "end" }}>
                             <i
-                              className="fa fa-remove text-danger"
+                              className="fa fa-trash text-danger"
                               onClick={() => rmProduct(data.pid)}
                               style={{
                                 cursor: "pointer",

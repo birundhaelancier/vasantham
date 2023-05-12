@@ -1,29 +1,35 @@
 import React, { useEffect, useState, useRef } from "react";
 import ProductCard from "../Common/Product/ProductCard";
 import { useDispatch, connect } from "react-redux";
-import Slider from "react-slick";
-import { useLocation, useParams } from "react-router-dom";
-import { CategoryList_api } from "../../Redux/Action/allActions";
+import { useParams } from "react-router-dom";
+import { CategoryList_api, Category_List } from "../../Redux/Action/allActions";
 import EmptyCart from "../Cart/EmptyCart";
 import "react-awesome-slider/dist/custom-animations/cube-animation.css";
 import Heading from "../Fashion/Heading";
 import Pagination from "@mui/material/Pagination";
-import Stack from "@mui/material/Stack";
 import { isMobile } from "react-device-detect";
 import SideBar from "./SideBar";
 import { colorSet } from "../../helpers/ListData";
+import InfiniteScroll from "react-infinite-scroll-component";
+import { CircularProgress } from "@mui/material";
 const Shop = (props) => {
   let { slug } = useParams();
-  let location = useLocation();
   let [loading, setloading] = useState(true);
   const [products, setProducts] = useState([]);
   const [page, setpage] = useState(1);
   const [Productname, setProductname] = useState("");
   const [FilterSearch, setFilterSearch] = useState([]);
   const [count, setcount] = useState(32);
+  const [countscroll, setcountscroll] = useState(1);
+  const [pagescroll, setpagescroll] = useState(12);
   let dispatch = useDispatch();
   const myRef = useRef(null);
+  var flag2 = 1;
   const [product_slide, setproduct_slide] = useState(0);
+
+  useEffect(() => {
+    dispatch(Category_List());
+  }, []);
 
   useEffect(() => {
     isMobile && executeScroll();
@@ -50,6 +56,8 @@ const Shop = (props) => {
     ).then((res) => {
       if (res) {
         setloading(false);
+        setcountscroll(1);
+        setpagescroll(12);
       }
     });
   }, [slug, Productname]);
@@ -69,11 +77,16 @@ const Shop = (props) => {
     setProductname(data);
   };
 
+  const fetchMoreData = () => {
+    setTimeout(() => {
+      setcountscroll(countscroll + 1);
+      setpagescroll((countscroll + 1) * pagescroll);
+    }, 1000);
+  };
+
   useEffect(() => {
     setProductname("");
   }, [slug]);
-
-  var flag2 = 1;
 
   const DealColors = (index) => {
     if (flag2 === 1) {
@@ -128,52 +141,80 @@ const Shop = (props) => {
             />
           </div>
 
-          <div className="col-md-9 col-lg-9 col-12">
-            <div className="backgr-shop" ref={myRef}>
+          <div className="col-md-9 col-lg-9 col-12" ref={myRef}>
+            <div className="backgr-shop">
               {products?.length > 0 ? (
                 <>
                   <div className="container">
                     {!loading ? (
                       <>
-                        <div className="row mobileshop p-0">
-                          {/* <Slider {...settings}> */}
+                        {/* <Slider {...settings}> */}
+                        <InfiniteScroll
+                          dataLength={pagescroll}
+                          next={fetchMoreData}
+                          scrollableTarget="scrollableDiv"
+                          endMessage={
+                            <p style={{ textAlign: "center" }}>
+                              <b>Yay! You have seen it all</b>
+                            </p>
+                          }
+                          hasMore={pagescroll <= products?.length}
+                          style={{ overflow: "inherit" }}
+                          loader={
+                            <div
+                              className="spinner text-center mt-2 mb-2"
+                              id="#scrollableDiv"
+                            >
+                              <CircularProgress color="success" />
+                            </div>
+                          }
+                        >
+                          <div className="row mobileshop p-0">
+                            {
+                              // products
+                              //   ?.slice(
+                              //     (page - 1) * count,
+                              //     (page - 1) * count + count
+                              //   )
+                              products
+                                ?.slice(0, pagescroll)
+                                ?.map((data, index) => (
+                                  <div className="col-md-3 col-6 p-0">
+                                    <ProductCard
+                                      data={data}
+                                      category={Productname == "" && true}
+                                      styles={Productname === "" && "slider"}
+                                      deals={
+                                        Productname?.slug === "deal" && true
+                                      }
+                                      customcss={
+                                        Productname?.slug === "deal"
+                                          ? "deals"
+                                          : Productname?.slug === "feature"
+                                          ? "newarrival"
+                                          : Productname?.slug === "hot"
+                                          ? "feature-product"
+                                          : Productname?.slug === "best"
+                                          ? "mobile-category"
+                                          : "norma-products"
+                                      }
+                                      classNames={
+                                        Productname?.slug === "best" &&
+                                        colorSet()
+                                      }
+                                      backGrounds={
+                                        Productname?.slug === "hot" &&
+                                        DealColors()
+                                      }
+                                    />
+                                  </div>
+                                ))
+                            }
+                          </div>
+                        </InfiniteScroll>
+                        {/* </Slider> */}
 
-                          {products
-                            ?.slice(
-                              (page - 1) * count,
-                              (page - 1) * count + count
-                            )
-                            .map((data, index) => (
-                              <div className="col-md-3 col-6 p-0">
-                                <ProductCard
-                                  data={data}
-                                  category={Productname == "" && true}
-                                  styles={Productname === "" && "slider"}
-                                  deals={Productname?.slug === "deal" && true}
-                                  customcss={
-                                    Productname?.slug === "deal"
-                                      ? "deals"
-                                      : Productname?.slug === "feature"
-                                      ? "newarrival"
-                                      : Productname?.slug === "hot"
-                                      ? "feature-product"
-                                      : Productname?.slug === "best"
-                                      ? "mobile-category"
-                                      : "norma-products"
-                                  }
-                                  classNames={
-                                    Productname?.slug === "best" && colorSet()
-                                  }
-                                  backGrounds={
-                                    Productname?.slug === "hot" && DealColors()
-                                  }
-                                />
-                              </div>
-                            ))}
-                          {/* </Slider> */}
-                        </div>
-
-                        {products?.length > 32 && (
+                        {/* {products?.length > 32 && (
                           <div className="pag-item">
                             <Pagination
                               count={Math.round(products?.length / 32)}
@@ -183,7 +224,7 @@ const Shop = (props) => {
                               onChange={(e, val) => handleChange(e, val)}
                             />
                           </div>
-                        )}
+                        )} */}
                       </>
                     ) : (
                       <div className="shop_loader">
@@ -207,23 +248,3 @@ const mapStateToProps = (state) => ({
   Category_List: state.AllReducer.Category_List || [],
 });
 export default connect(mapStateToProps)(Shop);
-
-// {/* <div className="container">
-//             {!loading ? (
-//               <div className="row">
-//                 {/* <Slider {...settings}> */}
-//                 {products?.products
-//                   ?.slice(pagen, count)
-//                   .map((data, index) => (
-//                     <div className="col-md-3 col-6">
-//                       <ProductCard data={data} category={true} />
-//                     </div>
-//                   ))}
-//                 {/* </Slider> */}
-//               </div>
-//             ) : (
-//               <div className="shop_loader">
-//                 <i class="fa fa-circle-o-notch fa-spin"></i>
-//               </div>
-//             )}
-//           </div>

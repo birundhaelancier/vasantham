@@ -55,26 +55,32 @@ const OrderSuccess = (props) => {
   };
 
   const headings = {
-    // subtotal:"SubTotal",
     // // reward:"Points",
     // discount:"Discount",
     // total:"Total",
-    // deliverycharge:"Delivery Charges",
     subtotal: "PRODUCT COST",
     discount: "DISCOUNT",
-    total_paid: "TOTAL POINTS",
+    subtot: "SUBTOTAL",
+    deliverycharge: "DELIVERY CHARGES",
+    total_paid:
+      OrderDetails?.payment_method === "cash" ? "TOTAL AMOUNT" : "TOTAL POINTS",
   };
 
   const FooterValues = {
-    subtotal: OrderDetails?.discount !== "null" ? Number(cartTotal()) : 0,
+    subtotal: Number(cartTotal()),
     // reward:OrderDetails?.reward || 0,
     discount:
       (OrderDetails?.discount &&
         JSON.parse(OrderDetails?.discount)?.discount) ||
+      OrderDetails?.offer_value ||
       0,
     total: OrderDetails?.orderTotal,
     deliverycharge: OrderDetails?.shipping?.price || 0,
     total_paid: OrderDetails?.orderTotal,
+    subtot: Math.abs(
+      Number(OrderDetails?.orderTotal) -
+        Number(OrderDetails?.shipping?.price || 0)
+    ),
   };
 
   return (
@@ -268,7 +274,11 @@ const OrderSuccess = (props) => {
                     })}
                     {Object.keys(headings).map((data) => (
                       <>
-                        {FooterValues[data] > 0 && (
+                        {/* {FooterValues[data] > 0 && ( */}
+                        {["discount", "subtot"].includes(data) &&
+                        OrderDetails?.payment_method === "point" ? (
+                          ""
+                        ) : (
                           <tr>
                             <td
                               colSpan="2"
@@ -297,19 +307,28 @@ const OrderSuccess = (props) => {
                               }}
                             >
                               <b>
-                                {
-                                  // data === "discount"
-                                  //   ? FooterValues["discount"] !== "[]"
-                                  //     ? FooterValues[data]
-                                  //     : 0
-                                  //   : data === "total_paid"
-                                  //   ? Number(FooterValues["total"]) +
-                                  //       Number(FooterValues["deliverycharge"]) ||
-                                  //     0
-                                  //   :
-                                  (FooterValues[data] && FooterValues[data]) ||
-                                    0
-                                }
+                                {FooterValues[data] > 0 && (
+                                  <span
+                                    style={{
+                                      color:
+                                        data === "discount"
+                                          ? "green"
+                                          : data === "deliverycharge"
+                                          ? "red"
+                                          : "",
+                                    }}
+                                  >
+                                    {data === "discount"
+                                      ? data?.offer_type === "amount"
+                                        ? "- "
+                                        : "%"
+                                      : data === "deliverycharge"
+                                      ? "+ "
+                                      : ""}
+                                  </span>
+                                )}{" "}
+                                {(FooterValues[data] && FooterValues[data]) ||
+                                  0}
                               </b>
                             </td>
                           </tr>

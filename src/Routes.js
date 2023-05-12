@@ -46,6 +46,11 @@ import Time from "./component/Time";
 import RecentActivity from "./page/Recentactivities";
 import Qrcode from "./Qrcode";
 import Offers from "./page/offers";
+import Festival from "./page/Festival";
+import Page from "./notify";
+import { useSelector } from "react-redux";
+import AllcategoryDetails from "./page/AllcategoryDetails";
+
 export default function Routes() {
   const PrivateRoute = ({ component: Component, ...rest }) => (
     <Route
@@ -64,6 +69,9 @@ export default function Routes() {
       <ScrollToTop />
       <Switch>
         <Route path="/" exact component={Electronics} />
+        <Route path="/festival" component={Festival} />
+        {/* <Route path="/cashfree-payment" exact component={CashfreePayment} /> */}
+
         <Route path="/shop/:slug?" exact component={ShopGrid} />
         <Route
           path="/product-details-one/:id?/:productid?"
@@ -120,6 +128,7 @@ export default function Routes() {
         <Route path="/login/:type?" exact component={Login} />
         <Route path="/forgot" exact component={ForgotComp} />
         <Route path="/changepassword" exact component={PasswordComp} />
+        <Route path="/resetpassword" element={<PasswordComp />} />
         <Route path="/register" exact component={Register} />
         <Route path="/privacy-policy" exact component={PrivacyPolicy} />
         <Route path="/faqs" exact component={Faqs} />
@@ -141,7 +150,7 @@ export default function Routes() {
         />
         <Route path="/qrcode" component={Qrcode} />
         <Route path="/offers" component={Offers} />
-
+        <Route path="/all-category" component={AllcategoryDetails} />
         <Route exact path="*" component={Electronics} />
       </Switch>
     </Router>

@@ -74,7 +74,12 @@ const initialState = {
   CartLists: [],
   Branchlists: [],
   Offerlists: [],
+  PincodeList: [],
+  GetListData: [],
   payType: "points",
+  MenuCategories: [],
+  LoadingType: "",
+  Sliderlists: [],
 };
 export default function (state = initialState, action) {
   const { type, payload } = action;
@@ -147,6 +152,8 @@ export default function (state = initialState, action) {
       return { ...state, Notify: payload };
     case SEARCH_CATEGORY:
       return { ...state, SearchResults: payload };
+    case "MENU_CATEGORIES":
+      return { ...state, MenuCategories: payload };
     case "VERIFICATION":
       return { ...state, Verification: payload };
     case "REGISTER_MOBILENUMBER":
@@ -157,11 +164,18 @@ export default function (state = initialState, action) {
       return { ...state, CartLists: payload };
     case "BranchList":
       return { ...state, Branchlists: payload };
+    case "PincodeList":
+      return { ...state, PincodeList: payload };
     case "OFFERLISTS":
       return { ...state, Offerlists: payload };
     case "PayType":
       return { ...state, payType: payload };
-
+    case "GETLISTS":
+      return { ...state, GetListData: payload };
+    case "LOADING-CONTENT":
+      return { ...state, LoadingType: payload };
+    case "SLIDER-BELOW":
+      return { ...state, Sliderlists: payload };
     default:
       return state;
   }

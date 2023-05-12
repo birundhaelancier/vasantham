@@ -11,7 +11,9 @@ import Carosal from "../../Carosal";
 import Heading from "../../Heading";
 import { colorSet } from "../../../helpers/ListData";
 const CategoryComp = () => {
-  const AllCategory = useSelector((state) => state.AllReducer.AllCategory);
+  const MenuCategories = useSelector(
+    (state) => state.AllReducer.MenuCategories
+  );
   let dispatch = useDispatch();
   let history = useHistory();
   const [Products, setProducts] = useState([]);
@@ -61,20 +63,15 @@ const CategoryComp = () => {
   }, [slideNumber]);
 
   useEffect(() => {
-    dispatch(Category_List());
-  }, []);
-
-  useEffect(() => {
     let Data = [];
-    AllCategory.filter((value) => {
-      if (value.home === 1) {
-        Data.push(value);
-      }
+    MenuCategories?.filter((value) => {
+      // if (value.home === 1) {
+      Data.push(value);
+      // }
     });
     setProducts(Data);
-  }, [AllCategory]);
+  }, [MenuCategories]);
   const Colors = ["back1", "back2", "back3", "back4", "back5", "back6"];
-
   return (
     <>
       <MobileView>

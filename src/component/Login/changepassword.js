@@ -5,8 +5,6 @@ import Swal from "sweetalert2";
 import { useHistory } from "react-router-dom";
 import { ChangePasswordApi } from "../../Redux/Action/LoginActions";
 import Loading from "../../page/Loading/Loading";
-import { useAuth } from "../../context/auth";
-import { Profile_Details, RewardPoints } from "../../Redux/Action/allActions";
 const ChangePassword = () => {
   let dispatch = useDispatch();
   let { type } = useParams();
@@ -18,10 +16,12 @@ const ChangePassword = () => {
   const [UserDetail, setUserDetail] = useState({
     password: "",
     confirm_pass: "",
-  })
+  });
   const onChangeData = (e) => {
     if (e.target.name === "confirm_pass") {
-        e.target.value === UserDetail.password ? seterror("") : seterror("Password does't not match");
+      e.target.value === UserDetail.password
+        ? seterror("")
+        : seterror("Password does't not match");
     }
     setUserDetail((prevState) => ({
       ...prevState,
@@ -29,58 +29,59 @@ const ChangePassword = () => {
     }));
   };
   const Submit = (e) => {
-    e.preventDefault()
-    if(error===""){
-     setloading(true)
-    dispatch(ChangePasswordApi(UserDetail)).then((res) => {
-      setloading(false)
-      if (res.payload.status === 1) {
-        Swal.fire({
-          icon: "success",
-          title: res.payload.response,
-          showConfirmButton: false,
-          timer: 1500,
-        })
-        ClearState()
-      } else if (res.payload.status === 0) {
-        Swal.fire({
-          icon: "warning",
-          title: res.payload.response,
-          showConfirmButton: false,
-          timer: 1500,
-        });
-      } else {
-        Swal.fire({
-          icon: "warning",
-          title: "Failed",
-          text: Object.values(res?.payload),
-          showConfirmButton: false,
-          timer: 1500,
-        });
-      }
-    })
-   }
+    e.preventDefault();
+    if (error === "") {
+      setloading(true);
+      dispatch(ChangePasswordApi(UserDetail)).then((res) => {
+        setloading(false);
+        if (res.payload.status === 1) {
+          Swal.fire({
+            icon: "success",
+            title: res.payload.response,
+            showConfirmButton: false,
+            timer: 1500,
+          });
+          ClearState();
+          history.push("/login");
+        } else if (res.payload.status === 0) {
+          Swal.fire({
+            icon: "warning",
+            title: res.payload.response,
+            showConfirmButton: false,
+            timer: 1500,
+          });
+        } else {
+          Swal.fire({
+            icon: "warning",
+            title: "Failed",
+            text: Object.values(res?.payload),
+            showConfirmButton: false,
+            timer: 1500,
+          });
+        }
+      });
+    }
 
     setUserDetail((prevState) => ({
       ...prevState,
-    }))
-  }
+    }));
+  };
   const ClearState = () => {
     setUserDetail((prevState) => ({
-        ...prevState,
-        confirm_pass : '',
-        password: ''
-    }))
-  }
-
+      ...prevState,
+      confirm_pass: "",
+      password: "",
+    }));
+  };
 
   return (
     <div className="parent_vas_div">
       <section id="login_area" className="mtb-20">
         <div className="container">
           <div className="row">
-            <div className="col-lg-8 offset-lg-2 col-md-12 col-sm-12 col-12 log_acc_form">
-              <div className="account_form">
+            <div className="col-lg-3 col-md-12 col-sm-12 col-12"></div>
+            <div className="col-lg-6 col-md-12 col-sm-12 col-12">
+              <div className="account_form" style={{ width: "100%" }}>
                 <h3>Change Password</h3>
                 <form
                   onSubmit={(e) => {
@@ -134,7 +135,7 @@ const ChangePassword = () => {
                       }
                     ></i>
                   </div>
-                  {error!=="" &&<div className="err_msg">{error}</div>}
+                  {error !== "" && <div className="err_msg">{error}</div>}
                   <div className="login_submit text-end">
                     <button
                       className="theme-btn-one btn-black-overlay  btn_md "
@@ -145,6 +146,7 @@ const ChangePassword = () => {
                   </div>
                 </form>
               </div>
+              <div className="col-lg-3 col-md-12 col-sm-12 col-12"></div>
             </div>
           </div>
         </div>

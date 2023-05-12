@@ -49,6 +49,14 @@ const Sidebar = () => {
                 <i className="fa fa-first-order"></i>My Orders
               </Link>
             </li>
+            <li>
+              <Link
+                to="/bills"
+                className={location.pathname === "/bills" ? "active" : null}
+              >
+                <i className="fa fa-first-order"></i>My Bills
+              </Link>
+            </li>
 
             <li>
               <Link

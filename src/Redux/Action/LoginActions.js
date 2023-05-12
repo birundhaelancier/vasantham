@@ -98,36 +98,14 @@ export const ForgotPassword = (data) => async (dispatch) => {
   return dispatch({ type: FORGOT_PASSWORD, payload: response.data });
 };
 
-// export const ProfileUpdate = (data,upload) => async dispatch => {
-//     try {
-//         axios({
-//             method: 'post',
-//             url: baseUrl + 'users/profileupdate',
-//             data:{
-//              "phone":"9911991191",
-//              "password":"123456"
-//             },
-//         })
-//         .then((response) => {
-//             dispatch({type:PROFILE_UPDATE,payload:response.data.response})
-//             if(response.data.status==="Success"){
-//                 notification.success({
-//                     message:response.data.message,
-//                   });
-//                   dispatch(User_signin_Details(data))
-//                   dispatch(ProfileGet_Api())
-//                 }
-//                 if(response.data.status==="Failure"){
-//                     notification.success({
-//                         message:response.data.message,
-//                       });
-//                     }
-//             return Promise.resolve();
-//         })
-
-//     } catch (err) {
-//         notification.error({
-//             message: 'Something wrong,Not Updated User Details',
-//           });
-//     }
-// }
+export const UserForgotPassword = (data) => async (dispatch) => {
+  const response = await axios({
+    method: "POST",
+    url: apiurl + "user_password_change",
+    data: {
+      mobile: data.mobileno,
+      password: data.password,
+    },
+  });
+  return dispatch({ type: FORGOT_PASSWORD, payload: response.data });
+};

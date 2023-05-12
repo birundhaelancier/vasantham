@@ -3,6 +3,7 @@ import { Link, useHistory } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
   CouponCode,
+  GetLists,
   Get_Shipping,
   PayTypeCashOrPoints,
   RewardPoints,
@@ -79,29 +80,11 @@ const TotalCart = (props) => {
 
   const PayTypefun = () => {
     setpaytype(false);
-    // if (payType === "points") {
-    //   if (Reward.rewardpoint > cartTotal()) {
-    //     history.push("/checkout");
-    //   } else {
-    //     Swal.fire({
-    //       icon: "warning",
-    //       title: "Warning",
-    //       text:
-    //         Reward.rewardpoint > 0
-    //           ? `You have only ${
-    //               Reward.rewardpoint || 0
-    //             } reward points.       you purchase  ${
-    //               Reward.rewardpoint || 0
-    //             } above`
-    //           : "Your reward point is 0",
-    //     });
-    //   }
-    // } else {
+
     history.push("/checkout");
-    // }
   };
 
-  const ProceedCheckout = () => {
+  const ProceedCheckout = async () => {
     if (!JSON.parse(localStorage.getItem("UserId"))) {
       history.push("/login/cart");
     } else {
@@ -133,18 +116,18 @@ const TotalCart = (props) => {
         <div className="coupon_code right">
           <h3>Cart Total</h3>
           <div className="coupon_inner">
-            <div className="cart_subtotal">
-              <p>{`Total ${"points"}`}</p>
-              <p className="cart_amount">
-                {" "}
-                {Number(cartTotal() || 0).toFixed(2)}
-              </p>
-            </div>
+            {payType === "points" && (
+              <div className="cart_subtotal">
+                <p>{`Total ${"points"}`}</p>
+                <p className="cart_amount">
+                  {" "}
+                  {Number(cartTotal() || 0).toFixed(2)}
+                </p>
+              </div>
+            )}
             <div className="cart_subtotal">
               <p>{`${
-                Number(Coupon?.Details?.discount)
-                  ? "Product cost"
-                  : "Total price"
+                Number(Coupon?.discount) ? "Product cost" : "Total price"
               }`}</p>
               <p className="cart_amount">
                 <i class="fa fa-inr" />
@@ -158,7 +141,7 @@ const TotalCart = (props) => {
                   <p>Coupon</p>
                   <p className="cart_amount">
                     {" "}
-                    {Number(Coupon?.Details?.discount).toFixed(2)}
+                    {Number(Coupon?.discount).toFixed(2)}
                   </p>
                 </div>
                 <div className="cart_subtotal">
@@ -177,10 +160,8 @@ const TotalCart = (props) => {
                 severity="success"
                 style={{ margin: "20px 0px" }}
               >
-                {Coupon.Details?.title} {Number(Coupon?.Details?.discount)}{" "}
-                {Coupon?.Details?.type == "amount"
-                  ? "Rupees Amount"
-                  : "Percentage"}{" "}
+                {Coupon?.title} {Number(Coupon?.discount)}{" "}
+                {Coupon?.type == "amount" ? "Rupees Amount" : "Percentage"}{" "}
                 Discount
               </Alert>
             )}

@@ -15,6 +15,9 @@ const YourOrders = () => {
   const Reward = useSelector((state) => state.AllReducer.RewardPoints);
   const Coupon = useSelector((state) => state.AllReducer.Coupon);
   const payType = useSelector((state) => state.AllReducer.payType);
+  const BillingInformation = useSelector(
+    (state) => state.AllReducer.BillingInformation || {}
+  );
   const [FilterData, setFilterData] = useState([]);
   const dispatch = useDispatch();
   const Timer = (val) => {
@@ -56,12 +59,15 @@ const YourOrders = () => {
     return data?.attribute?.filter((datas) => datas.id === data.aid);
   };
 
-  const pointscartTotal = () => {
+  const cartTotalDiscount = () => {
     return ShoppingCarts?.reduce(function (total, item) {
       return (
         total +
-        Number(item.qty || 1) *
-          Number(Timer(item) ? item.deal_point : item?.point)
+        (item.aid
+          ? attributeFun(item)?.[0]?.selling
+          : Timer(item)
+          ? item.deal_amount
+          : item.discount_price)
       );
     }, 0);
   };
@@ -71,21 +77,23 @@ const YourOrders = () => {
     dispatch(RewardPoints());
   }, []);
 
-  // useEffect(() => {
-  //   let Total = Math.round(
-  //     Number(cartTotal()) - Number(Reward?.rewardpoint || 0)
-  //   );
-  //   if (Total > 1000) {
-  //     setFilterData(ShippingDetails[0]);
-  //   } else {
-  //     setFilterData(ShippingDetails[1]);
-  //   }
-  // }, [cartTotal(), ShippingDetails, Reward]);
+  useEffect(() => {
+    let Total = Math.round(Number(cartTotal()));
+    if (payType !== "points" && !BillingInformation?.store_name) {
+      if (Total > 1000) {
+        setFilterData(ShippingDetails[0]);
+      } else {
+        setFilterData(ShippingDetails[1]);
+      }
+    } else {
+      setFilterData("");
+    }
+  }, [cartTotal(), ShippingDetails, Reward, payType, BillingInformation]);
 
   useEffect(() => {
-    // Number(FilterData?.price) +
     const Total = Math.abs(
-      Number(Coupon ? Coupon.Discount : Number(cartTotal()))
+      Number(FilterData?.price || 0) +
+        Number(Coupon ? Coupon.Discount : Number(cartTotal()))
     ).toFixed(2);
     dispatch(CartTotal(Total));
   }, [FilterData, Coupon, Reward, payType]);
@@ -176,12 +184,15 @@ const YourOrders = () => {
                 <td>{(pointscartTotal() || 0).toFixed(2)}</td>
               </tr> */}
 
-              {/* <tr>
-                <th>Delivery Charges</th>
-                <td>
-                  <i class="fa fa-rupee"></i> {FilterData?.price || 0}.00
-                </td>
-              </tr> */}
+              {payType !== "points" && !BillingInformation?.store_name && (
+                <tr>
+                  <th>Delivery Charges</th>
+                  <td>
+                    {payType != "points" && <i class="fa fa-rupee"></i>}{" "}
+                    {FilterData?.price || 0}.00
+                  </td>
+                </tr>
+              )}
 
               <tr>
                 <th>Grand Total</th>
@@ -204,10 +215,8 @@ const YourOrders = () => {
               severity="success"
               style={{ marginTop: "20px" }}
             >
-              {Coupon.Details?.title} {Coupon?.Details?.discount}{" "}
-              {Coupon?.Details?.type === "amount"
-                ? "Rupees Amount"
-                : "Percentage"}{" "}
+              {Coupon.title} {Coupon?.discount}{" "}
+              {Coupon?.type === "amount" ? "Rupees Amount" : "Percentage"}{" "}
               Discount
             </Alert>
           )}

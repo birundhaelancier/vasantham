@@ -7,6 +7,7 @@ import { AddToCartApi, AddWishlist } from "../../../Redux/Action/CreateActions";
 import Swal from "sweetalert2";
 import { CartListApi } from "../../../Redux/Action/allActions";
 import moment from "moment";
+import LazyLoadImg from "../../../helpers/LazyLoadImage";
 const ProductCard = (props) => {
   let dispatch = useDispatch();
   let history = useHistory();
@@ -29,6 +30,7 @@ const ProductCard = (props) => {
   const [hours, setHours] = useState("00");
   const [minutes, setMinutes] = useState("00");
   const [seconds, setSeconds] = useState("00");
+  const [qtyValue, setqtyValue] = useState({});
   const ChangeAttribute = (data) => {
     setselectpack(data);
     FilterData(data);
@@ -78,7 +80,7 @@ const ProductCard = (props) => {
       aid: filterPack?.id || "",
     };
     dispatch(AddToCartApi(product)).then((res) => {
-      dispatch(CartListApi());
+      type !== "qty" && dispatch(CartListApi());
       if (res?.payload?.status === 1) {
         type !== "qty" &&
           Swal.fire({
@@ -153,11 +155,25 @@ const ProductCard = (props) => {
         });
       }
     } else {
-      setQuantityValues((prevState) => ({
-        ...prevState,
-        ["test" + index]: Number(val),
-      }));
-      setupdate(true);
+      if (
+        Number(product?.pmax_count) > 0
+          ? Number(val) <= Number(product?.pmax_count)
+          : true
+      ) {
+        setQuantityValues((prevState) => ({
+          ...prevState,
+          ["test" + index]: Number(val),
+        }));
+        setupdate(true);
+      } else {
+        Swal.fire({
+          icon: "warning",
+          title: "Warning",
+          text: "Maximum order reached",
+          showConfirmButton: false,
+          timer: 1000,
+        });
+      }
     }
   };
 
@@ -235,14 +251,21 @@ const ProductCard = (props) => {
   const outofStock =
     Number(props?.data?.stock) > 0 && Number(props?.data?.out_of_stock) !== 1;
 
+  let saveamount = Math.round(
+    (filterPack ? filterPack?.price : props?.data.previous_price) -
+      (filterPack
+        ? filterPack?.selling
+        : timer["test" + props.data.id]
+        ? props?.data?.deal_amount
+        : props?.data.discount_price)
+  );
   const SaveAmount = () => {
-    return Math.round(
-      (filterPack ? filterPack?.price : props?.data.previous_price) -
-        (filterPack
-          ? filterPack?.selling
-          : timer["test" + props.data.id]
-          ? props?.data?.deal_amount
-          : props?.data.discount_price)
+    return Number(
+      Math.round(
+        (saveamount /
+          (filterPack ? filterPack?.price : props?.data.previous_price)) *
+          100
+      )
     );
   };
 
@@ -261,20 +284,24 @@ const ProductCard = (props) => {
           }
         }
       >
-        <div className="ribbon-corner ribbon-fold">
-          <span>₹ {SaveAmount()} OFF</span>
-        </div>
+        {SaveAmount() > 0 && (
+          <div className="ribbon-corner ribbon-fold">
+            <span>{SaveAmount()}% OFF</span>
+          </div>
+        )}
         <div className="thumb" style={{ background: props.backGrounds }}>
           <Link
             to={`/product-details-one/${props.data.slug}/${props.data.id}`}
             className="image"
           >
-            <img src={ImageUrl + props.data.photo} alt="Product" />
-            <img
+            {/* <img src={ImageUrl + props.data.photo} alt="Product" /> */}
+            <LazyLoadImg image={ImageUrl + props.data.photo} />
+            <LazyLoadImg image={ImageUrl + props.data.photo} />
+            {/* <img
               className="hover-image"
               src={ImageUrl + props.data.photo}
               alt="Product"
-            />
+            /> */}
           </Link>
 
           {/* <div className="actions">
@@ -299,10 +326,10 @@ const ProductCard = (props) => {
             <div className="re_points">
               Points :{" "}
               {filterPack
-                ? filterPack?.point
+                ? Math.round(filterPack?.point)
                 : timer["test" + props.data.id]
-                ? props.data.deal_point
-                : props.data.point}
+                ? Math.round(props.data.deal_point)
+                : Math.round(props.data.point)}
             </div>
             <div style={{ paddingTop: "5px" }} className="price_crd">
               <div
@@ -314,21 +341,25 @@ const ProductCard = (props) => {
                 <label>Price : </label>{" "}
                 <del>
                   <i className="fa fa-inr" />{" "}
-                  {filterPack ? filterPack?.price : props?.data.previous_price}
+                  {filterPack
+                    ? Math.round(filterPack?.price)
+                    : Math.round(props?.data.previous_price)}
                 </del>
                 {"  "}
                 <span>
                   <i className="fa fa-inr" />{" "}
                   {filterPack
-                    ? filterPack?.selling
+                    ? Math.round(filterPack?.selling)
                     : timer["test" + props.data.id]
-                    ? props?.data?.deal_amount
-                    : props?.data.discount_price}
+                    ? Math.round(props?.data?.deal_amount)
+                    : Math.round(props?.data.discount_price)}
                 </span>
               </div>
-              <div className="save-txt">
-                Save : <i className="fa fa-inr" /> {SaveAmount()}{" "}
-              </div>
+              {saveamount > 0 && (
+                <div className="save-txt">
+                  Save : <i className="fa fa-inr" /> {saveamount}{" "}
+                </div>
+              )}
             </div>
           </h5>
         </div>

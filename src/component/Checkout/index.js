@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { CartListApi } from "../../Redux/Action/allActions";
+import { BranchListsApi, CartListApi } from "../../Redux/Action/allActions";
 import BillingsInfo from "./BillingsInfo";
 import Payment from "./Payment";
 import YourOrders from "./YourOrders";
@@ -11,11 +11,32 @@ const Checkout = () => {
   let dispatch = useDispatch();
   const { TabPane } = Tabs;
   const [showmodal, setshowmodal] = useState(false);
+  const [pincodeList, setpincodeList] = useState([]);
   const BillingInformation = useSelector(
     (state) => state.AllReducer.BillingInformation
   );
+
+  const PincodeList = useSelector((state) => state.AllReducer.PincodeList);
+
+  useEffect(() => {
+    dispatch(BranchListsApi("instore"));
+  }, []);
+
+  useEffect(() => {
+    setpincodeList(PincodeList.map((data) => data.code));
+  }, [PincodeList]);
+
   const TabLists = [
-    { name: "Delivery Address", content: <BillingsInfo /> },
+    {
+      name: "Delivery Address",
+      content: (
+        <BillingsInfo
+          BillingInformation={BillingInformation}
+          PincodeList={pincodeList}
+          OrderBranchs={PincodeList}
+        />
+      ),
+    },
     {
       name: "Pickup store address",
       content: (
@@ -85,7 +106,7 @@ const Checkout = () => {
 
             <div className="col-lg-6 col-md-12 col-sm-12 col-12">
               <YourOrders />
-              <Payment />
+              <Payment PincodeList={pincodeList} OrderBranchs={PincodeList} />
             </div>
           </div>
         </div>

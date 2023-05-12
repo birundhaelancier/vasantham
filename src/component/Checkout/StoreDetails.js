@@ -1,7 +1,7 @@
 import React from "react";
 import { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { BillingDetails, BranchListsApi } from "../../Redux/Action/allActions";
+import { BillingDetails } from "../../Redux/Action/allActions";
 
 export default function StoreDetails(props) {
   const ContactDetails = useSelector((state) => state.AllReducer.Branchlists);
@@ -12,13 +12,10 @@ export default function StoreDetails(props) {
   const [Ind, setInd] = useState("");
   let dispatch = useDispatch();
 
-  useEffect(() => {
-    dispatch(BranchListsApi());
-  }, []);
-
   const SelectedPinStore = (data) => {
     setInd(data?.id);
     setselectedInd(data);
+
     dispatch(BillingDetails(data));
     props.handleClose(false);
   };

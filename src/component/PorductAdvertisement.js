@@ -5,7 +5,8 @@ import Ads from "../assets/img/advertise.png";
 import Ads2 from "../assets/img/ads.png";
 import { BannerImgs } from "../helpers/ListData";
 import { ImageUrl } from "../Redux/Utils/baseurl";
-export default function ProdcutAdvertisement({ ImageData }) {
+import { connect } from "react-redux";
+export default function ProdcutAdvertisement({ ImageData, content }) {
   const [settings, setsettings] = useState({
     arrows: true,
     dots: false,
@@ -44,14 +45,7 @@ export default function ProdcutAdvertisement({ ImageData }) {
   });
   return (
     <div className={`container ${!isMobile ? "pl-0 pr-0" : "pl-3 pr-3"}`}>
-      <Carosal
-        customsettings={settings}
-        content={ImageData?.map((data, index) => (
-          <>
-            <img src={ImageUrl + data} key={index} style={{ width: "100%" }} />
-          </>
-        ))}
-      />
+      <Carosal customsettings={settings} content={content} />
     </div>
   );
 }

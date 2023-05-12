@@ -5,7 +5,6 @@ import NaveItems from "./NaveItems";
 import TopHeader from "./TopHeader";
 import { useHistory } from "react-router-dom";
 import svg from "../../../assets/img/svg/cancel.svg";
-import svgsearch from "../../../assets/img/svg/search.svg";
 import home from "../../../assets/img/home.png";
 import category from "../../../assets/img/category.png";
 import order from "../../../assets/img/order.png";
@@ -37,6 +36,8 @@ import {
   SearchCategory,
   NotificationsApi,
   CartListApi,
+  MenuCategory_List,
+  GetSliderLists,
 } from "../../../Redux/Action/allActions";
 import Avatar from "@mui/material/Avatar";
 import Slider from "react-slick";
@@ -59,7 +60,7 @@ const Header = () => {
   const [click, setClick] = useState(false);
   const [show, setShow] = useState();
   const history = useHistory();
-  const [search, setSearch] = useState(false);
+  const [search, setSearch] = useState(true);
   const [Category, setCategory] = useState([]);
   const [NewMenuData, setNewMenuData] = useState([]);
   const [WishList, setWishList] = useState([]);
@@ -68,9 +69,13 @@ const Header = () => {
     (state) => state.AllReducer.ProfileData?.users
   );
   const AllCategory = useSelector((state) => state.AllReducer.AllCategory);
+  const MenuCategories = useSelector(
+    (state) => state.AllReducer.MenuCategories
+  );
   const Notifications = useSelector((state) => state.AllReducer.Notify);
   const Reward = useSelector((state) => state.AllReducer.RewardPoints);
   const WishListData = useSelector((state) => state.AllReducer.WishList);
+
   const [FilterData, setFilterData] = useState([]);
   const [searchValue, setsearchValue] = useState(null);
   const [SearchList, setSearchList] = useState([]);
@@ -78,9 +83,21 @@ const Header = () => {
   useEffect(() => {
     dispatch(Profile_Details());
     JSON.parse(localStorage.getItem("UserId")) && dispatch(RewardPoints());
-    dispatch(Category_List());
     dispatch(Get_Wishlist());
     dispatch(NotificationsApi());
+    dispatch(GetSliderLists());
+    dispatch(MenuCategory_List("categoryAndsub"));
+
+    dispatch(SearchCategory()).then((res) => {
+      let Data = [];
+      res.payload.product.concat(res.payload.category).map((data) => {
+        Data.push(data);
+      });
+      setFilterData(res.payload);
+      setSearchList(Data);
+    });
+    dispatch(CartListApi());
+    dispatch(Category_List());
   }, []);
 
   useEffect(() => {
@@ -133,39 +150,26 @@ const Header = () => {
   };
 
   useEffect(() => {
-    dispatch(Category_List()).then((res) => {});
-    axios({
-      method: "Get",
-      url: apiurl + "category",
-    }).then((response) => {});
-    dispatch(SearchCategory()).then((res) => {
-      let Data = [];
-      res.payload.product.concat(res.payload.category).map((data) => {
-        Data.push(data);
-      });
-      setFilterData(res.payload);
-      setSearchList(Data);
-    });
-    dispatch(CartListApi());
-  }, []);
-
-  useEffect(() => {
-    let array = [];
-    let newmenu = [];
-    AllCategory.map((val) => {
-      array.push({ name: val.name, href: `/shop/${val.slug}` });
-      if (val.home === 1) {
-        newmenu.push({
-          name: val.name,
-          href: `/shop/${val.slug}`,
-          children: [],
-        });
-      }
-    });
-    setCategory(AllCategory);
-    MenuData[0].children = array;
-    setNewMenuData(newmenu);
-  }, [AllCategory]);
+    // let array = [];
+    // let newmenu = [];
+    // AllCategory?.data?.map((val) => {
+    //   array.push({
+    //     name: val.name,
+    //     href: `/shop/${val.slug}`,
+    //     children: val.subcategories,
+    //   });
+    //   if (val.home === 1) {
+    //     newmenu.push({
+    //       name: val.name,
+    //       href: `/shop/${val.slug}`,
+    //       children: val.subcategories,
+    //     });
+    //   }
+    // });
+    setCategory(MenuCategories);
+    // MenuData[0].children = array;
+    // setNewMenuData(newmenu);
+  }, [MenuCategories]);
 
   const ChangeSearchList = (event, data) => {
     setsearchValue(data);
@@ -202,12 +206,13 @@ const Header = () => {
   };
 
   const HandleChange = (value) => {
-    setSearch(value);
+    // setSearch(value);
     if (value) dispatch({ type: "HandleSearch", payload: { type: true } });
     else {
       dispatch({ type: "HandleSearch", payload: { type: false } });
     }
   };
+
   return (
     <>
       <TopHeader />
@@ -230,6 +235,7 @@ const Header = () => {
                       <div class="wrapper">
                         <div className="input-group md-form form-sm form-1 pl-0 auto_search">
                           <Autocomplete
+                            clearOnBlur
                             onChange={(event, newValue) =>
                               ChangeSearchList(event, newValue)
                             }
@@ -238,6 +244,7 @@ const Header = () => {
                                 component="li"
                                 sx={{ "& > img": { mr: 2, flexShrink: 0 } }}
                                 {...props}
+                                key={option.id}
                               >
                                 {option.photo && (
                                   <img
@@ -253,6 +260,9 @@ const Header = () => {
                             value={searchValue}
                             options={SearchList}
                             getOptionLabel={(option) => option.name}
+                            getOptionSelected={(option, value) =>
+                              option.id === value.id
+                            }
                             renderInput={(params) => (
                               <TextField
                                 {...params}
@@ -409,19 +419,16 @@ const Header = () => {
           </div>
         </div>
         <div className="header-wrappers">
-          {/* <div className="header-bottom header-bottom-color--golden section-fluid sticky-header sticky-color--golden"> */}
           <div className="container">
             <div className="row">
               <div className="col-12 d-flex align-items-center justify-content-start">
                 <div className="main-menu menu-color--black menu-hover-color--golden  d-xl-block">
-                  {NewMenuData?.length > 0 ? (
+                  {Category?.length > 0 ? (
                     <nav>
                       <ul className="menus-list">
-                        {MenuData.map((item, index) => (
-                          <NaveItems item={item} key={index} />
-                        ))}
-                        {NewMenuData.slice(0, 6).map((item, index) => (
-                          <NaveItems item={item} key={index} />
+                        <NaveItems item={Category} all={true} />
+                        {Category.slice(0, 6).map((item, index) => (
+                          <NaveItems item={item} key={index} Index={index} />
                         ))}
                       </ul>
                     </nav>
@@ -456,7 +463,7 @@ const Header = () => {
 
               <div className="mobile-right-side">
                 <ul className="header-action-link action-color--black action-hover-color--golden">
-                  {!search && (
+                  {/* {!search && (
                     <li>
                       <i
                         class="fa fa-search"
@@ -464,7 +471,8 @@ const Header = () => {
                         onClick={() => HandleChange(true)}
                       ></i>
                     </li>
-                  )}
+                  )} */}
+
                   <li>
                     <Link to="/notification" className="offcanvas-icon">
                       <i class="fa fa-bell bell_ic" aria-hidden="true"></i>
@@ -531,7 +539,62 @@ const Header = () => {
                 </ul>
               </div>
             </div>
-            {search && (
+            <div className="SearchView">
+              <div className="search_space">
+                <div class="wrapper">
+                  <div className="input-group md-form form-sm form-1 pl-0 auto_search">
+                    <Autocomplete
+                      clearOnBlur
+                      onChange={(event, newValue) =>
+                        ChangeSearchList(event, newValue)
+                      }
+                      renderOption={(props, option) => (
+                        <Box
+                          component="li"
+                          sx={{ "& > img": { mr: 2, flexShrink: 0 } }}
+                          {...props}
+                          key={option.id}
+                        >
+                          {option.photo && (
+                            <img
+                              loading="lazy"
+                              width="40"
+                              style={{ width: "40px", height: "40px" }}
+                              src={ImageUrl + option?.photo}
+                            />
+                          )}
+                          <span>{option?.name}</span>
+                        </Box>
+                      )}
+                      value={searchValue}
+                      options={SearchList}
+                      getOptionLabel={(option) => option.name}
+                      getOptionSelected={(option, value) =>
+                        option.id === value.id
+                      }
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          size="Normal"
+                          InputLabelProps={{ shrink: false }}
+                          placeholder="Search for products"
+                          InputProps={{
+                            ...params.InputProps,
+                            type: "search",
+                            endAdornment: (
+                              <InputAdornment>
+                                <i className="fa fa-search" />
+                              </InputAdornment>
+                            ),
+                          }}
+                        />
+                      )}
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+            {/* {search && (
               <div className="search_div">
                 <div
                   class="search-icon"
@@ -548,7 +611,7 @@ const Header = () => {
                   onChange={(e) => handleSearch(e.target.value)}
                 />
               </div>
-            )}
+            )} */}
           </div>
         </div>
       </div>
@@ -764,8 +827,6 @@ const Header = () => {
                     className="img_play"
                   />
                 </li>
-
-                <li></li>
               </ul>
             </div>
             <div></div>

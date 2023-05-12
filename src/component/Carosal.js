@@ -5,14 +5,14 @@ export default function Carosal(props) {
   const [settings, setsettings] = useState({
     arrows: true,
     dots: false,
-    infinite: true,
+    infinite: false,
     autoplay: false,
     speed: 500,
     autoplaySpeed: 3000,
     swipeToSlide: false,
     // fade: true,
-    slidesToShow: 6,
-    slidesToScroll: 6,
+    slidesToShow: props.slideshow ? props.slideshow : 6,
+    slidesToScroll: props.sildescroll || 6,
 
     // rows: 2,
     responsive: [

@@ -5,13 +5,13 @@ import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 import { ImageUrl } from "../Redux/Utils/baseurl";
 import { useEffect } from "react";
-import { BranchListsApi, Contact_Us } from "../Redux/Action/allActions";
+import { BranchListsApi } from "../Redux/Action/allActions";
 const ContactUs = () => {
   let dispatch = useDispatch();
   const ContactDet = useSelector((state) => state.AllReducer.Branchlists);
 
   useEffect(() => {
-    dispatch(BranchListsApi());
+    dispatch(BranchListsApi("branchList"));
   }, []);
 
   return (

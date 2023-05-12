@@ -1,19 +1,17 @@
-import React from 'react'
-import Header from '../component/Common/Header'
-import Layout from '../component/MyAccountDashboard/Layout'
-import ChnagePass from '../component/Login/changepassword'
-import Footer from '../component/Common/Footer'
+import React from "react";
+import Header from "../component/Common/Header";
+import Layout from "../component/MyAccountDashboard/Layout";
+import ChnagePass from "../component/Login/changepassword";
+import Footer from "../component/Common/Footer";
 const PasswordChange = () => {
-    return (
-        <>
-             <Header />
-            {/* <Banner title="Customer Dashboard" /> */}
-            <Layout>
-                <ChnagePass />
-            </Layout>
-            <Footer />
-        </>
-    )
-}
+  return (
+    <>
+      <Header />
+      {/* <Banner title="Customer Dashboard" /> */}
+      <ChnagePass />
+      <Footer />
+    </>
+  );
+};
 
-export default PasswordChange
+export default PasswordChange;

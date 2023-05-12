@@ -206,25 +206,22 @@ export const OrderPlaced_Create =
         pincode: billing?.pincode,
         city: billing?.city,
         product: product,
-        shipping: shipping || "",
+        shipping: payment !== "points" && !billing?.store_name ? shipping : "",
         payment: payment === "points" ? "point" : payment,
         payment_id:
           payment_res?.razorpay_payment_id ||
           payment_res?.error?.metadata.payment_id,
         payment_status: payment_res?.error ? "Failed" : "Success",
         amount: total,
-        discount: discount || "",
+        discount: discount?.id || "",
         flag: billing?.store_name ? 1 : 0,
-        branch: billing?.store_name ? billing?.id : "",
-        amc: "",
-        delivery: "",
-        installation: "",
-        award: "",
-        premium: "",
-        premium_amt: "",
+        branch: billing?.store_name ? billing?.id : billing?.branch_id,
         payment_method: payment === "points" ? "point" : payment,
         reward: balance_reward || 0,
         total_reward: rewardpoint?.rewardpoint ? balance_reward : 0,
+        type: discount?.offer_type,
+        offer_type: discount?.type,
+        offer_value: discount?.discount,
       },
     });
     return dispatch({ type: ORDER_CREATE, payload: response.data });
@@ -249,6 +246,7 @@ export const Add_Address = (data) => async (dispatch) => {
         last_name: data.lastname,
         mobile: data.mobileno,
         email: data.email,
+        branch_id: data.branch_id,
       },
     });
     return dispatch({ type: ADD_ADDRESS, payload: response.data });
@@ -277,6 +275,7 @@ export const EditAddressDetails = (data, id) => async (dispatch) => {
         lastname: data.lastname,
         mobile: data.mobileno,
         email: data.email,
+        branch_id: data.branch_id,
       },
     });
     return dispatch({ type: EDIT_ADDRESS, payload: response.data });

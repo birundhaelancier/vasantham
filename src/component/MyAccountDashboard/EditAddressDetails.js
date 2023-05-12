@@ -13,6 +13,8 @@ import {
   City_List,
   Profile_Details,
   BillingDetails,
+  BranchListsApi,
+  PincodeListsApi,
 } from "../../Redux/Action/allActions";
 import { Checkbox } from "@mui/material";
 import { Radio } from "antd";
@@ -20,6 +22,7 @@ import Swal from "sweetalert2";
 import Loading from "../../page/Loading/Loading";
 import { BILLING_INFORMATION } from "../../Redux/Utils/constant";
 import { useHistory, useParams } from "react-router-dom";
+import { PincodeValidation } from "../../helpers/ListData";
 const EditAddressListComp = () => {
   let dispatch = useDispatch();
   let { type, id } = useParams();
@@ -27,14 +30,17 @@ const EditAddressListComp = () => {
   const [mobileerr, setmobileerr] = useState("");
   const [loading, setloading] = useState(false);
   const [emailerr, setemailerr] = useState("");
-  const [pincodeerr, setpincodeerr] = useState("");
+  const [pincodeList, setpincodeList] = useState("");
   const [addAddress, setaddAddress] = useState();
+
   const [changeAddress, setchangeAddress] = useState(false);
   const [AddressId, setAddressId] = useState("");
   const [edit, setedit] = useState(false);
   const ShoppingCarts = useSelector((state) => state.StoreProuct.ShoopingCarts);
   const Address_list = useSelector((state) => state.AllReducer.Address_list);
   const CityList = useSelector((state) => state.AllReducer.City_List);
+  const PincodeList = useSelector((state) => state.AllReducer.PincodeList);
+
   const [Billing_Info, setBilling_Info] = useState({
     firstname: "",
     lastname: "",
@@ -43,6 +49,7 @@ const EditAddressListComp = () => {
     address: "",
     pincode: "",
     city: "",
+    branch_id: "",
   });
 
   const ProfileData = useSelector((state) => state.AllReducer.ProfileData);
@@ -51,6 +58,11 @@ const EditAddressListComp = () => {
     if (key === "pincode") {
       if (Number(data)) {
         Billing_Info.pincode = data;
+        PincodeList?.filter((dtas) => {
+          if (dtas?.code === Billing_Info?.pincode) {
+            Billing_Info.branch_id = dtas?.branch_id;
+          }
+        });
       } else {
         Billing_Info.pincode = "";
       }
@@ -67,14 +79,7 @@ const EditAddressListComp = () => {
           setemailerr("Email is Invalid");
         }
       }
-      if (data && key === "pincode") {
-        var re = /(^\d{6}$)|(^\d{6}-\d{6}$)/;
-        if (re.test(data)) {
-          setpincodeerr("");
-        } else {
-          setpincodeerr("Invalid Pincode");
-        }
-      }
+
       if (data && key === "mobileno") {
         var re = /^(?=.*?[1-9])[0-9()-]+$/;
         if (re.test(data)) {
@@ -91,35 +96,47 @@ const EditAddressListComp = () => {
     }
   };
 
+  useEffect(() => {
+    dispatch(BranchListsApi("branchList"));
+    dispatch(PincodeListsApi());
+  }, []);
+
+  useEffect(() => {
+    setpincodeList(PincodeList.map((data) => data.code));
+  }, [PincodeList]);
+
   const Add_Address_Detail = (e) => {
-    setloading(true);
-    dispatch(Add_Address(Billing_Info)).then((res) => {
-      setloading(false);
-      window.scroll(0, 0);
-      if (res?.payload?.status === 1) {
-        dispatch(Get_Address_List());
-        setchangeAddress(false);
-        setaddAddress("");
-        history.push("/my-account/addresslist");
-        Swal.fire({
-          icon: "success",
-          title: "Success!",
-          text: res?.payload?.response,
-          showConfirmButton: false,
-          timer: 2000,
-        });
-        setchangeAddress(false);
-      }
-      if (res?.payload?.status === 0) {
-        Swal.fire({
-          icon: "warning",
-          title: "Failed!",
-          text: res?.payload?.response,
-          showConfirmButton: false,
-          timer: 2000,
-        });
-      }
-    });
+    if (pincodeList.includes(Billing_Info?.pincode)) {
+      setloading(true);
+
+      dispatch(Add_Address(Billing_Info)).then((res) => {
+        setloading(false);
+        window.scroll(0, 0);
+        if (res?.payload?.status === 1) {
+          dispatch(Get_Address_List());
+          setchangeAddress(false);
+          setaddAddress("");
+          history.push("/my-account/addresslist");
+          Swal.fire({
+            icon: "success",
+            title: "Success!",
+            text: res?.payload?.response,
+            showConfirmButton: false,
+            timer: 2000,
+          });
+          setchangeAddress(false);
+        }
+        if (res?.payload?.status === 0) {
+          Swal.fire({
+            icon: "warning",
+            title: "Failed!",
+            text: res?.payload?.response,
+            showConfirmButton: false,
+            timer: 2000,
+          });
+        }
+      });
+    }
   };
 
   useEffect(() => {
@@ -128,14 +145,6 @@ const EditAddressListComp = () => {
     dispatch(City_List());
   }, []);
 
-  const OnChangeAddressDetails = (id) => {
-    setAddressId(id);
-    Address_list.filter((value, index) => {
-      if (id === value.id) {
-        setaddAddress(value);
-      }
-    });
-  };
   useEffect(() => {
     Address_list.filter((value, index) => {
       if (Number(id) === value.id) {
@@ -170,32 +179,35 @@ const EditAddressListComp = () => {
     });
   };
   const UpdateAddress = () => {
-    dispatch(EditAddressDetails(Billing_Info, id)).then((res) => {
-      setloading(false);
-      window.scroll(0, 0);
-      if (res?.payload?.status === 1) {
-        dispatch(Get_Address_List());
-        setaddAddress("");
-        setAddressId("");
-        Swal.fire({
-          icon: "success",
-          title: "Success!",
-          text: res?.payload?.response,
-          showConfirmButton: false,
-          timer: 2000,
-        });
-        history.push("/my-account/addresslist");
-      }
-      if (res?.payload?.status === 0) {
-        Swal.fire({
-          icon: "warning",
-          title: "Failed!",
-          text: res?.payload?.response,
-          showConfirmButton: false,
-          timer: 2000,
-        });
-      }
-    });
+    if (pincodeList.includes(Billing_Info?.pincode)) {
+      setloading(true);
+      dispatch(EditAddressDetails(Billing_Info, id)).then((res) => {
+        setloading(false);
+        window.scroll(0, 0);
+        if (res?.payload?.status === 1) {
+          dispatch(Get_Address_List());
+          setaddAddress("");
+          setAddressId("");
+          Swal.fire({
+            icon: "success",
+            title: "Success!",
+            text: res?.payload?.response,
+            showConfirmButton: false,
+            timer: 2000,
+          });
+          history.push("/my-account/addresslist");
+        }
+        if (res?.payload?.status === 0) {
+          Swal.fire({
+            icon: "warning",
+            title: "Failed!",
+            text: res?.payload?.response,
+            showConfirmButton: false,
+            timer: 2000,
+          });
+        }
+      });
+    }
   };
 
   const DeleteAddress = (id) => {
@@ -392,6 +404,12 @@ const EditAddressListComp = () => {
                             minLength={6}
                             maxlength={6}
                           />
+                          <div>
+                            {PincodeValidation(
+                              pincodeList,
+                              Billing_Info.pincode
+                            )}
+                          </div>
                         </div>
                       </div>
                     </div>

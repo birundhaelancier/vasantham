@@ -13,7 +13,10 @@ export default function ProductCardOne(props) {
         title={props.data.name}
       >
         <div className="thumb">
-          <Link to={`/shop/${props.data.slug}`} className="image">
+          <Link
+            to={`/product-details-one/${props.data.slug}/${props.data.id}`}
+            className="image"
+          >
             <img src={ImageUrl + props.data.photo} alt="Product" />
             <img
               className="hover-image"

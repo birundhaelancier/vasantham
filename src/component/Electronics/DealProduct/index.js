@@ -13,7 +13,9 @@ const DealProduct = () => {
   let products = useSelector((state) => state?.products?.products);
   products = products?.filter((item) => item?.category === "electronics");
   // const [slideNumber, setSlideNumber] = useState(3)
-  let settings = {
+  const [viewall, setviewall] = useState(false);
+  const [Products, setProducts] = useState([]);
+  const [settings, setsettings] = useState({
     arrows: true,
     dots: false,
     margin: 30,
@@ -49,8 +51,7 @@ const DealProduct = () => {
         },
       },
     ],
-  };
-  const [Products, setProducts] = useState([]);
+  });
   useEffect(() => {
     axios({
       method: "post",
@@ -69,18 +70,21 @@ const DealProduct = () => {
       {Products.length > 0 && (
         <section id="elce_weekly_deal" className="mb-2 today-deal">
           <div className="container">
-            <div className="row">
+            <div className="row todaydel-par">
               <div className="col-lg-12">
                 <div className="left_heading_three text-center w-100 mt-1">
                   <Heading heading={"Today's Deals"} />
+                  <div className="viewall" onClick={() => setviewall(!viewall)}>
+                    View All
+                  </div>
                 </div>
               </div>
             </div>
             <div className="row">
-              <div className={`col-lg-12 ${isMobile && "p-0"}`}>
-                <div className="elce_weekly_slider">
-                  <Slider {...settings}>
-                    {Products?.map((data, index) => (
+              {viewall ? (
+                <>
+                  {Products?.map((data, index) => (
+                    <div className={`col-lg-3 col-6 ${isMobile && "p-0"}`}>
                       <ProductCard
                         data={data}
                         key={index}
@@ -88,10 +92,26 @@ const DealProduct = () => {
                         deals={true}
                         customcss={"deals"}
                       />
-                    ))}
-                  </Slider>
+                    </div>
+                  ))}
+                </>
+              ) : (
+                <div className={`col-lg-12 ${isMobile && "p-0"}`}>
+                  <div className="elce_weekly_slider">
+                    <Slider {...settings}>
+                      {Products?.map((data, index) => (
+                        <ProductCard
+                          data={data}
+                          key={index}
+                          styles={"slider"}
+                          deals={true}
+                          customcss={"deals"}
+                        />
+                      ))}
+                    </Slider>
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
           </div>
         </section>

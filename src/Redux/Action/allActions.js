@@ -34,10 +34,12 @@ import {
   CART_TOTAL,
   REDEEM__HISTORY_POINTS,
   GET_HOTPRODUCT_LIST,
+  MENU_CATEGORIES,
 } from "../Utils/constant";
 import { apiurl, findServer } from "../Utils/baseurl";
 import axios from "axios";
 import moment from "moment";
+import Swal from "sweetalert2";
 export const Get_Slider_List = () => async (dispatch) => {
   const response = await axios({
     method: "GET",
@@ -293,10 +295,10 @@ export const CouponDetails = (value) => async (dispatch) => {
   return dispatch({ type: COUPONCODE, payload: value });
 };
 
-export const Category_List = () => async (dispatch) => {
+export const Category_List = (url) => async (dispatch) => {
   const response = await axios({
     method: "get",
-    url: apiurl + "category",
+    url: `${apiurl}${url ? url : "category"}`,
   });
   return dispatch({ type: CATEGORY_LIST, payload: response.data });
 };
@@ -345,9 +347,17 @@ export const CartTotal = (value) => async (dispatch) => {
 export const NotificationsApi = () => async (dispatch) => {
   const response = await axios({
     method: "get",
-    url: "https://vasanthamhypermart.in/vasantham/api/notification",
+    url: apiurl + "notification",
   });
   return dispatch({ type: NOTIFICATIONS, payload: response?.data });
+};
+
+export const MenuCategory_List = () => async (dispatch) => {
+  const response = await axios({
+    method: "get",
+    url: apiurl + "categoryAndsub",
+  });
+  return dispatch({ type: "MENU_CATEGORIES", payload: response?.data?.data });
 };
 
 export const CartListApi = () => async (dispatch) => {
@@ -361,12 +371,28 @@ export const CartListApi = () => async (dispatch) => {
   return dispatch({ type: "CART_LIST", payload: response.data });
 };
 
-export const BranchListsApi = () => async (dispatch) => {
+export const BranchListsApi = (url) => async (dispatch) => {
   const response = await axios({
     method: "get",
-    url: apiurl + "branchList",
+    url: apiurl + url,
   });
   return dispatch({ type: "BranchList", payload: response.data });
+};
+
+export const PincodeListsApi = () => async (dispatch) => {
+  const response = await axios({
+    method: "get",
+    url: apiurl + "pincode",
+  });
+  return dispatch({ type: "PincodeList", payload: response.data });
+};
+
+export const GetSliderLists = () => async (dispatch) => {
+  const response = await axios({
+    method: "get",
+    url: apiurl + "sliderBelow",
+  });
+  return dispatch({ type: "SLIDER-BELOW", payload: response.data });
 };
 
 export const OffersLists = (point) => async (dispatch) => {
@@ -398,4 +424,22 @@ export const TimerEnd = (date) => async (dispatch) => {
     timer = false;
   }
   return timer;
+};
+
+export const GetLists = (url, method, payload) => async (dispatch) => {
+  try {
+    const response = await axios({
+      method: method,
+      url: apiurl + url,
+      data: payload,
+    });
+    return dispatch({ type: "GETLISTS", payload: response.data });
+  } catch (err) {
+    Swal.fire({
+      icon: "warning",
+      title: "Something went wrong please try again",
+      showConfirmButton: false,
+      timer: 1500,
+    });
+  }
 };

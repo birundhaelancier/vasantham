@@ -1,16 +1,18 @@
 import { QrReader } from "react-qr-reader";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import ModalComp from "./helpers/Modal";
+import { useHistory } from "react-router-dom";
+import { isMobile } from "react-device-detect";
 export default function App() {
   const [data, setData] = useState("");
   const [error, seterror] = useState(false);
   const [scan, setscan] = useState(false);
-
+  const history = useHistory();
   const OnResult = (result, error) => {
     if (!!result) {
       setscan(true);
-      if ("https://vasanthamhypermart.netlify.app/offers" === result?.text) {
-        window.open(result?.text);
+      if ("https://vasanthamstore.com/offers" === result?.text) {
+        history.push("/offers");
       } else {
         seterror(true);
         setData("");
@@ -32,11 +34,20 @@ export default function App() {
       <div style={{ width: 500, height: "400" }}>
         {!scan && (
           <QrReader
-            // style={{ height: 240, width: 200 }}
             style={{ width: "200px", heigth: "100px" }}
             constraints={{
               facingMode: "environment",
             }}
+            scanDelay={500}
+            // videoStyle={{
+            //   borderRadius: 15,
+            // }}
+            // videoId={"video"}
+            deviceId={isMobile && 59}
+            // videoContainerStyle={{
+            //   position: "unset",
+            //   paddingTop: "unset",
+            // }}
             onResult={(result, error) => {
               OnResult(result, error);
             }}
@@ -56,6 +67,7 @@ export default function App() {
               onClick={() => {
                 seterror(false);
                 setData("");
+                history.push("/");
               }}
             >
               Ok

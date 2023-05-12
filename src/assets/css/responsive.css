@@ -357,6 +357,7 @@
 
     .order_table table tbody tr td {
         padding: 5px;
+        text-align: center;
     }
 
     .order_review {

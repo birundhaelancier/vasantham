@@ -94,6 +94,9 @@ body {
 }
 
 .deals {
+  .content .title a {
+    color: #fff !important;
+  }
   // transition: 0.4s all ease-in-out;
   cursor: pointer;
   padding: 0;
@@ -225,7 +228,8 @@ body {
   transform-origin: var(--tor-ribbon-origin);
   width: calc((var(--tor-ribbon-size) + 1em) * 2.25);
   height: 1.8em;
-  color: #fff;
+  color: #333;
+  font-weight: bold;
 }
 .ribbon-corner {
   --tor-ribbon-size: 3em;
@@ -237,5 +241,21 @@ body {
   > span {
     font-family: cursive;
     font-size: 12px;
+  }
+}
+
+.festival {
+  .content .title {
+    .re_points {
+      display: none;
+    }
+    .price_crd,
+    .total_pro_card {
+      display: none;
+    }
+  }
+  .total_pro_card,
+  .hurry_up {
+    display: none;
   }
 }

@@ -46,26 +46,28 @@ const OrderMobile_View = (props) => {
   };
 
   const headings = {
-    // subtotal:"SubTotal",
-    // // reward:"Points",
-    // discount:"Discount",
-    // total:"Total",
-    // deliverycharge:"Delivery Charges",
     subtotal: "PRODUCT COST",
     discount: "DISCOUNT",
-    total_paid: "TOTAL POINTS",
+    subtot: "SUBTOTAL",
+    deliverycharge: "DELIVERY CHARGES",
+    total_paid:
+      OrderDetails?.payment_method === "cash" ? "TOTAL AMOUNT" : "TOTAL POINTS",
   };
 
   const FooterValues = {
-    subtotal: OrderDetails?.discount !== "null" ? Number(cartTotal()) : 0,
-    // reward:OrderDetails?.reward || 0,
+    subtotal: Number(cartTotal()),
     discount:
       (OrderDetails?.discount &&
         JSON.parse(OrderDetails?.discount)?.discount) ||
+      OrderDetails?.offer_value ||
       0,
     total: OrderDetails?.orderTotal,
-    deliverycharge: OrderDetails?.shipping?.price || 0,
+    deliverycharge: OrderDetails?.shipping?.price || "0",
     total_paid: OrderDetails?.orderTotal,
+    subtot: Math.abs(
+      Number(OrderDetails?.orderTotal) -
+        Number(OrderDetails?.shipping?.price || 0)
+    ),
   };
   return (
     <>
@@ -136,7 +138,10 @@ const OrderMobile_View = (props) => {
                       </div>
                       <div className="offcanvas-wishlist-item-details">
                         <span className="offcanvas-wishlist-item-details-quantity">
-                          Points :{" "}
+                          {OrderDetails?.payment_method === "cash"
+                            ? "MRP"
+                            : "Points"}{" "}
+                          :{" "}
                           {data.attribute_price
                             ? data.attribute_price
                             : data.main_price}
@@ -145,7 +150,11 @@ const OrderMobile_View = (props) => {
 
                       <div style={{ color: "green" }}>
                         {" "}
-                        Total Points:{" "}
+                        Total{" "}
+                        {OrderDetails?.payment_method === "cash"
+                          ? "Amount"
+                          : "Points"}
+                        :{" "}
                         {(data.attribute_price
                           ? data.attribute_price
                           : data.main_price) * data.qty}
@@ -160,19 +169,39 @@ const OrderMobile_View = (props) => {
           {Object.keys(headings).map((data) => {
             return (
               <>
-                {FooterValues[data] > 0 && (
+                {["discount", "subtot"].includes(data) &&
+                OrderDetails?.payment_method === "point" ? (
+                  ""
+                ) : (
                   <>
                     <span>{headings[data]}:</span>
                     <span>
+                      {FooterValues[data] > 0 && (
+                        <span
+                          style={{
+                            color:
+                              data === "discount"
+                                ? "green"
+                                : data === "deliverycharge"
+                                ? "red"
+                                : "",
+                          }}
+                        >
+                          {data === "discount"
+                            ? data?.offer_type === "amount"
+                              ? "- "
+                              : "%"
+                            : data === "deliverycharge" &&
+                              FooterValues["deliverycharge"] > 0
+                            ? "+ "
+                            : ""}
+                        </span>
+                      )}{" "}
                       {data === "discount"
                         ? FooterValues["discount"] !== "[]"
                           ? FooterValues[data]
                           : 0
-                        : // data === "total_paid"
-                          // ? Number(FooterValues["total"]) +
-                          //     Number(FooterValues["deliverycharge"]) || 0
-                          // :
-                          (FooterValues[data] && FooterValues[data]) || 0}
+                        : (FooterValues[data] && FooterValues[data]) || 0}
                     </span>
                   </>
                 )}

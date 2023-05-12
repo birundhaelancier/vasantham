@@ -1,58 +1,119 @@
-import React from 'react'
-import { Link } from 'react-router-dom';
-
-// import Img
-// import banner from '../../../assets/img/common/nav_banner.png'
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
 
 const NaveItems = (props) => {
-    return (
-        <>
-            {props.item.mega_menu ? (
-                <li className="has-dropdown has-megaitem">
-                    <a>{props.item.name} <i className="fa fa-angle-down"></i></a>
-                    <div className="mega-menu">
-                        <ul className="mega-menu-inner">
-                            {props.item.children.map((item, index) => (
-                                <li className="mega-menu-item" key={index}>
-                                    <p className="mega-menu-item-title">{item.name}</p>
-                                    <ul className="mega-menu-sub">
-                                        {item.children.map((datas, index) => (
-                                            <div className="sub-list">
-                                                <li key={index}><Link to={datas.href}>{datas.name}</Link></li>
-                                                <li key={index}><Link to={datas.href}>{datas.name}</Link></li>
-                                            </div>
-                                        ))}
-                                    </ul>
-                                </li>
+  const [filterItem, setfilterItem] = useState();
+  const [subfilterItem, setsubfilterItem] = useState();
+  const FilterFun = (data) => {
+    setfilterItem(data);
+  };
+  const SubFilter = (data) => {
+    setsubfilterItem(data);
+  };
+  return (
+    <>
+      {!props.all ? (
+        <li className="has-dropdown">
+          <Link
+            to={`/shop/${props?.item?.slug}`}
+            className="main-menu-link"
+            // onMouseLeave={() => setfilterItem([])}
+          >
+            {props.item.name} {/* {props.item.children.length > 0 && ( */}
+            <i className="fa fa-angle-down"></i>
+            {/* )} */}
+          </Link>
+          {props?.item?.subcategories?.length > 0 && (
+            <>
+              <ul
+                className={`sub-menu ${props.Index > 3 && "singlemenu"} ${
+                  filterItem?.length > 0 && "megamenu"
+                } ${
+                  props.Index > 3 && filterItem?.length > 0 && "navsubmenu"
+                } bg-clr`}
+              >
+                <div>
+                  {props?.item?.subcategories
+                    ?.slice(0, 10)
+                    ?.map((data, index) => (
+                      <li
+                        key={index}
+                        title={data.name}
+                        onMouseEnter={() => FilterFun(data.products)}
+                      >
+                        <Link>{data.name}</Link>
+                      </li>
+                    ))}
+                </div>
+                <div>
+                  {filterItem?.slice(0, 10)?.map((datas, index) => (
+                    <li key={index} title={datas.name}>
+                      <Link to={`/product-details-one/${datas.slug}`}>
+                        {datas.name}
+                      </Link>
+                    </li>
+                  ))}
+                </div>
+              </ul>
+            </>
+          )}
+        </li>
+      ) : (
+        <li className="has-dropdown">
+          <Link
+            // to={`/all-category`}
+            className="main-menu-link"
+            onMouseLeave={() => setfilterItem([])}
+          >
+            {"All "}
+            <i className="fa fa-angle-down"></i>
+          </Link>
 
-                            ))}
-                            <li className="mega-menu-item">
-                                <div className="menu-banner">
-                                    <Link to="/shop" className="menu-banner-link">
-                                        {/* <img className="menu-banner-img" src={banner} alt="img" /> */}
-                                    </Link>
-                                </div>
-                            </li>
-                        </ul>
-                    </div>
-                </li>
-            ) : (
-               
-                <li className="has-dropdown">
-                    <Link to={props.item.href} className="main-menu-link">{props.item.name} {props.item.children.length > 0 && <i className="fa fa-angle-down"></i>}</Link>
-                    {props.item.children.length > 0 && <ul className="sub-menu">
-                        {props.item.children.map((data, index) => (
-                            <li key={index}>
-                                <Link to={data.href}>{data.name}</Link>
-                            </li>
-                        ))}
-                    </ul>}
-                </li>
-            )
-            }
+          {/* {props?.item?.subcategories?.length > 0 && ( */}
+          <>
+            <ul
+              className={`sub-menu ${props.Index > 3 && "singlemenu"} ${
+                filterItem?.length > 0 && "megamenu"
+              } bg-clr`}
+            >
+              <div>
+                {props?.item?.slice(0, 10)?.map((data, index) => (
+                  <li
+                    key={index}
+                    title={data.name}
+                    onMouseEnter={() => FilterFun(data.subcategories)}
+                  >
+                    <Link to={`/shop/${data?.slug}`}>{data.name}</Link>
+                  </li>
+                ))}
+              </div>
+              <div>
+                {filterItem?.slice(0, 10)?.map((datas, index) => (
+                  <li
+                    key={index}
+                    title={datas.name}
+                    onMouseEnter={() => SubFilter(datas?.products)}
+                  >
+                    <Link>{datas.name}</Link>
+                  </li>
+                ))}
+              </div>
+              <div>
+                {subfilterItem?.slice(0, 10)?.map((datas, index) => (
+                  <li key={index} title={datas.name}>
+                    <Link to={`/product-details-one/${datas.slug}`}>
+                      {datas.name}
+                    </Link>
+                  </li>
+                ))}
+              </div>
+            </ul>
+          </>
+          {/* )} */}
+        </li>
+      )}
+    </>
+  );
+};
 
-        </>
-    )
-}
-
-export default NaveItems
+export default NaveItems;

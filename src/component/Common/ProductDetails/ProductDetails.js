@@ -12,6 +12,7 @@ import { AddToCartApi, AddWishlist } from "../../../Redux/Action/CreateActions";
 import EmptyProductLoading from "./EmptyProductLoading";
 import ImagesGalleryComp from "./ImageGallery";
 import moment from "moment";
+
 const ProductDetailsOne = (props) => {
   let dispatch = useDispatch();
   let history = useHistory();
@@ -22,6 +23,8 @@ const ProductDetailsOne = (props) => {
   const [selectpack, setselectpack] = useState();
   const [filterPack, setfilterPack] = useState();
   const [update, setupadte] = useState(false);
+  const [count, setCount] = useState(1);
+
   const [QuantityValues, setQuantityValues] = useState({});
   const Rewards = useSelector((state) => state.AllReducer.RewardPoints);
   const WishList = useSelector((state) => state.AllReducer.WishList);
@@ -34,15 +37,13 @@ const ProductDetailsOne = (props) => {
   const [seconds, setSeconds] = useState("00");
   const [deals, setdeals] = useState(false);
   // Add to cart
-  const OffersCountfun = (data, qty) => {
+  const OffersCountfun = (data, value, qty) => {
     setupadte(false);
 
-    let qtyCheck =
-      Math.abs(data?.max_count - data?.purchased_count) >=
-      QuantityValues["test" + data.id];
+    let qtyCheck = Math.abs(data?.max_count - data?.purchased_count) >= value;
     if (data.is_type === "flash_deal") {
       if (qty === "qty" ? qtyCheck : data?.max_count >= data?.purchased_count) {
-        ProceedAddtoCart(data.id, qty);
+        ProceedAddtoCart(data.id, qty, value);
       } else {
         setdeals(true);
         Swal.fire({
@@ -54,24 +55,38 @@ const ProductDetailsOne = (props) => {
         });
       }
     } else {
-      ProceedAddtoCart(data.id, qty);
+      if (
+        Number(product?.pmax_count) > 0
+          ? value <= Number(product?.pmax_count)
+          : true
+      ) {
+        setupadte(false);
+        ProceedAddtoCart(data.id, qty, value);
+      } else {
+        Swal.fire({
+          icon: "warning",
+          title: "Warning",
+          text: "Maximum order reached",
+          showConfirmButton: false,
+          timer: 1000,
+        });
+      }
     }
   };
-
   const addToCart = async (data) => {
+    alert(data?.id);
     if (JSON.parse(localStorage.getItem("UserId"))) {
-      // if (Rewards?.rewardpoint) {
-      OffersCountfun(data);
+      ProceedAddtoCart(product?.id);
     } else {
       history.push("/login");
     }
   };
 
-  const ProceedAddtoCart = (id, type) => {
+  const ProceedAddtoCart = (id, type, value) => {
     let product = {
       uid: JSON.parse(localStorage.getItem("UserId")),
       pid: id,
-      qty: QuantityValues["test" + id] || 1,
+      qty: value || 1,
       aid: filterPack?.id || "",
       flag: timer ? 1 : 0,
     };
@@ -108,15 +123,8 @@ const ProductDetailsOne = (props) => {
     }
   };
 
-  const [count, setCount] = useState(1);
-
-  const incNum = (id, stock, value) => {
-    !deals &&
-      setQuantityValues((prevState) => ({
-        ...prevState,
-        ["test" + id]: Number(value) + 1,
-      }));
-    if (count > product.stock) {
+  const incNum = (data, value) => {
+    if (value > product.stock) {
       Swal.fire({
         icon: "warning",
         title: "Warning",
@@ -125,29 +133,19 @@ const ProductDetailsOne = (props) => {
         timer: 1000,
       });
     } else {
-      setupadte(true);
+      OffersCountfun(data, value, "qty");
     }
   };
 
-  const decNum = (id, value) => {
-    setQuantityValues((prevState) => ({
-      ...prevState,
-      ["test" + id]: Number(value) - 1,
-    }));
+  const decNum = (data, value) => {
     if (value > 1) {
-      setupadte(true);
+      setCount(value);
+      OffersCountfun(data, value, "qty");
     } else {
       Swal.fire("Sorry!", "Minimum Quantity Reached", "warning");
-      setQuantityValues((prevState) => ({
-        ...prevState,
-        ["test" + id]: 1,
-      }));
+      setCount(1);
     }
   };
-
-  useEffect(() => {
-    update && ShopIds.includes(product?.id) && OffersCountfun(product, "qty");
-  }, [update]);
 
   const ChangeAttribute = (data) => {
     setselectpack(data);
@@ -205,11 +203,10 @@ const ProductDetailsOne = (props) => {
   useEffect(() => {
     let Ids = [];
     ShoopingCarts.map((data, index) => {
-      setQuantityValues((prevState) => ({
-        ...prevState,
-        ["test" + data.id]: data.qty || 1,
-      }));
       Ids.push(data.id);
+      if (Number(productid) === data?.id) {
+        setCount(data.qty);
+      }
     });
     setShopIds(Ids);
   }, [ShoopingCarts]);
@@ -237,6 +234,25 @@ const ProductDetailsOne = (props) => {
       clearInterval(intervalId);
     };
   }, [product]);
+
+  let saveamount = Math.round(
+    (filterPack ? filterPack?.price : product?.previous_price) -
+      (filterPack
+        ? filterPack?.selling
+        : timer["test" + product?.id]
+        ? product?.deal_amount
+        : product?.discount_price)
+  );
+
+  const SaveAmountInPer = () => {
+    return Number(
+      Math.round(
+        (saveamount /
+          (filterPack ? filterPack?.price : product?.previous_price)) *
+          100
+      )
+    );
+  };
 
   return (
     <>
@@ -284,23 +300,29 @@ const ProductDetailsOne = (props) => {
                             ? product?.deal_amount
                             : product.discount_price}
                         </span>
+                        {SaveAmountInPer() > 0 && (
+                          <span className="percen">
+                            {SaveAmountInPer()}% OFF
+                          </span>
+                        )}
                       </div>
                     </div>
 
-                    <div className="save-txt">
-                      Save : <i className="fa fa-inr" />{" "}
-                      {Math.abs(
-                        (filterPack
-                          ? filterPack?.price
-                          : product?.previous_price) -
+                    {saveamount > 0 && (
+                      <div className="save-txt">
+                        Save : <i className="fa fa-inr" />{" "}
+                        {Math.round(
                           (filterPack
-                            ? filterPack?.selling
-                            : timer["test" + product.id]
-                            ? product?.deal_amount
-                            : product.discount_price)
-                      )?.toFixed(2)}{" "}
-                    </div>
-
+                            ? filterPack?.price
+                            : product?.previous_price) -
+                            (filterPack
+                              ? filterPack?.selling
+                              : timer["test" + product.id]
+                              ? product?.deal_amount
+                              : product.discount_price)
+                        )}{" "}
+                      </div>
+                    )}
                     {product.attribute?.length > 0 &&
                       Number(product?.out_of_stock) !== 1 &&
                       Number(product?.stock) > 0 && (
@@ -331,10 +353,7 @@ const ProductDetailsOne = (props) => {
                                   type="button"
                                   className="button"
                                   onClick={() =>
-                                    decNum(
-                                      product.id,
-                                      QuantityValues["test" + product.id]
-                                    )
+                                    decNum(product, Number(count) - 1)
                                   }
                                 >
                                   <i className="fa fa-minus"></i>
@@ -343,7 +362,7 @@ const ProductDetailsOne = (props) => {
                               <input
                                 className="form-control"
                                 type="number"
-                                value={QuantityValues["test" + product.id] || 1}
+                                value={count || 1}
                                 readOnly
                               />
                               <div className="input-group-button">
@@ -351,11 +370,7 @@ const ProductDetailsOne = (props) => {
                                   type="button"
                                   className="button"
                                   onClick={() =>
-                                    incNum(
-                                      product.id,
-                                      product.stock,
-                                      QuantityValues["test" + product.id]
-                                    )
+                                    incNum(product, Number(count) + 1)
                                   }
                                 >
                                   <i className="fa fa-plus"></i>
@@ -394,7 +409,7 @@ const ProductDetailsOne = (props) => {
                               <a
                                 className="theme-btn-one btn-black-overlay btn_sm"
                                 style={{ color: "#fff" }}
-                                onClick={() => addToCart(product)}
+                                onClick={() => addToCart(product?.id)}
                               >
                                 <i className="fa fa-shopping-cart" /> Buy
                               </a>

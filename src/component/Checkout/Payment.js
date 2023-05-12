@@ -3,9 +3,12 @@ import { useDispatch, useSelector } from "react-redux";
 import { useHistory } from "react-router-dom";
 import Swal from "sweetalert2";
 import RazorpayPayment from "../../helpers/RazorPay";
+import razorimg from "../../assets/img/razorpay.jpg";
+import cashfree from "../../assets/img/cashfree.avif";
 import {
   CartTotal,
   CouponDetails,
+  GetLists,
   Get_Address_List,
   PayTypeCashOrPoints,
   Profile_Details,
@@ -21,19 +24,25 @@ import moment from "moment";
 import ModalComp from "../../helpers/Modal";
 import ConfirmPopup from "./ConfirmPopup";
 import { Radio } from "antd";
-const Payment = () => {
+import { cartTotalPrice } from "../../helpers/ListData";
+import { apiurl } from "../../Redux/Utils/baseurl";
+import axios from "axios";
+const Payment = ({ PincodeList }) => {
   const [open, setopen] = useState(false);
   const [value, setvalue] = useState("");
   const [showmodal, setshowmodal] = useState(false);
   const [paytype, setpaytype] = useState(false);
   const [payment_id, setpayment_id] = useState();
   const [checkadd, setcheckadd] = useState(false);
+  const ShippingDetails = useSelector((state) => state.AllReducer.Shipping);
   // const ShoppingCarts=useSelector(state=>state.StoreProuct.ShoopingCarts)
   const ShoppingCarts = useSelector((state) => state.AllReducer.CartLists);
   const Coupon = useSelector((state) => state.AllReducer.Coupon);
   const ProfileDetail = useSelector((state) => state.AllReducer.ProfileData);
   const Address_detail = useSelector((state) => state.AllReducer.Address_list);
   const payType = useSelector((state) => state.AllReducer.payType);
+  const PaymentCheck = useSelector((state) => state.AllReducer.GetListData);
+
   const Cart_Total_Value = useSelector(
     (state) => state.AllReducer.Cart_Total_Value
   );
@@ -114,6 +123,7 @@ const Payment = () => {
     JSON.parse(localStorage.getItem("UserId")) && dispatch(RewardPoints());
     dispatch(Get_Address_List());
     dispatch(CartTotal());
+    dispatch(GetLists("online_payment", "get"));
   }, []);
 
   const RemoveItems = () => {
@@ -164,26 +174,24 @@ const Payment = () => {
               BillingInformation,
               value,
               Cart_Total_Value,
-              Math.round(
-                Number(cartTotal()) - Number(Reward?.rewardpoint || 0)
-              ) > 1000
-                ? 1
-                : 2,
+              ShippingDetails?.[Math.abs(Number(cartTotal())) > 1000 ? 0 : 1]
+                ?.id,
               Reward_Points,
               Reward || "",
               cartTotal(),
-              Coupon?.Details?.id
+              Coupon
             )
           ).then((res) => {
             setloading(false);
             if (res?.payload?.status === 1) {
-              history.push("/order-complete");
               RemoveItems();
               setpayment_id("");
-              dispatch(UserOrders());
+              // dispatch(UserOrders());
               dispatch(CouponDetails(""));
-              payType === "points" &&
+
+              if (payType === "points") {
                 dispatch(RedeemedHistory(Reward?.rewardpoint, RedeemTotal()));
+              }
               Swal.fire({
                 icon: "success",
                 title: "Success!",
@@ -191,6 +199,7 @@ const Payment = () => {
                 showConfirmButton: false,
                 timer: 1500,
               });
+              history.push("/order-complete");
             } else {
               Swal.fire({
                 icon: "warning",
@@ -258,27 +267,24 @@ const Payment = () => {
           BillingInformation,
           value,
           Cart_Total_Value,
-          Math.abs(
-            Number(cartTotal()) - Number(Reward?.rewardpoint || 0),
-            cartTotal()
-          ) > 1000
-            ? 1
-            : 2,
+          ShippingDetails?.[Math.abs(Number(cartTotal())) > 1000 ? 0 : 1]?.id,
           Reward_Points,
           Reward || "",
           response,
-          Coupon?.Details?.id
+          Coupon
         )
       ).then((res) => {
         if (res?.payload?.status === 1) {
-          history.push("/order-complete");
           RemoveItems();
           setcheckadd(false);
           setpayment_id("");
           setloading(false);
           dispatch(UserOrders());
           dispatch(CouponDetails(""));
-          dispatch(RedeemedHistory(Reward?.rewardpoint, RedeemTotal()));
+          if (payType === "points") {
+            dispatch(RedeemedHistory(Reward?.rewardpoint, RedeemTotal()));
+          }
+          history.push("/order-complete");
         } else {
           Swal.fire({
             icon: "warning",
@@ -329,6 +335,28 @@ const Payment = () => {
     localStorage.setItem("carts", JSON.stringify(ShoppingCarts));
   }, [ShoppingCarts]);
 
+  const MiniumOrderCheckFun = async () => {
+    let payload = {
+      amount: cartTotalPrice(ShoppingCarts),
+    };
+    await axios({
+      method: "post",
+      url: apiurl + "minimumAmountOrder",
+      data: payload,
+    }).then((res) => {
+      if (res?.data?.message === "Order placed successfully.") {
+        setshowmodal(true);
+      } else {
+        Swal.fire({
+          icon: "warning",
+          title: res?.data?.message,
+          showConfirmButton: false,
+          timer: 1500,
+        });
+      }
+    });
+  };
+
   const PointCheckFun = () => {
     if (payType === "points") {
       if (Reward.rewardpoint > cartTotal()) {
@@ -348,14 +376,28 @@ const Payment = () => {
         });
       }
     } else {
-      setshowmodal(true);
+      MiniumOrderCheckFun();
     }
   };
 
   const AddressCheckProceed = () => {
-    if (Object.keys(BillingInformation && BillingInformation)?.length > 0)
-      PointCheckFun();
-    else
+    if (Object.keys(BillingInformation && BillingInformation)?.length > 0) {
+      if (BillingInformation?.pincode) {
+        if (PincodeList.includes(BillingInformation?.pincode)) {
+          PointCheckFun();
+        } else {
+          Swal.fire({
+            icon: "warning",
+            title: "warning!",
+            text: "Delivery not available for your location",
+            showConfirmButton: false,
+            timer: 1500,
+          });
+        }
+      } else {
+        PointCheckFun();
+      }
+    } else {
       Swal.fire({
         icon: "warning",
         title: "warning!",
@@ -363,12 +405,18 @@ const Payment = () => {
         showConfirmButton: false,
         timer: 1500,
       });
+    }
   };
 
   const paymentType = (data) => {
     setvalue(data);
     dispatch(PayTypeCashOrPoints(data === "online" ? "cash" : data));
   };
+  useEffect(() => {
+    if (Coupon?.Discount) {
+      setPayments(Payments.splice(0, 1));
+    }
+  }, [Coupon]);
 
   return (
     <>
@@ -392,26 +440,46 @@ const Payment = () => {
                 return (
                   <div className="payment_area_wrappers">
                     <div className="heading_payment" id={`headingOne${index}`}>
-                      <div
-                        data-toggle="collapse"
-                        data-target={`#collapseOne${index}`}
-                        class="accordion-collapse collapse show"
-                        aria-labelledby={`headingOne${index}`}
-                      >
-                        <input
-                          type="radio"
-                          name="payment"
-                          // id={`html${index}`}
-                          value={value}
-                          onChange={(e) => paymentType(data.name)}
-                        />
-                        <label
-                          htmlFor={`html${index}`}
-                          style={{ transform: "up" }}
+                      {PaymentCheck?.online_payment === 0 &&
+                      data.name === "online" ? (
+                        ""
+                      ) : (
+                        <div
+                          data-toggle="collapse"
+                          data-target={`#collapseOne${index}`}
+                          class="accordion-collapse collapse show"
+                          aria-labelledby={`headingOne${index}`}
                         >
-                          {data.label}{" "}
-                        </label>
-                      </div>
+                          <input
+                            type="radio"
+                            name="payment"
+                            // id={`html${index}`}
+                            value={value}
+                            onChange={(e) => paymentType(data.name)}
+                          />
+                          <label
+                            htmlFor={`html${index}`}
+                            style={{ transform: "up" }}
+                            onClick={(e) => paymentType(data.name)}
+                          >
+                            {data.label}{" "}
+                          </label>
+                        </div>
+                      )}
+                      {/* {index === 2 && (
+                        <div class="collapse" id={`collapseOne${index}`}>
+                          <div class="card card-body payment-meth">
+                            <div>
+                              <img src={razorimg} /> <label>Razorpay</label>
+                            </div>
+                            <div
+                              onClick={() => history.push("/cashfree-payment")}
+                            >
+                              <img src={cashfree} /> <label>Cash free</label>
+                            </div>
+                          </div>
+                        </div>
+                      )} */}
                     </div>
                   </div>
                 );

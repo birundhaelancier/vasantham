@@ -8,8 +8,10 @@ import axios from "axios";
 import ProductCardOne from "../Product/ProductCardOne";
 import Carosal from "../../Carosal";
 import ProductCard from "../Product/ProductCard";
+import { useHistory } from "react-router-dom";
 const RelatedProducts = (props) => {
   let dispatch = useDispatch();
+  let history = useHistory();
   const ArrivalList = useSelector((state) => state.AllReducer.Products);
   useEffect(() => {
     dispatch(Get_HomeProduct_List("new"));
@@ -20,11 +22,17 @@ const RelatedProducts = (props) => {
       <section id="product_variation_one" className="pt-4 sort_list container">
         <div className="container-fluid">
           <Heading heading="New Arrivals" />
+          <div
+            className="viewall"
+            onClick={() => history.push(`/view-detail/new`)}
+          >
+            View All
+          </div>
           {ArrivalList?.length > 0 ? (
             <div>
               <Carosal
                 arrows={false}
-                content={ArrivalList?.slice(0, 12).map((data, index) => {
+                content={ArrivalList?.map((data, index) => {
                   return (
                     <div key={index} className={"p-2"}>
                       <ProductCard

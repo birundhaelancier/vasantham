@@ -50,6 +50,7 @@ import Festival from "./page/Festival";
 import Page from "./notify";
 import { useSelector } from "react-redux";
 import AllcategoryDetails from "./page/AllcategoryDetails";
+import ViewallProducts from "./component/Common/ProductDetails/Viewall";
 
 export default function Routes() {
   const PrivateRoute = ({ component: Component, ...rest }) => (
@@ -70,7 +71,6 @@ export default function Routes() {
       <Switch>
         <Route path="/" exact component={Electronics} />
         <Route path="/festival" component={Festival} />
-        {/* <Route path="/cashfree-payment" exact component={CashfreePayment} /> */}
 
         <Route path="/shop/:slug?" exact component={ShopGrid} />
         <Route
@@ -93,6 +93,7 @@ export default function Routes() {
         <Route path="/terms" component={TermsAndCondition} />
         <Route path="/refund" component={Refund} />
         <Route path="/time" component={Time} />
+        <Route path="/view-detail/:slug?" component={ViewallProducts} />
         <Route
           path="/my-account/recent-activities"
           component={RecentActivity}

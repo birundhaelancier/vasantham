@@ -14,7 +14,7 @@ import OrderMobile_View from "./OrderMobileView";
 
 const OrderSuccess = (props) => {
   const history = useHistory();
-
+  const RewardStatus = useSelector((state) => state.AllReducer.Reward_status);
   let { id } = useParams();
   let dispatch = useDispatch();
   const [OrderDetails, setOrderDetails] = useState([]);
@@ -49,7 +49,11 @@ const OrderSuccess = (props) => {
       return (
         total +
         (item.qty || 1) *
-          (item.attribute_price ? item.attribute_price : item.price)
+          (OrderDetails?.payment_method === "cash"
+            ? item.attribute_price
+              ? item.attribute_price
+              : item.price
+            : item.reward_point)
       );
     }, 0);
   };
@@ -58,7 +62,10 @@ const OrderSuccess = (props) => {
     // // reward:"Points",
     // discount:"Discount",
     // total:"Total",
-    subtotal: "PRODUCT COST",
+    subtotal:
+      OrderDetails?.payment_method === "cash"
+        ? "PRODUCT COST"
+        : "PRODUCT POINTS",
     discount: "DISCOUNT",
     subtot: "SUBTOTAL",
     deliverycharge: "DELIVERY CHARGES",
@@ -81,6 +88,14 @@ const OrderSuccess = (props) => {
       Number(OrderDetails?.orderTotal) -
         Number(OrderDetails?.shipping?.price || 0)
     ),
+  };
+
+  const ReturnValue = (payment, data) => {
+    if (payment === "cash") {
+      return data.attribute_price ? data.attribute_price : data.main_price;
+    } else {
+      return data.reward_point;
+    }
   };
 
   return (
@@ -207,7 +222,11 @@ const OrderSuccess = (props) => {
                       <th>IMAGE</th>
                       <th style={{ paddingLeft: " 15px" }}>PRODUCTNAME </th>
                       <th>QUANTITY</th>
-                      <th>POINTS</th>
+                      <th>
+                        {OrderDetails?.payment_method === "cash"
+                          ? "PRICE"
+                          : "POINTS"}
+                      </th>
                       <th>TOTAL</th>
                     </tr>
                     {OrderDetail.map((data, index) => {
@@ -248,9 +267,10 @@ const OrderSuccess = (props) => {
                             >
                               <b>
                                 {" "}
-                                {data.attribute_price
-                                  ? data.attribute_price
-                                  : data.main_price}
+                                {ReturnValue(
+                                  OrderDetails?.payment_method,
+                                  data
+                                )}
                               </b>
                             </h5>
                           </td>
@@ -263,9 +283,10 @@ const OrderSuccess = (props) => {
                               }}
                             >
                               <b>
-                                {(data.attribute_price
-                                  ? data.attribute_price
-                                  : data.main_price) * data.qty}
+                                {ReturnValue(
+                                  OrderDetails?.payment_method,
+                                  data
+                                ) * data.qty}
                               </b>
                             </h5>
                           </td>

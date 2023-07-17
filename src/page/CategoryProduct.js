@@ -85,6 +85,18 @@ const TopPRoduct = () => {
                                             style={{ cursor: "pointer" }}
                                             para="Mauris luctus nisi sapien tristique dignissim"
                                           />
+                                          <div
+                                            className="viewall"
+                                            onClick={() =>
+                                              history.push(
+                                                `/view-detail/${
+                                                  datas?.slug
+                                                }?type=${"category"}`
+                                              )
+                                            }
+                                          >
+                                            View All
+                                          </div>
                                         </div>
                                       </div>
                                       {/* header end */}

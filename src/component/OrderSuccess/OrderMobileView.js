@@ -34,7 +34,11 @@ const OrderMobile_View = (props) => {
       return (
         total +
         (item.qty || 1) *
-          (item.attribute_price ? item.attribute_price : item.main_price)
+          (OrderDetails?.payment_method === "cash"
+            ? item.attribute_price
+              ? item.attribute_price
+              : item.price
+            : item.reward_point)
       );
     }, 0);
   };
@@ -46,7 +50,10 @@ const OrderMobile_View = (props) => {
   };
 
   const headings = {
-    subtotal: "PRODUCT COST",
+    subtotal:
+      OrderDetails?.payment_method === "cash"
+        ? "PRODUCT COST"
+        : "PRODUCT POINTS",
     discount: "DISCOUNT",
     subtot: "SUBTOTAL",
     deliverycharge: "DELIVERY CHARGES",
@@ -68,6 +75,14 @@ const OrderMobile_View = (props) => {
       Number(OrderDetails?.orderTotal) -
         Number(OrderDetails?.shipping?.price || 0)
     ),
+  };
+
+  const ReturnValue = (payment, data) => {
+    if (payment === "cash") {
+      return data.attribute_price ? data.attribute_price : data.main_price;
+    } else {
+      return data.reward_point;
+    }
   };
   return (
     <>
@@ -141,10 +156,7 @@ const OrderMobile_View = (props) => {
                           {OrderDetails?.payment_method === "cash"
                             ? "MRP"
                             : "Points"}{" "}
-                          :{" "}
-                          {data.attribute_price
-                            ? data.attribute_price
-                            : data.main_price}
+                          : {ReturnValue(OrderDetails?.payment_method, data)}
                         </span>
                       </div>
 
@@ -155,9 +167,8 @@ const OrderMobile_View = (props) => {
                           ? "Amount"
                           : "Points"}
                         :{" "}
-                        {(data.attribute_price
-                          ? data.attribute_price
-                          : data.main_price) * data.qty}
+                        {ReturnValue(OrderDetails?.payment_method, data) *
+                          data.qty}
                       </div>
                     </div>
                   </div>

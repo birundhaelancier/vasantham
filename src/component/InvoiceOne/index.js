@@ -40,7 +40,11 @@ const InvoiceOnes = (props) => {
       return (
         total +
         (item.qty || 1) *
-          (item.attribute_price ? item.attribute_price : item.main_price)
+          (OrderDetails?.payment_method === "cash"
+            ? item.attribute_price
+              ? item.attribute_price
+              : item.price
+            : item.reward_point)
       );
     }, 0);
   };
@@ -57,7 +61,10 @@ const InvoiceOnes = (props) => {
   };
 
   const headings = {
-    subtotal: "PRODUCT COST",
+    subtotal:
+      OrderDetails?.payment_method === "cash"
+        ? "PRODUCT COST"
+        : "PRODUCT POINTS",
     discount: "DISCOUNT",
     subtot: "SUBTOTAL",
     deliverycharge: "DELIVERY CHARGES",
@@ -81,6 +88,13 @@ const InvoiceOnes = (props) => {
     ),
   };
 
+  const ReturnValue = (payment, data) => {
+    if (payment === "cash") {
+      return data.attribute_price ? data.attribute_price : data.main_price;
+    } else {
+      return data.reward_point;
+    }
+  };
   return (
     <>
       <section className="theme-invoice-1 pb-100">
@@ -174,7 +188,11 @@ const InvoiceOnes = (props) => {
                         <tr>
                           <th scope="col">#</th>
                           <th scope="col">Products</th>
-                          <th scope="col">price</th>
+                          <th scope="col">
+                            {OrderDetails?.payment_method === "cash"
+                              ? "PRICE"
+                              : "POINTS"}
+                          </th>
                           <th scope="col">Qty</th>
                           <th scope="col">total</th>
                         </tr>
@@ -187,15 +205,17 @@ const InvoiceOnes = (props) => {
                               <td>{data.name}</td>
                               <td>
                                 {" "}
-                                {data.attribute_price
-                                  ? data.attribute_price
-                                  : data.main_price}
+                                {ReturnValue(
+                                  OrderDetails?.payment_method,
+                                  data
+                                )}
                               </td>
                               <td>{data.qty}</td>
                               <td>
-                                {(data.attribute_price
-                                  ? data.attribute_price
-                                  : data.main_price) * data.qty}
+                                {ReturnValue(
+                                  OrderDetails?.payment_method,
+                                  data
+                                ) * data.qty}
                               </td>
                             </tr>
                           </tbody>
@@ -292,9 +312,9 @@ const InvoiceOnes = (props) => {
                                     {OrderDetails?.payment_method === "cash"
                                       ? "MRP - "
                                       : "Points - "}{" "}
-                                    {(data.attribute_price
-                                      ? data.attribute_price
-                                      : data.main_price
+                                    {ReturnValue(
+                                      OrderDetails?.payment_method,
+                                      data
                                     ).toFixed(2) || 0}
                                   </span>
                                 </div>
@@ -306,9 +326,10 @@ const InvoiceOnes = (props) => {
                                     ? "Amount - "
                                     : "Points - "}{" "}
                                   {(
-                                    (data.attribute_price
-                                      ? data.attribute_price
-                                      : data.main_price) * data.qty
+                                    ReturnValue(
+                                      OrderDetails?.payment_method,
+                                      data
+                                    ) * data.qty
                                   )?.toFixed(2)}
                                 </div>
                               </div>

@@ -9,9 +9,11 @@ import { colorSet } from "../../../helpers/ListData";
 import ProdcutAdvertisement from "../../PorductAdvertisement";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { CircularProgress } from "@mui/material";
+import { useHistory } from "react-router-dom";
 
 const TopPRoduct = () => {
   let dispatch = useDispatch();
+  let history = useHistory();
   const Advertisement = useSelector((state) => state.AllReducer.Advertisement);
   const ProductsData = useSelector((state) => state.AllReducer.HotProducts);
   const [hasmore, sethasmore] = useState(true);
@@ -62,7 +64,7 @@ const TopPRoduct = () => {
 
   var flag2 = 1;
 
-  const DealColors = (index) => {
+  const DealColors = () => {
     if (flag2 === 1) {
       flag2 = flag2 + 1;
       return "#e0e7ff";
@@ -122,6 +124,22 @@ const TopPRoduct = () => {
                                         heading={HeaderFun(dd)}
                                         para="Mauris luctus nisi sapien tristique dignissim"
                                       />
+                                      <div
+                                        className="viewall"
+                                        onClick={() =>
+                                          history.push(
+                                            `/view-detail/${
+                                              dd === 0
+                                                ? "hot"
+                                                : dd === 1
+                                                ? "best"
+                                                : "feature"
+                                            }`
+                                          )
+                                        }
+                                      >
+                                        View All
+                                      </div>
                                     </div>
                                   </div>
                                   {/* header end */}

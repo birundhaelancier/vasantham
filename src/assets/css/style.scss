@@ -9720,3 +9720,53 @@ body.modal-open {
     color: #c6d75f;
   }
 }
+.view-rows {
+  display: flex;
+  flex-direction: row;
+  align-items: stretch;
+  overflow: hidden;
+  flex-wrap: wrap;
+  // justify-content: space-between;
+  .view-child {
+    width: 234px;
+    margin: 0px 10px;
+  }
+}
+
+.cards {
+  box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+  .center_heading_two {
+    padding-bottom: 0px;
+    padding: 10px 0px;
+    > h2 {
+      font-size: 26px;
+    }
+  }
+}
+
+.price-fli-child {
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 1px solid #e2e2e2;
+  > h4 {
+    border-bottom: none;
+    margin-bottom: 0px;
+  }
+  > select {
+    min-height: 28px;
+    height: 28px;
+    font-size: 13px;
+    margin-bottom: 8px;
+  }
+}
+.minpri {
+  font-size: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.MuiSlider-root {
+  color: #c6d75f !important;
+  margin-top: 10px;
+}

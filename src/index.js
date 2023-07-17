@@ -9,7 +9,6 @@ import "slick-carousel/slick/slick-theme.css";
 import store from "./Redux/Store/store";
 
 import { Provider } from "react-redux";
-
 // import Custom Css
 import "./assets/css/style.scss";
 import "./assets/css/color.css";

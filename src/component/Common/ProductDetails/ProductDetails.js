@@ -29,6 +29,7 @@ const ProductDetailsOne = (props) => {
   const Rewards = useSelector((state) => state.AllReducer.RewardPoints);
   const WishList = useSelector((state) => state.AllReducer.WishList);
   const ShoopingCarts = useSelector((state) => state.AllReducer.CartLists);
+  const RewardStatus = useSelector((state) => state.AllReducer.Reward_status);
   let { id, productid } = useParams();
   const [timer, settimer] = useState(false);
   const [days, setdays] = useState("00");
@@ -74,9 +75,8 @@ const ProductDetailsOne = (props) => {
     }
   };
   const addToCart = async (data) => {
-    alert(data?.id);
     if (JSON.parse(localStorage.getItem("UserId"))) {
-      ProceedAddtoCart(product?.id);
+      ProceedAddtoCart(product?.id, "", product?.pmin_count);
     } else {
       history.push("/login");
     }
@@ -138,12 +138,12 @@ const ProductDetailsOne = (props) => {
   };
 
   const decNum = (data, value) => {
-    if (value > 1) {
+    if (value >= product?.pmin_count) {
       setCount(value);
       OffersCountfun(data, value, "qty");
     } else {
       Swal.fire("Sorry!", "Minimum Quantity Reached", "warning");
-      setCount(1);
+      setCount(product?.pmin_count || 1);
     }
   };
 
@@ -273,14 +273,16 @@ const ProductDetailsOne = (props) => {
                     <h3>{product.name}</h3>
 
                     <p>{product.sort_details}</p>
-                    <div className="re_points" style={{ fontSize: "16px" }}>
-                      Points :{" "}
-                      {filterPack
-                        ? filterPack?.point
-                        : timer
-                        ? product.deal_point
-                        : product.point}
-                    </div>
+                    {RewardStatus?.reward === 1 && (
+                      <div className="re_points" style={{ fontSize: "16px" }}>
+                        Points :{" "}
+                        {filterPack
+                          ? filterPack?.point
+                          : timer
+                          ? product.deal_point
+                          : product.point}
+                      </div>
+                    )}
 
                     <div style={{ paddingTop: "5px" }} className="price_crd">
                       <div>

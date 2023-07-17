@@ -40,7 +40,6 @@ import {
   GetSliderLists,
 } from "../../../Redux/Action/allActions";
 import Avatar from "@mui/material/Avatar";
-import Slider from "react-slick";
 import {
   FacebookShareButton,
   TwitterShareButton,
@@ -72,6 +71,7 @@ const Header = () => {
   const MenuCategories = useSelector(
     (state) => state.AllReducer.MenuCategories
   );
+  const RewardStatus = useSelector((state) => state.AllReducer.Reward_status);
   const Notifications = useSelector((state) => state.AllReducer.Notify);
   const Reward = useSelector((state) => state.AllReducer.RewardPoints);
   const WishListData = useSelector((state) => state.AllReducer.WishList);
@@ -311,12 +311,13 @@ const Header = () => {
                             <strong>
                               {profileDetails?.first_name || "My Profile"}
                             </strong>
-                          </span>{" "}
+                          </span>
                           <i className="fa fa-angle-down"></i>
                           <ul className="custom_dropdown">
                             <li>
                               <Link to="/my-account">
-                                <i className="fa fa-tachometer"></i> Dashboard
+                                <i className="fa fa-tachometer" />
+                                Dashboard
                               </Link>
                             </li>
                             <li>
@@ -325,15 +326,24 @@ const Header = () => {
                                 <span>My Orders</span>
                               </Link>
                             </li>
+                            {RewardStatus?.reward === 1 && (
+                              <li>
+                                <Link style={{ cursor: "auto" }}>
+                                  <i className="fa fa-product-hunt"></i>
+                                  <span>
+                                    My Reward Points {Reward?.rewardpoint || 0}
+                                  </span>
+                                </Link>
+                              </li>
+                            )}
+
                             <li>
-                              <Link style={{ cursor: "auto" }}>
-                                <i className="fa fa-product-hunt"></i>
-                                <span>
-                                  {" "}
-                                  My Reward Points {Reward?.rewardpoint || 0}
-                                </span>
+                              <Link to="/bills">
+                                <i className="fa fa-money"></i>
+                                <span>My Bills</span>
                               </Link>
                             </li>
+
                             <li>
                               <Link to="/my-account/addresslist">
                                 <i className="fa fa-address-card"></i>

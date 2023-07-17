@@ -8,12 +8,15 @@ const Layout = (props) => {
   let dispatch = useDispatch();
   let { pathname } = useLocation();
   const Reward = useSelector((state) => state.AllReducer.RewardPoints);
+  const RewardStatus = useSelector((state) => state.AllReducer.Reward_status);
   return (
     <>
       <section id="my-account_area" className="pt-4 pb-4">
-        <div className="text-center pt-2 pb-5 reward_dash">
-          My Reward Points <span>{Reward.rewardpoint || 0}</span>
-        </div>
+        {RewardStatus?.reward === 1 && (
+          <div className="text-center pt-2 pb-5 reward_dash">
+            My Reward Points <span>{Reward.rewardpoint || 0}</span>
+          </div>
+        )}
         <div className="container">
           <div className="row">
             <Sidebar />

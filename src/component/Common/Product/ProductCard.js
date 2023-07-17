@@ -24,6 +24,8 @@ const ProductCard = (props) => {
   const Rewards = useSelector((state) => state.AllReducer.RewardPoints);
   const ShoopingCarts = useSelector((state) => state.AllReducer.CartLists);
   const WishList = useSelector((state) => state.AllReducer.WishList);
+  const RewardStatus = useSelector((state) => state.AllReducer.Reward_status);
+
   const [QuantityValues, setQuantityValues] = useState({});
   const [timer, settimer] = useState({});
   const [days, setdays] = useState("00");
@@ -76,7 +78,8 @@ const ProductCard = (props) => {
     let product = {
       uid: JSON.parse(localStorage.getItem("UserId")),
       pid: props.data.id,
-      qty: QuantityValues["test" + props.data.id] || 1,
+      qty:
+        QuantityValues["test" + props.data.id] || props?.data?.pmin_count || 1,
       aid: filterPack?.id || "",
     };
     dispatch(AddToCartApi(product)).then((res) => {
@@ -189,7 +192,17 @@ const ProductCard = (props) => {
         timer: 1000,
       });
     } else {
-      OfferQtyCheck(val, product, index);
+      if (Number(val) >= product?.pmin_count) {
+        OfferQtyCheck(val, product, index);
+      } else {
+        Swal.fire({
+          icon: "warning",
+          title: "Warning",
+          text: "Minimum qty reached!!!",
+          showConfirmButton: false,
+          timer: 1000,
+        });
+      }
     }
   };
 
@@ -246,7 +259,7 @@ const ProductCard = (props) => {
     return () => {
       clearInterval(intervalId);
     };
-  }, [props.date]);
+  }, [props.data]);
 
   const outofStock =
     Number(props?.data?.stock) > 0 && Number(props?.data?.out_of_stock) !== 1;
@@ -323,14 +336,16 @@ const ProductCard = (props) => {
             >
               {props.data.name}
             </Link>
-            <div className="re_points">
-              Points :{" "}
-              {filterPack
-                ? Math.round(filterPack?.point)
-                : timer["test" + props.data.id]
-                ? Math.round(props.data.deal_point)
-                : Math.round(props.data.point)}
-            </div>
+            {RewardStatus?.reward === 1 && (
+              <div className="re_points">
+                Points :{" "}
+                {filterPack
+                  ? Math.round(filterPack?.point)
+                  : timer["test" + props.data.id]
+                  ? Math.round(props.data.deal_point)
+                  : Math.round(props.data.point)}
+              </div>
+            )}
             <div style={{ paddingTop: "5px" }} className="price_crd">
               <div
                 style={{

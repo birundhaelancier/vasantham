@@ -14,6 +14,7 @@ const CartArea = () => {
   const [timer, settimer] = useState(false);
   const [QuantityValues, setQuantityValues] = useState({});
   const ShoppingCarts = useSelector((state) => state.AllReducer.CartLists);
+  const RewardStatus = useSelector((state) => state.AllReducer.Reward_status);
   const columnss = [
     { field: "id", width: 50, headerName: "Remove" },
     { field: "", width: 130, headerName: "Image" },
@@ -53,42 +54,52 @@ const CartArea = () => {
         timer: 1000,
       });
     } else {
-      if (data.is_type === "flash_deal") {
-        if (Math.abs(data?.max_count - data.purchased_count) >= Number(val)) {
-          ProceedAddtoCart(data, val, "qty");
-          setQuantityValues((prevState) => ({
-            ...prevState,
-            ["test" + data?.id]: val,
-          }));
+      if (val >= (data.pmin_count || 1)) {
+        if (data.is_type === "flash_deal") {
+          if (Math.abs(data?.max_count - data.purchased_count) >= Number(val)) {
+            ProceedAddtoCart(data, val, "qty");
+            setQuantityValues((prevState) => ({
+              ...prevState,
+              ["test" + data?.id]: val,
+            }));
+          } else {
+            Swal.fire({
+              icon: "warning",
+              title: "Warning",
+              text: "Maximum order reached",
+              showConfirmButton: false,
+              timer: 1000,
+            });
+          }
         } else {
-          Swal.fire({
-            icon: "warning",
-            title: "Warning",
-            text: "Maximum order reached",
-            showConfirmButton: false,
-            timer: 1000,
-          });
+          if (
+            Number(data?.pmax_count) > 0
+              ? Number(val) <= Number(data?.pmax_count)
+              : true
+          ) {
+            ProceedAddtoCart(data, val, "qty");
+            setQuantityValues((prevState) => ({
+              ...prevState,
+              ["test" + data?.id]: val,
+            }));
+          } else {
+            Swal.fire({
+              icon: "warning",
+              title: "Warning",
+              text: "Maximum order reached",
+              showConfirmButton: false,
+              timer: 1000,
+            });
+          }
         }
       } else {
-        if (
-          Number(data?.pmax_count) > 0
-            ? Number(val) <= Number(data?.pmax_count)
-            : true
-        ) {
-          ProceedAddtoCart(data, val, "qty");
-          setQuantityValues((prevState) => ({
-            ...prevState,
-            ["test" + data?.id]: val,
-          }));
-        } else {
-          Swal.fire({
-            icon: "warning",
-            title: "Warning",
-            text: "Maximum order reached",
-            showConfirmButton: false,
-            timer: 1000,
-          });
-        }
+        Swal.fire({
+          icon: "warning",
+          title: "Warning",
+          text: "Minimum qty reached!!!",
+          showConfirmButton: false,
+          timer: 1000,
+        });
       }
     }
   };
@@ -111,7 +122,7 @@ const CartArea = () => {
     ShoppingCarts.map((data, index) => {
       setQuantityValues((prevState) => ({
         ...prevState,
-        ["test" + data.id]: data.qty || 1,
+        ["test" + data.id]: data.qty,
       }));
       Ids.push(data.id);
     });
@@ -169,9 +180,17 @@ const CartArea = () => {
                         <tr>
                           {columnss.map((data) => {
                             return (
-                              <th className="product_remove">
-                                {data.headerName}
-                              </th>
+                              <>
+                                {["Total Points", "Points"].includes(
+                                  data.headerName
+                                ) && RewardStatus?.reward === 0 ? (
+                                  ""
+                                ) : (
+                                  <th className="product_remove">
+                                    {data.headerName}
+                                  </th>
+                                )}
+                              </>
                             );
                           })}
                         </tr>
@@ -217,17 +236,19 @@ const CartArea = () => {
                                 ? data?.deal_amount
                                 : data.discount_price}
                             </td>
-                            <td className="product_name">
-                              <Link
-                                to={`/product-details-one/${data.slug}/${data.pid}`}
-                              >
-                                {data.aid
-                                  ? attributeFun(data)?.[0]?.point
-                                  : Timer(data?.date, data?.to_date)
-                                  ? data.deal_point
-                                  : data?.point}
-                              </Link>
-                            </td>
+                            {RewardStatus?.reward === 1 && (
+                              <td className="product_name">
+                                <Link
+                                  to={`/product-details-one/${data.slug}/${data.pid}`}
+                                >
+                                  {data.aid
+                                    ? attributeFun(data)?.[0]?.point
+                                    : Timer(data?.date, data?.to_date)
+                                    ? data.deal_point
+                                    : data?.point}
+                                </Link>
+                              </td>
+                            )}
                             <td className="product_quantity">
                               <input
                                 min="1"
@@ -257,18 +278,20 @@ const CartArea = () => {
                                 ) * Number(data.qty)
                               ).toFixed(2)}
                             </td>
-                            <td className="product_total">
-                              {" "}
-                              {Math.abs(
-                                Number(
-                                  data.aid
-                                    ? attributeFun(data)?.[0]?.point
-                                    : Timer(data?.date, data?.to_date)
-                                    ? data.deal_point
-                                    : data?.point
-                                ) * Number(data.qty)
-                              ).toFixed(2)}
-                            </td>
+                            {RewardStatus?.reward === 1 && (
+                              <td className="product_total">
+                                {" "}
+                                {Math.abs(
+                                  Number(
+                                    data.aid
+                                      ? attributeFun(data)?.[0]?.point
+                                      : Timer(data?.date, data?.to_date)
+                                      ? data.deal_point
+                                      : data?.point
+                                  ) * Number(data.qty)
+                                ).toFixed(2)}
+                              </td>
+                            )}
                           </tr>
                         ))}
                       </tbody>
@@ -293,16 +316,18 @@ const CartArea = () => {
                                   {/* <div style={{fontSize:"13px"}}><span>Points <i class="fa fa-inr"/>{" "}{data.points} - Prize <i class="fa fa-inr"/> {data.discount_price} </span></div> */}
                                 </div>
                               </li>
-                              <li>
-                                <div className="table_val">
-                                  {" "}
-                                  {data.aid
-                                    ? attributeFun(data)?.[0]?.point
-                                    : Timer(data?.date, data?.to_date)
-                                    ? data.deal_point
-                                    : data?.point}
-                                </div>
-                              </li>
+                              {RewardStatus?.reward === 1 && (
+                                <li>
+                                  <div className="table_val">
+                                    {" "}
+                                    {data.aid
+                                      ? attributeFun(data)?.[0]?.point
+                                      : Timer(data?.date, data?.to_date)
+                                      ? data.deal_point
+                                      : data?.point}
+                                  </div>
+                                </li>
+                              )}
                               <li>
                                 <div className="table_val">
                                   <i class="fa fa-inr" />{" "}
@@ -343,18 +368,20 @@ const CartArea = () => {
                                   />
                                 </div>
                               </li>
-                              <li>
-                                <div className="table_val">
-                                  Points{" "}
-                                  {Number(
-                                    (data.aid
-                                      ? attributeFun(data)?.[0]?.point
-                                      : Timer(data?.date, data?.to_date)
-                                      ? data.deal_point
-                                      : data?.point) * (data.qty || 1)
-                                  ).toFixed(2)}
-                                </div>
-                              </li>
+                              {RewardStatus?.reward === 1 && (
+                                <li>
+                                  <div className="table_val">
+                                    Points{" "}
+                                    {Number(
+                                      (data.aid
+                                        ? attributeFun(data)?.[0]?.point
+                                        : Timer(data?.date, data?.to_date)
+                                        ? data.deal_point
+                                        : data?.point) * (data.qty || 1)
+                                    ).toFixed(2)}
+                                  </div>
+                                </li>
+                              )}
                             </ul>
                           </div>
                           <div style={{ textAlign: "end" }}>

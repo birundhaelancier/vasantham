@@ -54,7 +54,12 @@ export const Get_HomeProduct_List = (type) => async (dispatch) => {
     url: apiurl + "homeProduct",
     data: { type: type },
   });
-  return dispatch({ type: GET_HOMEPRODUCT_LIST, payload: response.data });
+  return dispatch({
+    type: GET_HOMEPRODUCT_LIST,
+    payload: response?.data?.products
+      ? response?.data?.products
+      : response?.data,
+  });
 };
 
 export const Get_HotProducts_List = (type) => async (dispatch) => {
@@ -393,6 +398,14 @@ export const GetSliderLists = () => async (dispatch) => {
     url: apiurl + "sliderBelow",
   });
   return dispatch({ type: "SLIDER-BELOW", payload: response.data });
+};
+
+export const RewardStatus = () => async (dispatch) => {
+  const response = await axios({
+    method: "get",
+    url: apiurl + "reward_status",
+  });
+  return dispatch({ type: "REWARD-STATUS", payload: response.data });
 };
 
 export const OffersLists = (point) => async (dispatch) => {

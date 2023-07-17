@@ -9,10 +9,12 @@ import { apiurl } from "../../../Redux/Utils/baseurl";
 import { isMobile } from "react-device-detect";
 import Heading from "../../Fashion/Heading";
 import { colorSet, DealColors } from "../../../helpers/ListData";
+import { useHistory } from "react-router-dom";
 const DealProduct = () => {
   let products = useSelector((state) => state?.products?.products);
   products = products?.filter((item) => item?.category === "electronics");
   // const [slideNumber, setSlideNumber] = useState(3)
+  const history = useHistory();
   const [viewall, setviewall] = useState(false);
   const [Products, setProducts] = useState([]);
   const [settings, setsettings] = useState({
@@ -24,6 +26,8 @@ const DealProduct = () => {
     speed: 500,
     slidesToShow: 5,
     slidesToScroll: 2,
+    slide: "div",
+    cssEase: "linear",
     responsive: [
       {
         breakpoint: 1024,
@@ -74,7 +78,10 @@ const DealProduct = () => {
               <div className="col-lg-12">
                 <div className="left_heading_three text-center w-100 mt-1">
                   <Heading heading={"Today's Deals"} />
-                  <div className="viewall" onClick={() => setviewall(!viewall)}>
+                  <div
+                    className="viewall"
+                    onClick={() => history.push(`/view-detail/deal`)}
+                  >
                     View All
                   </div>
                 </div>

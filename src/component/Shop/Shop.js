@@ -19,9 +19,13 @@ const Shop = (props) => {
   const [page, setpage] = useState(1);
   const [Productname, setProductname] = useState("");
   const [FilterSearch, setFilterSearch] = useState([]);
+  const [FilterData, setFilterData] = useState([]);
   const [count, setcount] = useState(32);
+  const [selectType, setselectType] = useState("all");
   const [countscroll, setcountscroll] = useState(1);
   const [pagescroll, setpagescroll] = useState(12);
+  const [slidevalue, setslidevalue] = useState([10, 5000]);
+
   let dispatch = useDispatch();
   const myRef = useRef(null);
   var flag2 = 1;
@@ -120,6 +124,29 @@ const Shop = (props) => {
 
   const executeScroll = () => myRef.current.scrollIntoView();
 
+  const PriceFilterFun = (val) => {
+    setslidevalue(val);
+  };
+
+  useEffect(() => {
+    let filter = [];
+    if (selectType !== "all") {
+      products.filter((val) => {
+        if (
+          selectType !== "points"
+            ? slidevalue[0] <= val?.discount_price &&
+              slidevalue[1] >= val?.discount_price
+            : slidevalue[0] <= val?.point && slidevalue[1] >= val?.point
+        ) {
+          filter.push(val);
+        }
+      });
+      setFilterData(filter);
+    } else {
+      setFilterData(products);
+    }
+  }, [products, slidevalue, selectType]);
+
   return (
     <>
       <section id="shop_main_area" className="pb-100 container">
@@ -138,12 +165,16 @@ const Shop = (props) => {
               HandleChange={(data) => HandleChange(data)}
               SearchFun={(e) => SearchFun(e)}
               executeScroll={() => executeScroll()}
+              pricefilterFun={(val) => PriceFilterFun(val)}
+              TypeofFilterFun={(val) => setselectType(val)}
+              slidevalue={slidevalue}
+              selectType={selectType}
             />
           </div>
 
           <div className="col-md-9 col-lg-9 col-12" ref={myRef}>
             <div className="backgr-shop">
-              {products?.length > 0 ? (
+              {FilterData?.length > 0 ? (
                 <>
                   <div className="container">
                     {!loading ? (
@@ -158,7 +189,7 @@ const Shop = (props) => {
                               <b>Yay! You have seen it all</b>
                             </p>
                           }
-                          hasMore={pagescroll <= products?.length}
+                          hasMore={pagescroll <= FilterData?.length}
                           style={{ overflow: "inherit" }}
                           loader={
                             <div
@@ -176,9 +207,8 @@ const Shop = (props) => {
                               //     (page - 1) * count,
                               //     (page - 1) * count + count
                               //   )
-                              products
-                                ?.slice(0, pagescroll)
-                                ?.map((data, index) => (
+                              FilterData?.slice(0, pagescroll)?.map(
+                                (data, index) => (
                                   <div className="col-md-3 col-6 p-0">
                                     <ProductCard
                                       data={data}
@@ -208,7 +238,8 @@ const Shop = (props) => {
                                       }
                                     />
                                   </div>
-                                ))
+                                )
+                              )
                             }
                           </div>
                         </InfiniteScroll>

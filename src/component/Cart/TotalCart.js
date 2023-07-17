@@ -19,6 +19,7 @@ const TotalCart = (props) => {
   const carts = useSelector((state) => state.AllReducer.CartLists);
   const Reward = useSelector((state) => state.AllReducer.RewardPoints);
   const Coupon = useSelector((state) => state.AllReducer.Coupon);
+  const RewardStatus = useSelector((state) => state.AllReducer.Reward_status);
   const [paytype, setpaytype] = useState(false);
   const payType = useSelector((state) => state.AllReducer.payType);
   const [FilterData, setFilterData] = useState([]);
@@ -116,7 +117,7 @@ const TotalCart = (props) => {
         <div className="coupon_code right">
           <h3>Cart Total</h3>
           <div className="coupon_inner">
-            {payType === "points" && (
+            {payType === "points" && RewardStatus?.reward === 1 && (
               <div className="cart_subtotal">
                 <p>{`Total ${"points"}`}</p>
                 <p className="cart_amount">

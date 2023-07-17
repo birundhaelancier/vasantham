@@ -99,6 +99,12 @@ const CategoryComp = () => {
         >
           <div className="container-fluid">
             <Heading heading="Top Categories" />
+            <div
+              className="viewall"
+              onClick={() => history.push(`/view-detail/category-list`)}
+            >
+              View All
+            </div>
             {Products?.length > 0 && (
               <div>
                 <Carosal

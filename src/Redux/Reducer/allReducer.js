@@ -76,10 +76,11 @@ const initialState = {
   Offerlists: [],
   PincodeList: [],
   GetListData: [],
-  payType: "points",
+  payType: "cash",
   MenuCategories: [],
   LoadingType: "",
   Sliderlists: [],
+  Reward_status: [],
 };
 export default function (state = initialState, action) {
   const { type, payload } = action;
@@ -176,6 +177,8 @@ export default function (state = initialState, action) {
       return { ...state, LoadingType: payload };
     case "SLIDER-BELOW":
       return { ...state, Sliderlists: payload };
+    case "REWARD-STATUS":
+      return { ...state, Reward_status: payload };
     default:
       return state;
   }

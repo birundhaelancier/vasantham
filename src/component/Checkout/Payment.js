@@ -42,7 +42,7 @@ const Payment = ({ PincodeList }) => {
   const Address_detail = useSelector((state) => state.AllReducer.Address_list);
   const payType = useSelector((state) => state.AllReducer.payType);
   const PaymentCheck = useSelector((state) => state.AllReducer.GetListData);
-
+  const RewardStatus = useSelector((state) => state.AllReducer.Reward_status);
   const Cart_Total_Value = useSelector(
     (state) => state.AllReducer.Cart_Total_Value
   );
@@ -166,6 +166,7 @@ const Payment = ({ PincodeList }) => {
                   ? data.deal_amount
                   : data.discount_price,
               qty: data.qty,
+              reward_point: data.point,
             });
           });
           dispatch(
@@ -259,6 +260,7 @@ const Payment = ({ PincodeList }) => {
               ? data.deal_amount
               : data.discount_price,
           qty: data.qty,
+          reward_point: data.point,
         });
       });
       dispatch(
@@ -413,10 +415,10 @@ const Payment = ({ PincodeList }) => {
     dispatch(PayTypeCashOrPoints(data === "online" ? "cash" : data));
   };
   useEffect(() => {
-    if (Coupon?.Discount) {
+    if (Coupon?.Discount || RewardStatus?.reward === 0) {
       setPayments(Payments.splice(0, 1));
     }
-  }, [Coupon]);
+  }, [Coupon, RewardStatus]);
 
   return (
     <>

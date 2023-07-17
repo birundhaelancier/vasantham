@@ -4,6 +4,7 @@ import PullToRefresh from "react-simple-pull-to-refresh";
 import Routes from "./Routes";
 import { isMobile } from "react-device-detect";
 import { useDispatch, useSelector } from "react-redux";
+import { RewardStatus } from "./Redux/Action/allActions";
 
 const App = () => {
   let dispatch = useDispatch();
@@ -24,6 +25,7 @@ const App = () => {
         setloading(false);
       }
     });
+    dispatch(RewardStatus());
   }, []);
   const fakeRequest = () => {
     return new Promise((resolve) => setTimeout(() => resolve(), 0));
